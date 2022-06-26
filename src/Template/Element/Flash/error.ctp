@@ -8,4 +8,23 @@ if (!isset($params['escape']) || $params['escape'] !== false) {
     $message = h($message);
 }
 ?>
-<div class="message error" onclick="this.classList.add('hidden');"><?= $message ?></div>
+
+
+
+<div id="toast-container" class="toast-top-right">
+    <div class="toast toast-error" aria-live="assertive" style="">
+        <div class="toast-message"><?= $message ?>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        setTimeout(function (){
+            $('#toast-container').hide();
+        }, 10000);
+
+    });
+</script>
+
+

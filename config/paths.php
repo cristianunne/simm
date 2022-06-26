@@ -87,3 +87,13 @@ define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . 'vendor' . DS . 'cakephp' . DS . 'c
  */
 define('CORE_PATH', CAKE_CORE_INCLUDE_PATH . DS);
 define('CAKE', CORE_PATH . 'src' . DS);
+
+define('IMG',  WWW_ROOT . 'img' . DS);
+define('PROFILE', IMG . 'profile'. DS);
+define('PROFILE_SHORT', DS .'img'. DS . 'profile'. DS);
+
+define('LOGOS', IMG . 'logos'. DS);
+define('LOGOS_SHORT', DS .'img'. DS . 'logos'. DS);
+
+define('OTROS', IMG . 'otros'. DS);
+define('OTROS_SHORT', DS .'img'. DS . 'otros'. DS);

@@ -14,7 +14,7 @@
  * @var \App\View\AppView $this
  */
 
-$cakeDescription = 'CakePHP: the rapid development php framework';
+$cakeDescription = 'SIMM - Sistema Integrado de Manejo de Maquinarias';
 ?>
 <!DOCTYPE html>
 <html>
@@ -25,34 +25,45 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         <?= $cakeDescription ?>:
         <?= $this->fetch('title') ?>
     </title>
-    <?= $this->Html->meta('icon') ?>
+    <?= $this->Html->meta('icon', 'favicon.png') ?>
 
-    <?= $this->Html->css('base.css') ?>
-    <?= $this->Html->css('style.css') ?>
+
+    <?= $this->Html->css('../bootstrap5.0.2/css/bootstrap.min.css') ?>
+    <!-- FONT AWESOME -->
+    <?= $this->Html->css('../plugins/fontawesome-free/css/all.css') ?>
+    <!-- IonIcons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+    <!-- ADMINLTE -->
+    <?= $this->Html->css('../adminlte/css/adminlte.css') ?>
+    <?= $this->Html->css('../plugins/toastr/toastr.css') ?>
+
+
+    <!-- JS necessary for inicial page -->
+    <?= $this->Html->script('jquery-3.6.0.min.js') ?>
+
+    <?= $this->Html->script('../bootstrap5.0.2/js/bootstrap.bundle.min.js') ?>
+    <?= $this->Html->script('../adminlte/js/adminlte.js') ?>
+
+    <?= $this->Html->css('simm-style.css') ?>
+
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
 </head>
+
 <body>
-    <nav class="top-bar expanded" data-topbar role="navigation">
-        <ul class="title-area large-3 medium-4 columns">
-            <li class="name">
-                <h1><a href=""><?= $this->fetch('title') ?></a></h1>
-            </li>
-        </ul>
-        <div class="top-bar-section">
-            <ul class="right">
-                <li><a target="_blank" href="https://book.cakephp.org/3/">Documentation</a></li>
-                <li><a target="_blank" href="https://api.cakephp.org/3.0/">API</a></li>
-            </ul>
-        </div>
-    </nav>
-    <?= $this->Flash->render() ?>
-    <div class="container clearfix">
+
+    <div class="wrapper">
+
         <?= $this->fetch('content') ?>
     </div>
-    <footer>
-    </footer>
+
 </body>
+
+<?= $this->Html->script('../plugins/toastr/toastr.min.js') ?>
+
 </html>
