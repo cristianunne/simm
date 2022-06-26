@@ -46,10 +46,66 @@ class AppController extends Controller
         ]);
         $this->loadComponent('Flash');
 
+        $this->loadComponent('Auth', [
+            'authorize' => ['Controller'],
+            'authenticate' => [
+                'Form' => [
+                    'fields' => [
+                        'username' => 'email',
+                        'password' => 'password'
+                    ],
+                    'finder' => 'auten'
+                ]
+            ],
+            'loginAction' => [
+                'controller' => 'Users',
+                'action' => 'login'
+            ],
+            'loginRedirect' => [
+                'controller' => 'Pages',
+                'action' => 'index'
+            ],
+            'logoutRedirect' => [
+                'controller' => 'Users',
+                'action' => 'login'
+            ]
+        ]);
+
+
         /*
          * Enable the following component for recommended CakePHP security settings.
          * see https://book.cakephp.org/3/en/controllers/components/security.html
          */
         //$this->loadComponent('Security');
     }
+
+    public function beforeFilter(Event $event)
+    {
+        $this->set('current_user', $this->Auth->user());
+    }
+
+    /**
+     * @param $user
+     * @return bool
+     */
+    public function isAuthorized($user)
+    {
+        //Tendre tres niveles, admingeneral, admin de empresa (Lo llamaremos supervisor) y user de emperesa
+
+        if(isset($user['role']) and ($user['role'] === 'admin'))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function json($data){
+
+        //$this->response->getType('json');
+        //$this->response->withStringBody(json_encode($data));
+        return $this->response->withType('application/json')->withStringBody(json_encode($data));
+
+    }
+
 }
