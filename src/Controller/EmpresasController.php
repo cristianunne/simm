@@ -132,6 +132,10 @@ class EmpresasController extends AppController
                                     //traigo los datos nuevamente y actualizo el current user
 
                                     return $this->redirect(['action' => 'index']);
+                                } //debería controlar por si no guarda en la db
+                                else {
+                                    $this->Flash->error(__('Error al almacenar los cambios en nuestras Bases de Datos. Intenta nuevamente'));
+                                    //debería eliminar la imagen recien subida
                                 }
                             }
 

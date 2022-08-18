@@ -112,6 +112,9 @@ class PagesController extends AppController
         $id_empresa = $session->read('Auth.User.empresas_idempresas');
         $user_role = $session->read('Auth.User.role');
 
+
+
+
         if($user_role == 'admin')
         {
             return $this->redirect(['controller' => 'Pages', 'action' => 'indexAdmin']);
@@ -142,6 +145,13 @@ class PagesController extends AppController
         $user_role = $session->read('Auth.User.role');
         $id_empresa = $session->read('Auth.User.empresas_idempresas');
         $this->set(compact('user_role'));
+
+        //Variable usada para el sidebar
+        $seccion = 'inicio';
+        $sub_seccion = null;
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
 
         try{
             //Consulto si no es el administrador el que esta ingresando

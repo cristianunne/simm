@@ -54,11 +54,9 @@
                                 ['confirm' => __('Dar de Baja la Empresa: {0}?', $empresa->name), 'class' => 'btn btn-danger','escape' => false]) ?>
                         <?php endif;?>
 
-
-
-
-
                     </div>
+
+
                     <div class="col-md-6 card box-simm-shadow" style="margin: 0 auto; padding: 1.25rem">
                         <!-- MUESTRO LA IMAGEN DE PERFIL AQUÍ -->
 

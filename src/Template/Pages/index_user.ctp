@@ -78,9 +78,8 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-arreglos btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'ArreglosMecanicos', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-arreglos btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div class="div_content">
                                 <p class="center text-color-navy">Arreglos Mecánicos</p>
@@ -137,8 +136,7 @@
                 </div>
             </div>
         </div>
-
-
     </div>
-
 </div>
+
+

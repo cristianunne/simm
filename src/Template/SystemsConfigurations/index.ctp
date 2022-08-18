@@ -65,9 +65,8 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-parcela btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'Parcelas', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-parcela btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div>
                                 <p class="center text-color-navy">Parcelas</p>
@@ -77,7 +76,7 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'SystemsConfigurations', 'action' => 'index'],
+                                    ['controller' => 'Productos', 'action' => 'index'],
                                     ['class' => 'btn-simm btn-productos btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div class="div_content">
@@ -97,9 +96,8 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-maquina btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'Maquinas', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-maquina btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div>
                                 <p class="center text-color-navy">Maquinarias</p>
@@ -110,9 +108,8 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-operarios btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'Operarios', 'action' => 'index']
+                                    ,['class' => 'btn-simm btn-operarios btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div>
                                 <p class="center text-color-navy">Operarios</p>
@@ -133,9 +130,8 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-constantes btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'Constantes', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-constantes btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div class="div_content">
                                 <p class="center text-color-navy">Constantes</p>
@@ -146,9 +142,8 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-met-costos btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'MetodCostos', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-met-costos btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div class="div_content">
                                 <p class="center text-color-navy">Metodología de Costos</p>
@@ -158,7 +153,7 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'SystemsConfigurations', 'action' => 'index'],
+                                    ['controller' => 'OperariosMaquinas', 'action' => 'index'],
                                     ['class' => 'btn-simm btn-salarios btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div class="div_content">
@@ -176,9 +171,8 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-precio-destino btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'DestinosProductos', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-precio-destino btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div class="div_content">
                                 <p class="center text-color-navy">Precios por Destinos</p>
@@ -205,3 +199,4 @@
 
     </div>
 </div>
+

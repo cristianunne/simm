@@ -59,9 +59,14 @@
                                 <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
                                     ['action' => 'edit', $centro->idcentros_costos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                    ['action' => 'delete', $centro->idcentros_costos],
-                                    ['confirm' => __('Eliminar {0}?', $centro->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+
+                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                        ['action' => 'delete', $centro->idcentros_costos],
+                                        ['confirm' => __('Eliminar {0}?', $centro->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                <?php endif;?>
+
+
 
                             </td>
 

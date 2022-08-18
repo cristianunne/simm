@@ -54,6 +54,6 @@
 </div>
 
 <?= $this->Html->script('../plugins/popper/umd/popper.min.js') ?>
-<?= $this->Html->script('simm.js') ?>
+
 
 

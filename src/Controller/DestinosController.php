@@ -37,6 +37,13 @@ class DestinosController extends AppController
         $session = $this->request->getSession();
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
 
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'Destinos';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
 
         if(empty($id_empresa)){
             $this->Flash->error(__('Tenemos problemas para procesar la información. Inicie Sesión nuevamente.'));
@@ -52,6 +59,14 @@ class DestinosController extends AppController
 
     public function add()
     {
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'Destinos';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
+
         //Traigo los datos de la sesion
         $session = $this->request->getSession();
         $user_id = $session->read('Auth.User.idusers');
@@ -126,6 +141,13 @@ class DestinosController extends AppController
     {
         try{
 
+            //Variable usada para el sidebar
+            $seccion = 'system';
+            $sub_seccion = 'Destinos';
+
+            $this->set(compact('seccion'));
+            $this->set(compact('sub_seccion'));
+
             $destinos = $this->Destinos->get($id);
 
             if ($this->request->is(['patch', 'post', 'put'])) {
@@ -165,6 +187,13 @@ class DestinosController extends AppController
         $destino = $this->Destinos->get($id);
 
         try{
+
+            //Variable usada para el sidebar
+            $seccion = 'system';
+            $sub_seccion = 'Destinos';
+
+            $this->set(compact('seccion'));
+            $this->set(compact('sub_seccion'));
 
             //Primero elimino la imagen si es que tiene
             $var_aux = false;

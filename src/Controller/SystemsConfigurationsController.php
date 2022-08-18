@@ -27,6 +27,12 @@ class SystemsConfigurationsController extends AppController
 
     public function index()
     {
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'inicio';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
 
     }
 }

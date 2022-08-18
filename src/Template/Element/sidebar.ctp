@@ -39,37 +39,142 @@
         <?php endif;?>
 
         <!-- Sidebar Menu -->
+
+
+
         <nav class="mt-2">
+
+            <label type="text" style="display: none !important;" id="seccion" attr=" <?=$seccion ?>"> </label>
+            <label type="text" style="display: none !important;" id="subseccion" attr=" <?=$sub_seccion ?>"></label>
+            <ul class="nav nav-pills nav-sidebar flex-column" id="prueba_padre">
+                <li class="nav-item">
+                    <?=  $this->Html->link(
+                        '<i class="nav-icon fas fa-tachometer-alt"></i> Inicio',
+                        ['controller' => 'Pages', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false, 'id' => 'nav-icon-inicio']) ?>
+                </li>
+            </ul>
+
+
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
-                <li class="nav-item menu-open">
-                    <a href="#" class="nav-link active">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                <li class="nav-item menu-close" id="arreglos_mecanicos">
+
+                    <a href="#" class="nav-link" id="title-system">
+                        <i class="nav-icon fas fa-tools"></i>
                         <p>
-                            Dashboard
+                            Arreglos Mecánicos
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
+
+                </li>
+
+                <li class="nav-item menu-close" id="configuracion">
+
+                    <a href="#" class="nav-link" id="title-system">
+                        <i class="nav-icon fas fa-cog"></i>
+                        <p>
+                            Configuración
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="./index.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Dashboard v1</p>
-                            </a>
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Inicio',
+                                ['controller' => 'SystemsConfigurations', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-inicio']) ?>
                         </li>
+
+
                         <li class="nav-item">
-                            <a href="./index2.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Dashboard v2</p>
-                            </a>
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Destinos',
+                                ['controller' => 'Destinos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Destinos']) ?>
                         </li>
+
                         <li class="nav-item">
-                            <a href="./index3.html" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Dashboard v3</p>
-                            </a>
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Grupos de Trabajo',
+                                ['controller' => 'Worksgroups', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Worksgroups']) ?>
                         </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Lotes',
+                                ['controller' => 'Lotes', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Lotes']) ?>
+                        </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Parcelas',
+                                ['controller' => 'Parcelas', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Parcelas']) ?>
+                        </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Productos',
+                                ['controller' => 'Productos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Productos']) ?>
+                        </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Maquinas',
+                                ['controller' => 'Maquinas', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Maquinas']) ?>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Operarios',
+                                ['controller' => 'Operarios', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Operarios']) ?>
+                        </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Propietarios',
+                                ['controller' => 'Propietarios', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Propietarios']) ?>
+                        </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Constantes',
+                                ['controller' => 'Constantes', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-Constantes']) ?>
+                        </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Metodología de Costos',
+                                ['controller' => 'MetodCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-MetodCostos']) ?>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Salarios',
+                                ['controller' => 'OperariosMaquinas', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-OperariosMaquinas']) ?>
+                        </li>
+
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Precios por Destinos',
+                                ['controller' => 'DestinosProductos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-system-DestinosProductos']) ?>
+                        </li>
+
                     </ul>
                 </li>
 
@@ -79,3 +184,5 @@
     </div>
     <!-- /.sidebar -->
 </aside>
+
+<?= $this->Html->script('simm.js') ?>

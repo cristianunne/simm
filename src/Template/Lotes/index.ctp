@@ -37,7 +37,7 @@
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
                     <tr>
-
+                        <th scope="col"></th>
                         <th scope="col"><?= $this->Paginator->sort('Nombre') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Descripción') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Provincia') ?></th>
@@ -52,6 +52,10 @@
                     <tbody>
                     <?php foreach ($lotes as $lote): ?>
                         <tr>
+                            <td class="actions" style="text-align: center">
+                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
+                                    ['action' => 'view', $lote->idlotes], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                            </td>
                             <td class="dt-center"><?= h($lote->name) ?></td>
                             <td class="dt-center"><?= h($lote->description) ?></td>
                             <td class="dt-center"><?= h($lote->provincia) ?></td>
@@ -69,9 +73,13 @@
                                 <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
                                     ['action' => 'edit', $lote->idlotes], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                    ['action' => 'delete', $lote->idlotes],
-                                    ['confirm' => __('Eliminar {0}?', $lote->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                        ['action' => 'delete', $lote->idlotes],
+                                        ['confirm' => __('Eliminar {0}?', $lote->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                <?php endif;?>
+
+
 
                             </td>
 

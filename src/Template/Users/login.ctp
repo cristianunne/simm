@@ -9,7 +9,9 @@
             <!-- /.login-logo -->
             <div class="card">
                 <div class="widget-user-imag">
-                    <img class="img-circle img-size-90" src="../img/user" alt="logo">
+                    <?php echo $this->Html->image('user.png', ["alt" => 'User Image' ,
+                        "class" => 'img-circle img-size-90']) ?>
+
                 </div>
 
                 <div class="card-body login-card-body">

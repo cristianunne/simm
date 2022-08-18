@@ -156,7 +156,7 @@ class UsersAdministrationController extends AppController
 
             if ($this->Userstable->save($user)) {
 
-                $session->write('Auth.User', $user);
+                //$session->write('Auth.User', $user);
 
                 $this->Flash->success(__('El usuario ha sido actualizado correctamente'));
 
@@ -166,7 +166,7 @@ class UsersAdministrationController extends AppController
                 $this->Flash->error(__('Error al almacenar el usuario'));
 
             }
-            debug($this->Userstable->erros());
+            //debug($this->Userstable->erros());
             //$this->Flash->error(__('Error al almacenar el usuario'));
 
         }

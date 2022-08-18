@@ -1,8 +1,7 @@
 <?= $this->Html->css('jquery-filestyle.css') ?>
 
 <?= $this->element('header')?>
-
-
+<?= $this->element('sidebar')?>
     <div class="content-wrapper">
         <div class="container">
 

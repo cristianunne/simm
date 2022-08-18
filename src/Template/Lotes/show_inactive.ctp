@@ -37,7 +37,7 @@
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
                     <tr>
-
+                        <th scope="col"></th>
                         <th scope="col"><?= $this->Paginator->sort('Nombre') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Descripción') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Provincia') ?></th>
@@ -52,6 +52,10 @@
                     <tbody>
                     <?php foreach ($lotes as $lote): ?>
                         <tr>
+                            <td class="actions" style="text-align: center">
+                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
+                                    ['action' => 'view', $lote->idlotes], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                            </td>
                             <td class="dt-center"><?= h($lote->name) ?></td>
                             <td class="dt-center"><?= h($lote->description) ?></td>
                             <td class="dt-center"><?= h($lote->provincia) ?></td>

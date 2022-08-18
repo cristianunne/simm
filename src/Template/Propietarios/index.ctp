@@ -37,6 +37,7 @@
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
                     <tr>
+                        <th scope="col"></th>
                         <th scope="col"><?= $this->Paginator->sort('Tipo') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Nombre') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Apellido') ?></th>
@@ -54,10 +55,16 @@
                     <?php foreach ($propietarios as $prop): ?>
                         <?php if($prop->tipo == 'Persona'):  ?>
                             <tr>
+                                <td class="actions" style="text-align: center">
+                                    <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
+                                        ['action' => 'view', $prop->idpropietarios], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                                </td>
+
+
                             <td class="dt-center"><?= h($prop->tipo) ?></td>
                             <td class="dt-center"><?= h($prop->firstname) ?></td>
                             <td class="dt-center"><?= h($prop->lastname) ?></td>
-                            <td class="dt-center"><?= h($prop->card_id) ?></td>
+                            <td class="dt-center"><?= h($prop->dni) ?></td>
                             <td class="dt-center"><?= h($prop->address) ?></td>
                             <td class="dt-center"><?= h($prop->email) ?></td>
 
@@ -82,9 +89,19 @@
                                 <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
                                     ['action' => 'edit', $prop->idpropietarios], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                    ['action' => 'delete', $prop->idpropietarios],
-                                    ['confirm' => __('Eliminar {0}?', $prop->name . $prop->firstname), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                        ['action' => 'delete', $prop->idpropietarios],
+                                        ['confirm' => __('Eliminar {0}?', $prop->name . $prop->firstname), 'class' => 'btn btn-danger','escape' => false]) ?>
+
+                                <?php else: ?>
+
+                                    <?php if($current_user['idusers'] == $prop->user->idusers):  ?>
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                            ['action' => 'delete', $prop->idpropietarios],
+                                            ['confirm' => __('Eliminar {0}?', $prop->name . $prop->firstname), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                    <?php endif;?>
+                                <?php endif;?>
 
                             </td>
 
@@ -100,6 +117,7 @@
                 <table id="tabladata_2" class="table table-bordered table-hover dataTable">
                     <thead>
                     <tr>
+                        <th scope="col"></th>
                         <th scope="col"><?= $this->Paginator->sort('Tipo') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Nombre Empresa') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Dirección') ?></th>
@@ -117,6 +135,11 @@
                         <?php if($prop->tipo == 'Empresa'):  ?>
 
                             <tr>
+                                <td class="actions" style="text-align: center">
+                                    <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
+                                        ['action' => 'view', $prop->idpropietarios], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                                </td>
+
                             <td class="dt-center"><?= h($prop->tipo) ?></td>
                             <td class="dt-center"><?= h($prop->name) ?></td>
                             <td class="dt-center"><?= h($prop->address) ?></td>
@@ -144,9 +167,19 @@
                                 <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
                                     ['action' => 'edit', $prop->idpropietarios], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                    ['action' => 'delete', $prop->idpropietarios],
-                                    ['confirm' => __('Eliminar {0}?', $prop->name . $prop->firstname), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                        ['action' => 'delete', $prop->idpropietarios],
+                                        ['confirm' => __('Eliminar {0}?', $prop->name . $prop->firstname), 'class' => 'btn btn-danger','escape' => false]) ?>
+
+                                <?php else: ?>
+
+                                    <?php if($current_user['idusers'] == $prop->user->idusers):  ?>
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                            ['action' => 'delete', $prop->idpropietarios],
+                                            ['confirm' => __('Eliminar {0}?', $prop->name . $prop->firstname), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                    <?php endif;?>
+                                <?php endif;?>
 
                             </td>
 

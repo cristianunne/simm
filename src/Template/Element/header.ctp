@@ -18,7 +18,7 @@ $email = $session->read('Auth.User.email');
     <!-- Left navbar links -->
     <ul class="navbar-nav">
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/simm/pages/" class="logo">
+            <a href="/pages/" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
                 <?= $this->Html->image('icons/tractor_white.png', ['class' => 'img-logo']); ?>
                 <span class="text-logo"><b>SIMM</b></span>

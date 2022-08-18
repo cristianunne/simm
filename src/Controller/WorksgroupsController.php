@@ -31,6 +31,12 @@ class WorksgroupsController extends AppController
     public function index()
     {
 
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'Worksgroups';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
         //Consulto si la empresa no esta vacia
         //Traigo los datos de la sesion
         $session = $this->request->getSession();
@@ -49,6 +55,12 @@ class WorksgroupsController extends AppController
 
     public function showInactive()
     {
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'Worksgroups';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
         //Consulto si la empresa no esta vacia
         //Traigo los datos de la sesion
         $session = $this->request->getSession();
@@ -68,6 +80,13 @@ class WorksgroupsController extends AppController
 
     public function add()
     {
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'Worksgroups';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
         $worksgroup =  $this->Worksgroups->newEntity();
 
         //Traigo los datos de la sesion
@@ -99,6 +118,12 @@ class WorksgroupsController extends AppController
     public function edit($id = null)
     {
         try{
+            //Variable usada para el sidebar
+            $seccion = 'system';
+            $sub_seccion = 'Worksgroups';
+
+            $this->set(compact('seccion'));
+            $this->set(compact('sub_seccion'));
             $worksgroup =  $this->Worksgroups->get($id);
             if ($this->request->is(['patch', 'post', 'put'])) {
 
