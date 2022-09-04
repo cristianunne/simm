@@ -1,21 +1,21 @@
 <?php
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\ArreglosMecanicosYearTable;
+use App\Model\Table\CostosGruposTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\ArreglosMecanicosYearTable Test Case
+ * App\Model\Table\CostosGruposTable Test Case
  */
-class ArreglosMecanicosYearTableTest extends TestCase
+class CostosGruposTableTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \App\Model\Table\ArreglosMecanicosYearTable
+     * @var \App\Model\Table\CostosGruposTable
      */
-    public $ArreglosMecanicosYear;
+    public $CostosGrupos;
 
     /**
      * Fixtures
@@ -23,11 +23,8 @@ class ArreglosMecanicosYearTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.ArreglosMecanicosYear',
-        'app.Users',
-        'app.Worksgroups',
-        'app.Maquinas',
-        'app.Parcelas',
+        'app.CostosGrupos',
+        'app.Hashes',
     ];
 
     /**
@@ -38,8 +35,8 @@ class ArreglosMecanicosYearTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::getTableLocator()->exists('ArreglosMecanicosYear') ? [] : ['className' => ArreglosMecanicosYearTable::class];
-        $this->ArreglosMecanicosYear = TableRegistry::getTableLocator()->get('ArreglosMecanicosYear', $config);
+        $config = TableRegistry::getTableLocator()->exists('CostosGrupos') ? [] : ['className' => CostosGruposTable::class];
+        $this->CostosGrupos = TableRegistry::getTableLocator()->get('CostosGrupos', $config);
     }
 
     /**
@@ -49,7 +46,7 @@ class ArreglosMecanicosYearTableTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->ArreglosMecanicosYear);
+        unset($this->CostosGrupos);
 
         parent::tearDown();
     }
@@ -70,6 +67,16 @@ class ArreglosMecanicosYearTableTest extends TestCase
      * @return void
      */
     public function testValidationDefault()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test buildRules method
+     *
+     * @return void
+     */
+    public function testBuildRules()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

@@ -24,10 +24,6 @@
 
 
             <div class="card-body table-responsive">
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Constante', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'Constantes', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
 
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>

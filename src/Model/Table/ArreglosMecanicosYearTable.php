@@ -54,6 +54,13 @@ class ArreglosMecanicosYearTable extends Table
             'joinType' => 'INNER'
         ]);
 
+        $this->hasOne('Parcelas', [
+            'foreignKey' => 'idparcelas',
+            'bindingKey' => 'parcelas_idparcelas', //actual
+            'joinType' => 'INNER'
+        ]);
+
+
     }
 
     /**
@@ -84,15 +91,15 @@ class ArreglosMecanicosYearTable extends Table
             ->allowEmptyString('concepto');
 
         $validator
-            ->numeric('mano_obra')
+            ->decimal('mano_obra')
             ->allowEmptyString('mano_obra');
 
         $validator
-            ->numeric('repuestos')
+            ->decimal('repuestos')
             ->allowEmptyString('repuestos');
 
         $validator
-            ->numeric('total')
+            ->decimal('total')
             ->allowEmptyString('total');
 
         $validator

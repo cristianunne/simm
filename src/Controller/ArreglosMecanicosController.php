@@ -16,12 +16,12 @@ class ArreglosMecanicosController extends AppController
     {
         if (isset($user['role']) and $user['role'] === 'user') {
             if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'showInactive',
-                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos'])) {
+                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos', 'remove'])) {
                 return true;
             }
         } else if (isset($user['role']) and $user['role'] === 'supervisor') {
             if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'showInactive',
-                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos'])) {
+                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos', 'remove'])) {
                 return true;
             }
         }
@@ -34,8 +34,8 @@ class ArreglosMecanicosController extends AppController
     {
 
         //Variable usada para el sidebar
-        $seccion = 'Arreglos_Mecanicos';
-        $sub_seccion = 'Agregar';
+        $seccion = 'arreglos_mecanicos';
+        $sub_seccion = 'Inicio';
 
         $this->set(compact('seccion'));
         $this->set(compact('sub_seccion'));
@@ -46,6 +46,14 @@ class ArreglosMecanicosController extends AppController
         $user_id = $session->read('Auth.User.idusers');
         $user_role = $session->read('Auth.User.role');
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+
+        if(empty($id_empresa))
+        {
+            $this->Flash->error(__('Tenemos problemas para procesar la información. Inicie Sesión nuevamente.'));
+            return $this->redirect(['controller' => 'Pages', 'action' => 'index']);
+        }
+
 
         $arregos_model = $this->loadModel('arreglos_mecanicos_year');
 
@@ -63,8 +71,9 @@ class ArreglosMecanicosController extends AppController
     {
 
         //Variable usada para el sidebar
-        $seccion = 'Arreglos_Mecanicos';
-        $sub_seccion = 'Agregar';
+        //Variable usada para el sidebar
+        $seccion = 'arreglos_mecanicos';
+        $sub_seccion = '';
 
         $this->set(compact('seccion'));
         $this->set(compact('sub_seccion'));
@@ -75,6 +84,13 @@ class ArreglosMecanicosController extends AppController
         $user_id = $session->read('Auth.User.idusers');
         $user_role = $session->read('Auth.User.role');
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        if(empty($id_empresa))
+        {
+            $this->Flash->error(__('Tenemos problemas para procesar la información. Inicie Sesión nuevamente.'));
+            return $this->redirect(['controller' => 'Pages', 'action' => 'index']);
+        }
+
 
         $arreglos = $this->ArreglosMecanicos->newEntity();
 
@@ -116,6 +132,7 @@ class ArreglosMecanicosController extends AppController
 
         $this->set(compact('lotes_data'));
 
+
         if ($this->request->is('post')) {
 
             $data = $this->request->getData();
@@ -140,6 +157,7 @@ class ArreglosMecanicosController extends AppController
     public function view($id = null)
     {
 
+
         if(is_null($id))
         {
             return $this->redirect(['controller' => 'ArreglosMecanicos', 'action' => 'index']);
@@ -147,9 +165,8 @@ class ArreglosMecanicosController extends AppController
 
             try{
 
-                //Variable usada para el sidebar
-                $seccion = 'system';
-                $sub_seccion = 'Parcelas';
+                $seccion = 'arreglos_mecanicos';
+                $sub_seccion = '';
 
                 $this->set(compact('seccion'));
                 $this->set(compact('sub_seccion'));
@@ -184,15 +201,16 @@ class ArreglosMecanicosController extends AppController
 
     public function edit($id = null)
     {
+
+
         if(is_null($id))
         {
             return $this->redirect(['controller' => 'ArreglosMecanicos', 'action' => 'index']);
         } else {
 
 
-            //Variable usada para el sidebar
-            $seccion = 'Arreglos_Mecanicos';
-            $sub_seccion = 'Agregar';
+            $seccion = 'arreglos_mecanicos';
+            $sub_seccion = '';
 
             $this->set(compact('seccion'));
             $this->set(compact('sub_seccion'));
@@ -203,6 +221,13 @@ class ArreglosMecanicosController extends AppController
             $user_id = $session->read('Auth.User.idusers');
             $user_role = $session->read('Auth.User.role');
             $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+            if(empty($id_empresa))
+            {
+                $this->Flash->error(__('Tenemos problemas para procesar la información. Inicie Sesión nuevamente.'));
+                return $this->redirect(['controller' => 'Pages', 'action' => 'index']);
+            }
+
 
             $bool_has_lote = false;
 
@@ -423,7 +448,9 @@ class ArreglosMecanicosController extends AppController
 
             if($option_select == 'Fecha')
             {
-                return null;
+                $fecha_desde = $data[0];
+                $fecha_hasta = $data[1];
+                $array_data = $this->getDataByFecha($fecha_desde, $fecha_hasta);
 
             } elseif ($option_select == 'Grupo') {
 
@@ -454,9 +481,21 @@ class ArreglosMecanicosController extends AppController
     }
 
 
-    private function getDataByFecha()
+    private function getDataByFecha($fecha_desde = null, $fecha_hasta = null)
     {
-        return null;
+        $this->autoRender =  false;
+        $data = [];
+
+        //return [$fecha_desde, $fecha_hasta];
+
+        //no uso all_date dado que tengo el rango de fechas
+
+        $data = $this->ArreglosMecanicos->find('all', [
+            'contain' => ['Users', 'Maquinas', 'Worksgroups']
+        ])->where(['ArreglosMecanicos.fecha >=' => strval($fecha_desde), 'ArreglosMecanicos.fecha <=' => strval($fecha_hasta)])
+            ->toArray();
+
+        return $data;
     }
 
     private function getDataByGrupo($grupo = null, $all_date = null)
@@ -481,8 +520,6 @@ class ArreglosMecanicosController extends AppController
                 ->toArray();
 
         }
-
-
 
         return $data;
 
@@ -579,7 +616,6 @@ class ArreglosMecanicosController extends AppController
 
     }
 
-
     public function delete()
     {
         $this->autoRender =  false;
@@ -613,6 +649,38 @@ class ArreglosMecanicosController extends AppController
         }
 
         return $this->json(['result' => false]);
+    }
+
+    public function remove($id = null){
+        $this->request->allowMethod(['post', 'delete']);
+        try{
+
+            //Variable usada para el sidebar
+            $seccion = 'system';
+            $sub_seccion = 'Parcelas';
+
+            $this->set(compact('seccion'));
+            $this->set(compact('sub_seccion'));
+
+            $arreglos =  $this->ArreglosMecanicos->get($id);
+
+            if ($this->ArreglosMecanicos->delete($arreglos)) {
+                $this->Flash->success(__('El Registro ha sido eliminado.'));
+
+                return $this->redirect(['action' => 'index']);
+            } else {
+                $this->Flash->error(__('El Registro no pudo ser eliminada. Intente nuevamente.'));
+            }
+        }
+        catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+        }
+        catch (Exception $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+        }
     }
 
 

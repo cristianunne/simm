@@ -32,8 +32,11 @@
                             </div>
 
                             <div class="form-group">
-                                <?=  $this->Form->label('Valor: ') ?>
-                                <?= $this->Form->number('value', ['class' => 'form-control', 'placeholder' => 'Valor', 'required']) ?>
+
+                                <div class="form-group">
+                                    <?= $this->Form->input('value', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor: ']) ?>
+                                </div>
+
                             </div>
 
                             <br>

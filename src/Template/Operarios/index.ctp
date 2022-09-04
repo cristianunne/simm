@@ -86,8 +86,6 @@
                                         ['action' => 'edit', $oper->idoperarios], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
 
-
-
                                     <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
                                         <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                             ['action' => 'delete', $oper->idoperarios],

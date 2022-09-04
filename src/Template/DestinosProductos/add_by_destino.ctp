@@ -34,8 +34,10 @@
                         <br>
 
                         <div class="form-group" id="group-dni" >
-                            <?= $this->Form->label('Precio: ') ?>
-                            <?= $this->Form->number('precio', ['class' => 'form-control', 'placeholder' => 'Precio', 'required']) ?>
+
+                            <?= $this->Form->input('precio', ['class' => 'form-control', 'type' => 'number',
+                                'label' => 'Precio: ', 'required']) ?>
+
                         </div>
 
                         <div class="form-group" style="margin-top: 40px;">

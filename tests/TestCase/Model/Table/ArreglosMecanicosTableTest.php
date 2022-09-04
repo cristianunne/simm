@@ -24,6 +24,10 @@ class ArreglosMecanicosTableTest extends TestCase
      */
     public $fixtures = [
         'app.ArreglosMecanicos',
+        'app.Users',
+        'app.Worksgroups',
+        'app.Maquinas',
+        'app.Parcelas',
     ];
 
     /**

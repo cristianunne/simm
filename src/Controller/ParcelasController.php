@@ -289,7 +289,7 @@ class ParcelasController extends AppController
     {
         $this->autoRender = false;
 
-        $array_localidad = ['texto' => 'cristian'];
+        //$array_localidad = ['texto' => 'cristian'];
 
 
         $lote = $_POST['lote'];

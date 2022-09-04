@@ -207,6 +207,8 @@ $(function (){
 
         seccion = $.trim(seccion.toString());
         subseccion = $.trim(subseccion.toString());
+
+
         let item = "nav-icon-" + seccion;
         let item_Active = $("#" + item);
         item_Active.addClass('active');
@@ -227,6 +229,8 @@ $(function (){
             //obtengo el ul padre
             //let padre = item_Active.parent().parent().attr('id');
             let padre_principal = sub_item_Active.parent().parent().parent();
+
+
             $(padre_principal).addClass('menu-open');
 
             let titulo = "title-" + seccion.toString();
@@ -235,7 +239,7 @@ $(function (){
             sub_item_Active.empty();
             if(subseccion === 'Worksgroups')
             {
-                sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Grupos de Taabajo')
+                sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Grupos de Trabajo')
             } else if(subseccion === 'MetodCostos')
             {
                 sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Metodología de Costos')
@@ -248,6 +252,10 @@ $(function (){
             {
                 sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Precios por Destino')
             }
+            else if(subseccion === 'Centros_costos')
+            {
+                sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Centros de Costos')
+            }
             else {
                 sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + subseccion)
             }
@@ -258,6 +266,8 @@ $(function (){
 
     }
 });
+
+/* CONTROL DE SIDEBAR */
 
 
 function removeActiveClass()
@@ -596,6 +606,11 @@ function filterArreglos()
         //COnsutlo la opcion elegida para obtener el valor
         if(option_filter_arreglos === 'Fecha'){
             //Obtengo las fechas de los inputs
+            let value_fecha_1 = $("#fecha_desde").val().toString();
+            let value_fecha_2 = $("#fecha_hasta").val().toString();
+            all_date = null;
+            values.push(value_fecha_1);
+            values.push(value_fecha_2);
 
         } else if (option_filter_arreglos === 'Grupo') {
             value_filter_arreglos = $("#groups_modal").val();
@@ -631,8 +646,8 @@ function filterArreglos()
             },
             success: function(data, textStatus){
 
-               //console.log(data);
-                loadDataFromArreglos(table, data);
+               console.log(data);
+               loadDataFromArreglos(table, data);
 
 
             },
@@ -741,3 +756,193 @@ function deleteRow(row)
         .remove()
         .draw();
 }
+
+
+
+/***** FUNCIONES PARA ADDCOSTOS MAQUINAS**************/
+
+function selectGroups(option){
+
+    //OBtengo el value del select
+    let option_select = $(option).val().toString();
+
+    //OBtengo el id de la maquina
+    let id_maquina = $("#name_maquina").attr('attr').toString();
+    //alert(option_select);
+
+    if ((option_select === undefined || option_select === '' || option_select == null) ||
+        (id_maquina === undefined || id_maquina === '' || id_maquina == null))
+    {
+        //Informo el error
+        alert("Tenemos poblemas al procesar la solicitud. Intente nuevamente");
+    } else {
+
+        getCentroCostos(id_maquina, option_select);
+
+    }
+}
+
+function getCentroCostos(id_maquina = null, id_group = null)
+{
+
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: '../getCentroCostosByMaquinaAndGroups',
+        data: {'worksgroup' : id_group, 'maquina' : id_maquina},
+
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        },
+        success: function(data, textStatus){
+
+            console.log(data);
+            loadCentroCostosToSelect(data);
+
+        },
+        error: function (data) {
+        }
+    });
+
+}
+function loadCentroCostosToSelect(data) {
+
+    let control = $("#select_centro_costos");
+    //Limpio el select primero
+    control.empty();
+    control.append(new Option('(Elija una opción)', null));
+
+    for (let i = 0; i < data.length; i++){
+        let optionText = data[i].name;
+        let optionValue = data[i].idcentros_costos;
+        control.append(new Option(optionText, optionValue));
+    }
+}
+
+/*GET COSTO MAQUINAS BY ID **/
+
+function getCostosMaquinaById(element) {
+
+    let id_costo = $(element).attr('attr2');
+    let id_modal = $(element).attr('attr');
+
+    let history_costos = $(element).attr('attr3');
+
+    if (id_costo === undefined || id_costo === '' || id_costo == null)
+    {
+        //Informo el error
+        alert("Tenemos poblemas al procesar la solicitud. Intente nuevamente");
+    } else {
+
+        getCostosMaquinaByIdDb(id_costo, element, history_costos);
+    }
+
+}
+
+function getCostosMaquinaByIdDb(id_costo, element, history_costos) {
+
+    //Reviso de donde viene la peticion y elijo la url en virtud
+    let url = null;
+
+    if(history_costos === 'history_costos'){
+        url = '../../viewCostosMaq';
+    } else {
+        url = '../viewCostosMaq';
+    }
+
+
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: url,
+        data: {'id_costo_maq' : id_costo},
+
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        },
+        success: function(data, textStatus){
+
+            console.log(data);
+            loadDataToCostosMaquinaView(data, element);
+
+        },
+        error: function (data) {
+        }
+    });
+
+}
+
+function loadDataToCostosMaquinaView(data, element) {
+
+    let maq_name = $("#maq_name");
+    let grupo_name = $("#grupo_name");
+    let centro_costo_name = $("#centro_costo_name");
+    let met_costo_name = $("#met_costo_name");
+
+
+    maq_name.empty();
+    grupo_name.empty();
+    centro_costo_name.empty();
+    met_costo_name.empty();
+
+
+    let val_adq = $("#val_adq");
+    let vida_util = $("#vida_util");
+    let horas_tot = $("#horas_tot");
+    let horas_men = $("#horas_men");
+    let tasa_int = $("#tasa_int");
+    let cons_lit_h = $("#cons_lit_h");
+    let alquiler = $("#alquiler");
+
+    val_adq.empty();
+    vida_util.empty();
+    horas_tot.empty();
+    horas_men.empty();
+    tasa_int.empty();
+    cons_lit_h.empty();
+    alquiler.empty();
+
+
+    let val_neum = $("#val_neum");
+    let vida_util_neum = $("#vida_util_neum");
+    let horas_uso_anual = $("#horas_uso_anual");
+    let horas_uso_dia = $("#horas_uso_dia");
+    let fat_corr = $("#fat_corr");
+    let coef_arr_mec = $("#coef_arr_mec");
+    let lubricante = $("#lubricante");
+
+    val_neum.empty();
+    vida_util_neum.empty();
+    horas_uso_anual.empty();
+    horas_uso_dia.empty();
+    fat_corr.empty();
+    coef_arr_mec.empty();
+    lubricante.empty();
+
+
+    maq_name.html(data[0].maquina.marca.toString() + ": " + data[0].maquina.name.toString());
+    grupo_name.html(data[0].worksgroup.name.toString());
+    centro_costo_name.html(data[0].centros_costo.name.toString());
+    met_costo_name.html(data[0].metod_costo.name.toString());
+
+    val_adq.html(data[0].val_adq);
+    vida_util.html(data[0].vida_util);
+    horas_tot.html(data[0].horas_total_uso);
+    horas_men.html(data[0].horas_mens_uso);
+    tasa_int.html(data[0].tasa_int_simple);
+    cons_lit_h.html(data[0].consumo);
+    alquiler.html(data[0].costo_alquiler);
+
+    val_neum.html(data[0].val_neum);
+    vida_util_neum.html(data[0].vida_util_neum);
+    //ES hora efectivas
+    horas_uso_anual.html(data[0].horas_efec_uso);
+    horas_uso_dia.html(data[0].horas_dia_uso);
+    fat_corr.html(data[0].factor_cor);
+    coef_arr_mec.html(data[0].coef_err_mec);
+    lubricante.html(data[0].lubricante);
+
+
+    showModalAll(element)
+}
+

@@ -20,23 +20,18 @@ class UsersController extends AppController
         $this->Auth->allow(['register', 'login', 'logout', 'adminRegister']);
     }
 
+
     public function isAuthorized($user)
     {
-
-        if(isset($user['role']) and $user['role'] === 'user')
-        {
-            if(in_array($this->request->action, ['editProfile']))
-            {
+        if (isset($user['role']) and $user['role'] === 'user') {
+            if (in_array($this->request->getParam('action'), ['editProfile'])) {
                 return true;
             }
-        } else if(isset($user['role']) and $user['role'] === 'supervisor')
-        {
-            if(in_array($this->request->action, ['editProfile']))
-            {
+        } else if (isset($user['role']) and $user['role'] === 'supervisor') {
+            if (in_array($this->request->getParam('action'), ['editProfile'])) {
                 return true;
             }
         }
-
         return parent::isAuthorized($user);
     }
 

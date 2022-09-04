@@ -87,8 +87,8 @@
 
                                 <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                        ['action' => 'delete', $arreglo->idarreglos_mecanicos],
-                                        ['confirm' => __('Eliminar {0}?', $arreglo->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                        ['action' => 'remove', $arreglo->idarreglos_mecanicos],
+                                        ['confirm' => __('Eliminar {0}?', $arreglo->idarreglos_mecanicos), 'class' => 'btn btn-danger','escape' => false]) ?>
                                 <?php endif;?>
 
 

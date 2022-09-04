@@ -22,7 +22,6 @@
                 </h3>
             </div>
 
-
             <div class="card-body table-responsive">
 
                 <div>
@@ -90,8 +89,10 @@
                 </div>
 
             </div>
-
         </div>
+        <!-- Main content -->
+
+
     </div>
 </div>
 

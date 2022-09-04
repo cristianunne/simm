@@ -6,7 +6,12 @@
 
 <?= $this->element('header')?>
 
+
+<?php if(!empty($id_empresa)): ?>
+
 <?= $this->element('sidebar')?>
+
+<?php endif; ?>
 
 <div class="content-wrapper">
     <div class="container">

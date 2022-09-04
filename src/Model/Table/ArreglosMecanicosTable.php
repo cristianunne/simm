@@ -37,6 +37,7 @@ class ArreglosMecanicosTable extends Table
         $this->setPrimaryKey('idarreglos_mecanicos');
 
         $this->addBehavior('Timestamp');
+
         $this->hasOne('Users', [
             'foreignKey' => 'idusers',
             'bindingKey' => 'users_idusers', //actual
@@ -98,7 +99,7 @@ class ArreglosMecanicosTable extends Table
             ->allowEmptyString('repuestos');
 
         $validator
-            ->numeric('total')
+            ->decimal('total')
             ->allowEmptyString('total');
 
         $validator

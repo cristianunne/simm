@@ -30,6 +30,14 @@ class CentrosCostosController extends AppController
 
     public function index()
     {
+
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'Centros_costos';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
         //Consulto si la empresa no esta vacia
         //Traigo los datos de la sesion
         $session = $this->request->getSession();
@@ -50,6 +58,13 @@ class CentrosCostosController extends AppController
     public function add()
     {
         $centros_costos =  $this->CentrosCostos->newEntity();
+
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'Centros_costos';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
 
         //Traigo los datos de la sesion
         $session = $this->request->getSession();
@@ -82,6 +97,14 @@ class CentrosCostosController extends AppController
     {
 
         try{
+
+            //Variable usada para el sidebar
+            $seccion = 'system';
+            $sub_seccion = 'Centros_costos';
+
+            $this->set(compact('seccion'));
+            $this->set(compact('sub_seccion'));
+
             $centros_costos =  $this->CentrosCostos->get($id);
 
             if ($this->request->is(['patch', 'post', 'put'])) {

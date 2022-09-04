@@ -35,8 +35,10 @@
                             <br>
 
                             <div class="form-group" id="group-dni" >
-                                <?= $this->Form->label('Sueldo: ') ?>
-                                <?= $this->Form->number('sueldo', ['class' => 'form-control', 'placeholder' => 'Salario', 'required']) ?>
+                                <div class="form-group">
+                                    <?= $this->Form->input('sueldo', ['class' => 'form-control', 'type' => 'number', 'label' => 'Salario: ']) ?>
+                                </div>
+
                             </div>
 
                             <div class="form-group" style="margin-top: 40px;">

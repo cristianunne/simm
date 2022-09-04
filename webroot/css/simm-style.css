@@ -636,4 +636,15 @@ div.jfilestyle label{
     margin-right: 5px;
 }
 
+.table-view tr {
+    border-bottom: solid 0.5px #d5d5d5;
+    display: block;
+}
+
+.table-view tbody th, .table-view tbody td{
+    border-top: unset !important;
+    border-style: unset !important;
+    padding-right: 0px !important;
+}
+
 

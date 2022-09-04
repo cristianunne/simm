@@ -1,21 +1,21 @@
 <?php
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\ArreglosMecanicosYearTable;
+use App\Model\Table\CostosMaquinasTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\ArreglosMecanicosYearTable Test Case
+ * App\Model\Table\CostosMaquinasTable Test Case
  */
-class ArreglosMecanicosYearTableTest extends TestCase
+class CostosMaquinasTableTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \App\Model\Table\ArreglosMecanicosYearTable
+     * @var \App\Model\Table\CostosMaquinasTable
      */
-    public $ArreglosMecanicosYear;
+    public $CostosMaquinas;
 
     /**
      * Fixtures
@@ -23,11 +23,12 @@ class ArreglosMecanicosYearTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.ArreglosMecanicosYear',
-        'app.Users',
-        'app.Worksgroups',
+        'app.CostosMaquinas',
         'app.Maquinas',
-        'app.Parcelas',
+        'app.Worksgroups',
+        'app.CentrosCostos',
+        'app.MetodCostos',
+        'app.Users',
     ];
 
     /**
@@ -38,8 +39,8 @@ class ArreglosMecanicosYearTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::getTableLocator()->exists('ArreglosMecanicosYear') ? [] : ['className' => ArreglosMecanicosYearTable::class];
-        $this->ArreglosMecanicosYear = TableRegistry::getTableLocator()->get('ArreglosMecanicosYear', $config);
+        $config = TableRegistry::getTableLocator()->exists('CostosMaquinas') ? [] : ['className' => CostosMaquinasTable::class];
+        $this->CostosMaquinas = TableRegistry::getTableLocator()->get('CostosMaquinas', $config);
     }
 
     /**
@@ -49,7 +50,7 @@ class ArreglosMecanicosYearTableTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->ArreglosMecanicosYear);
+        unset($this->CostosMaquinas);
 
         parent::tearDown();
     }
@@ -70,6 +71,16 @@ class ArreglosMecanicosYearTableTest extends TestCase
      * @return void
      */
     public function testValidationDefault()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test buildRules method
+     *
+     * @return void
+     */
+    public function testBuildRules()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

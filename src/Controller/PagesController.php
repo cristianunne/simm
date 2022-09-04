@@ -87,21 +87,15 @@ class PagesController extends AppController
 
     public function isAuthorized($user)
     {
-
-        if(isset($user['role']) and $user['role'] === 'user')
-        {
-            if(in_array($this->request->action, ['indexUser', 'index']))
-            {
+        if (isset($user['role']) and $user['role'] === 'user') {
+            if (in_array($this->request->getParam('action'), ['index', 'indexUser'])) {
                 return true;
             }
-        } else if(isset($user['role']) and $user['role'] === 'supervisor')
-        {
-            if(in_array($this->request->action, ['indexUser', 'index']))
-            {
+        } else if (isset($user['role']) and $user['role'] === 'supervisor') {
+            if (in_array($this->request->getParam('action'), ['index', 'indexUser'])) {
                 return true;
             }
         }
-
         return parent::isAuthorized($user);
     }
 
@@ -113,11 +107,10 @@ class PagesController extends AppController
         $user_role = $session->read('Auth.User.role');
 
 
-
-
         if($user_role == 'admin')
         {
             return $this->redirect(['controller' => 'Pages', 'action' => 'indexAdmin']);
+
         } else {
             //deberia retornar con el get
             //Consulto si la empresa esta activa, sino la llevo a otro lado
@@ -125,9 +118,11 @@ class PagesController extends AppController
 
             if($empresa->active){
                 return $this->redirect(['controller' => 'Pages', 'action' => 'indexUser']);
+
+
             } else {
                 $this->Flash->error(__('La Empresa no tiene prestación actualmente. Contacte al Administrador del Sitio.'));
-                return $this->redirect(['controller' => 'Users', 'action' => 'logout']);
+                //return $this->redirect(['controller' => 'Users', 'action' => 'logout']);
             }
         }
 
@@ -168,7 +163,9 @@ class PagesController extends AppController
         } catch (InvalidPrimaryKeyException $e){
 
             $this->Flash->error(__('Acceso no Autorizado.'));
-            return $this->redirect(['controller' => 'Pages', 'action' => 'index']);
+            //SI Hay error me quedo aca pero muestro algun mensaje
+
+            //return $this->redirect(['controller' => 'Pages', 'action' => 'index']);
         }
 
 

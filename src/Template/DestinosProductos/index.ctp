@@ -69,8 +69,6 @@
                         <td class="actions" style="text-align: center">
                             <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
                                 ['action' => 'viewPricesByDestino', $destino->iddestinos], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-
-
                         </td>
 
                     </tr>

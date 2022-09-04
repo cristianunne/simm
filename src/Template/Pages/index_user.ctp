@@ -70,8 +70,8 @@
                                         ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
                                             'id' => 1]], ['class' => 'btn-simm btn-maquina btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
                             </div>
-                            <div>
-                                <p class="center text-color-navy">Maquinarias</p>
+                            <div class="div_content">
+                                <p class="center text-color-navy">Uso de Maquinarias</p>
                             </div>
                         </div>
 

@@ -38,8 +38,8 @@
 
 
                         <div class="form-group" id="group-dni" >
-                            <?= $this->Form->label('Sueldo: ') ?>
-                            <?= $this->Form->number('sueldo', ['class' => 'form-control', 'placeholder' => 'Salario', 'required']) ?>
+                            <?= $this->Form->input('sueldo', ['class' => 'form-control', 'type' => 'number', 'label' => 'Sueldo: ', 'required']) ?>
+
                         </div>
 
 

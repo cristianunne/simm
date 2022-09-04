@@ -8,7 +8,7 @@
 <?= $this->element('sidebar')?>
 
 <div class="content-wrapper">
-    <div class="container">
+    <div class="container" style="max-width: 1500px;">
         <?= $this->Flash->render() ?>
 
         <!-- Main content -->
@@ -18,84 +18,82 @@
                 <h3 class="card-title">
                     <?php echo $this->Html->image('tractor_white.png', ["alt" => 'User Image' , "class" => 'img-circle img-header',
                         'pathPrefix' => '/webroot/img/icons/']) ?>
-                    Máquinas
+                    Datos Teóricos de Máquinas
                 </h3>
             </div>
 
 
             <div class="card-body table-responsive">
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Máquina', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'Maquinas', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
-                <br>
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Ver Inactivos', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
-                        ['controller' => 'Maquinas', 'action' => 'showInactive'], ['class' => 'btn btn-warning', 'escape' => false]) ?>
-                </div>
 
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
                     <tr>
+                        <th scope="col" class="actions"><?= __('Ver') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('ID') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Nombre') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Marca') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('¿Propia?') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Grupo') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Centro de Costos') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Met. de Costos') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Fecha') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('¿Activo?') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Fecha de Alta') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Usuario') ?></th>
-                        <th scope="col" class="actions"><?= __('Datos Teóricos') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
 
                     </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ($maquinas as $maq): ?>
+                    <?php foreach ($maquinas_costos as $maq): ?>
                         <tr>
+                            <td class="actions" style="text-align: center">
+                                <?= $this->Form->button($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
+                                    ['class' => 'btn bg-navy', 'escape' => false, 'onClick' => 'getCostosMaquinaById(this)',
+                                        'attr2' => $maq->idcostos_maquinas, 'attr' => 'modal_view_costos_maq']) ?>
+                            </td>
+                            <td class="dt-center"><?= h($maq->hash_id) ?></td>
+                            <td class="dt-center"><?= h($maq->maquina->name) ?></td>
+                            <td class="dt-center"><?= h($maq->maquina->marca) ?></td>
 
-                            <td class="dt-center"><?= h($maq->name) ?></td>
-                            <td class="dt-center"><?= h($maq->marca) ?></td>
+                            <td class="dt-center"><?= h($maq->worksgroup->name) ?></td>
 
-                            <?php if($maq->propia == 1):  ?>
-                                <td class="dt-center"><?= h('Si') ?></td>
-                            <?php else: ?>
-                                <td class="dt-center"><?= h('No') ?></td>
-                            <?php endif;?>
+                            <td class="dt-center"><?= h($maq->centros_costo->name) ?></td>
+                            <td class="dt-center"><?= h($maq->metod_costo->name) ?></td>
+                            <td class="dt-center"><?= h($maq->created->format('d-m-Y')) ?></td>
+
 
                             <?php if($maq->active == 1):  ?>
                                 <td class="dt-center"><?= h('Si') ?></td>
                             <?php else: ?>
                                 <td class="dt-center"><?= h('No') ?></td>
                             <?php endif;?>
-                            <td class="dt-center"><?= h($maq->created->format('d-m-Y')) ?></td>
+
 
                             <td class="dt-center"><?= h($maq->user->lastname . ' ' . $maq->user->firstname) ?></td>
 
-                            <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-dollar-sign', 'aria-hidden' => 'true']),
-                                    ['controller' => 'Maquinas' , 'action' => 'indexCostos', $maq->idmaquinas], ['class' => 'btn bg-warning', 'escape' => false]) ?>
-                            </td>
 
                             <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
-                                    ['action' => 'edit', $maq->idmaquinas], ['class' => 'btn bg-purple', 'escape' => false]) ?>
+
+                                <?php if($maq->active == true):  ?>
+                                    <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-sync', 'aria-hidden' => 'true']),
+                                        ['action' => 'updateCostos', $maq->idcostos_maquinas], ['class' => 'btn bg-purple', 'escape' => false]) ?>
+                                <?php endif;?>
+
 
                                 <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                        ['action' => 'delete', $maq->idmaquinas],
-                                        ['confirm' => __('Eliminar {0}?', $maq->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                        ['action' => 'deleteCostosMaquina', $maq->idcostos_maquinas, $maq->maquina->idmaquinas],
+                                        ['confirm' => __('Eliminar {0}?', 'el registro'), 'class' => 'btn btn-danger','escape' => false]) ?>
 
                                 <?php else: ?>
 
                                     <?php if($current_user['idusers'] == $maq->user->idusers):  ?>
                                         <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                            ['action' => 'delete', $maq->idmaquinas],
-                                            ['confirm' => __('Eliminar {0}?', $maq->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                            ['action' => 'deleteCostosMaquina', $maq->idcostos_maquinas, $maq->maquina->idmaquinas],
+                                            ['confirm' => __('Eliminar {0}?', 'el registro'), 'class' => 'btn btn-danger','escape' => false]) ?>
 
                                     <?php endif;?>
                                 <?php endif;?>
-
                             </td>
-
                         </tr>
                     <?php endforeach; ?>
 
@@ -103,6 +101,10 @@
                 </table>
             </div>
         </div>
+        <!-- Main content -->
+
+        <?= $this->element('modals/modals_costos_maq_view')?>
+
     </div>
 </div>
 
