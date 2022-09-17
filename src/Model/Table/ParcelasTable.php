@@ -53,7 +53,7 @@ class ParcelasTable extends Table
         $this->hasOne('Lotes', [
             'foreignKey' => 'idlotes',
             'bindingKey' => 'lotes_idlotes', //actual
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
         ]);
 
     }

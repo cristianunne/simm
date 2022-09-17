@@ -70,6 +70,31 @@
 
 
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+                <li class="nav-item menu-close" id="uso_maquinaria">
+
+                    <a href="#" class="nav-link" id="title-uso_maquinaria">
+                        <i class="nav-icon fas fa-truck"></i>
+                        <p>
+                            Uso de Maquinaria
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Inicio',
+                                ['controller' => 'UsoMaquinaria', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-uso_maquinaria-Inicio']) ?>
+                        </li>
+
+                    </ul>
+                </li>
+
+
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
                 <li class="nav-item menu-close" id="arreglos_mecanicos">

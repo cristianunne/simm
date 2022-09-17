@@ -58,12 +58,23 @@
 
                             <hr style="width: 97%; margin-top: 25px;">
 
+                            <div class="col-md-12">
+
+                                <div class="col-md-5" style="margin: auto;">
+                                    <?= $this->Form->control('alquilada', ['options' => [1 => 'SI', 0 => 'NO'],
+                                        'empty' => '(Elija una opción)', 'type' => 'select',
+                                        'class' => 'form-control', 'placeholder' => '', 'id' => 'select_conditions',
+                                        'label' => '¿La Máquina es Alquilada?', 'onchange' => 'selectConditionsMaquina(this)']) ?>
+                                    <br>
+                                </div>
+
+                            </div>
                             <div class="col-md-5">
                                 <br>
                                 <br>
 
                                 <div class="form-group">
-                                    <?= $this->Form->input('val_adq', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Adquisición ($): ']) ?>
+                                    <?= $this->Form->input('val_adq', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Adquisición ($): ', 'required']) ?>
                                 </div>
 
                                 <div class="form-group">
@@ -141,7 +152,7 @@
                                 <?= $this->Form->button("Aceptar", ['class' => 'btn-navy btn bg-navy', 'escape' => false]) ?>
                             </div>
                             <div class="pull-left">
-                                <?= $this->Html->link("Volver", ['action' => 'view'], ['class' => 'btn btn-danger btn-flat']) ?>
+                                <?= $this->Html->link("Volver", ['action' => 'indexCostos', $id], ['class' => 'btn btn-danger btn-flat']) ?>
                             </div>
                         </div>
                         <?= $this->Form->end() ?>

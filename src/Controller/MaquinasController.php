@@ -338,6 +338,7 @@ class MaquinasController extends AppController
             $this->set(compact('metod_costos_data'));
             $this->set(compact('maquinas'));
             $this->set(compact('maquinas_costos'));
+            $this->set(compact('id'));
 
         } catch (InvalidPrimaryKeyException $e) {
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
