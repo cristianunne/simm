@@ -110,7 +110,7 @@
                                     'label' => 'Tipo:', 'onChange' => 'selectTypePropietarioModal(this)']) ?>
                             </div>
 
-                            <div id="div_tabladata" style="display: none;">
+                            <div id="div_tabladata_prop_1" style="display: none;">
                             <table id="tabladata" name="tabla_persona" class="table table-bordered table-hover dataTable">
                                 <thead>
                                 <tr>
@@ -142,7 +142,7 @@
                                 </tbody>
                             </table>
                             </div>
-                            <div id="div_tabladata_2" style="display: none;">
+                            <div id="div_tabladata_prop_2" style="display: none;">
                                 <table id="tabladata_2" class="table table-bordered table-hover dataTable">
                                 <thead>
                                 <tr>

@@ -118,7 +118,7 @@ function selectTypePropietario(element)
 
         $("#group-name").show();
     }
-}selectTypeFilter
+}
 
 
 //MOdal administration
@@ -148,15 +148,15 @@ function selectTypePropietarioModal(element)
     } else if (option_select === 'Persona') { //tabla_persona
 
         //$("[name='tabladata_wrapper']").hide();
-        $("#div_tabladata_prop_1").show();
+        $("#div_tabladata").show();
 
-        $("#div_tabladata_prop_2").hide();
+        $("#div_tabladata_2").hide();
 
 
     } else if (option_select === 'Empresa'){
-        $("#div_tabladata_prop_1").hide();
+        $("#div_tabladata").hide();
 
-        $("#div_tabladata_prop_2").show();
+        $("#div_tabladata_2").show();
     }
 }
 
@@ -178,41 +178,7 @@ function selectLote(object)
     $("#input_lotes").val(variable);
     $("#lotes_idlotes").val(id);
 
-
     closeModalById('modal_lotes');
-}
-
-
-function selectLoteUsoMaquinaria(object) {
-
-    let id_function = $(object).attr('id').toString();
-
-
-    let variable = $(object).attr('attr').toString();
-    let id = $(object).attr('attr2').toString();
-
-    $("#input_lotes").val(variable);
-    $("#lotes_idlotes").val(id);
-
-    //Si el id es usomaquinaria_add traigo las parcelas
-    //Le paso el control lotes parcelas
-
-    if (id_function === undefined || id_function === '' || id_function == null){
-           console.log("error");
-    } else {
-
-        //Verifico si es el EDIT
-        if (id_function === 'usomaquinaria_edit'){
-
-            getParcelaByLoteEdit($("#lotes_idlotes"));
-        } else {
-            getParcelaByLote($("#lotes_idlotes"));
-        }
-
-
-    }
-    closeModalById('modal_lotes');
-
 }
 
 
@@ -301,6 +267,8 @@ $(function (){
     }
 });
 
+
+
 /* CONTROL DE SIDEBAR */
 
 
@@ -316,7 +284,6 @@ function removeActiveClass()
 function getParcelaByLote(lote) {
 
     let option_select = $(lote).val().toString();
-
 
     if (option_select === undefined || option_select === '' || option_select == null){
         $("#parcela").prop('disabled', true);
@@ -346,9 +313,6 @@ function getParcelaByLoteEdit(lote) {
 
 
 function getParcelaByLoteFromDb(lote) {
-
-    //Verificar si viene de un edit la peticion
-
 
     $.ajax({
         type: "POST",
@@ -473,9 +437,13 @@ function selectTypeFilter(option){
 
         getUsuarios(empresa);
 
+
         $("#div-filter-usuarios").css("display", "block");
 
     }
+
+
+
 }
 
 
@@ -980,108 +948,6 @@ function loadDataToCostosMaquinaView(data, element) {
     showModalAll(element)
 }
 
-function selectConditionsMaquina(object)
-{
-    let value_ = $(object).val();
-    //Si el valor es 1 apago todos los input menos el de costo, si es 0 los prendo
-
-    if(value_ == 0)
-    {
-        $("[name='costo_alquiler']").prop('disabled', true);
-
-        //Apago todos los controles
-        $("[name='val_adq']").prop('disabled', false);
-        $("[name='vida_util']").prop('disabled', false);
-        $("[name='horas_total_uso']").prop('disabled', false);
-        $("[name='horas_mens_uso']").prop('disabled', false);
-        $("[name='tasa_int_simple']").prop('disabled', false);
-        $("[name='consumo']").prop('disabled', false);
-        $("[name='val_neum']").prop('disabled', false);
-        $("[name='vida_util_neum']").prop('disabled', false);
-        $("[name='horas_efec_uso']").prop('disabled', false);
-        $("[name='horas_dia_uso']").prop('disabled', false);
-        $("[name='factor_cor']").prop('disabled', false);
-        $("[name='coef_err_mec']").prop('disabled', false);
-        $("[name='lubricante']").prop('disabled', false);
-
-        //desactivo el required
-
-        $("[name='val_adq']").attr('required', 'required');
-        $("[name='vida_util']").attr('required', 'required');
-        $("[name='horas_total_uso']").attr('required', 'required');
-        $("[name='horas_mens_uso']").attr('required', 'required');
-        $("[name='tasa_int_simple']").attr('required', 'required');
-        $("[name='consumo']").attr('required', 'required');
-        $("[name='val_neum']").attr('required', 'required');
-        $("[name='vida_util_neum']").attr('required', 'required');
-        $("[name='horas_efec_uso']").attr('required', 'required');
-        $("[name='horas_dia_uso']").attr('required', 'required');
-        $("[name='factor_cor']").attr('required', 'required');
-        $("[name='coef_err_mec']").attr('required', 'required');
-        $("[name='lubricante']").attr('required', 'required');
-
-
-        $("[name='costo_alquiler']").removeAttr('required');
-        $("[name='costo_alquiler']").val('');
-
-    } else {
-
-        $("[name='costo_alquiler']").prop('disabled', false);
-        $("[name='costo_alquiler']").attr('required', 'required');
-
-        //Apago todos los controles
-        $("[name='val_adq']").prop('disabled', true);
-        $("[name='vida_util']").prop('disabled', true);
-        $("[name='horas_total_uso']").prop('disabled', true);
-        $("[name='horas_mens_uso']").prop('disabled', true);
-        $("[name='tasa_int_simple']").prop('disabled', true);
-        $("[name='consumo']").prop('disabled', true);
-        $("[name='val_neum']").prop('disabled', true);
-        $("[name='vida_util_neum']").prop('disabled', true);
-        $("[name='horas_efec_uso']").prop('disabled', true);
-        $("[name='horas_dia_uso']").prop('disabled', true);
-        $("[name='factor_cor']").prop('disabled', true);
-        $("[name='coef_err_mec']").prop('disabled', true);
-        $("[name='lubricante']").prop('disabled', true);
-
-        //Activo el required
-
-
-        $("[name='val_adq']").removeAttr('required');
-        $("[name='vida_util']").removeAttr('required');
-        $("[name='horas_total_uso']").removeAttr('required');
-        $("[name='horas_mens_uso']").removeAttr('required');
-        $("[name='tasa_int_simple']").removeAttr('required');
-        $("[name='consumo']").removeAttr('required');
-        $("[name='val_neum']").removeAttr('required');
-        $("[name='vida_util_neum']").removeAttr('required');
-        $("[name='horas_efec_uso']").removeAttr('required');
-        $("[name='horas_dia_uso']").removeAttr('required');
-        $("[name='factor_cor']").removeAttr('required');
-        $("[name='coef_err_mec']").removeAttr('required');
-        $("[name='lubricante']").removeAttr('required');
-
-
-        //limpio las celdas
-
-        $("[name='val_adq']").val('');
-        $("[name='vida_util']").val('');
-        $("[name='horas_total_uso']").val('');
-        $("[name='horas_mens_uso']").val('');
-        $("[name='tasa_int_simple']").val('');
-        $("[name='consumo']").val('');
-        $("[name='val_neum']").val('');
-        $("[name='vida_util_neum']").val('');
-        $("[name='horas_efec_uso']").val('');
-        $("[name='horas_dia_uso']").val('');
-        $("[name='factor_cor']").val('');
-        $("[name='coef_err_mec']").val('');
-        $("[name='lubricante']").val('');
-
-    }
-
-}
-
 
 /*REMITOS */
 
@@ -1090,15 +956,18 @@ function showModalMaquinas() {
 }
 
 
-//Cargo la maquina selecionada en la tabla principal l
+//Cargo la maquina selecionada en la tabla principal
 function loadMaquinaSelectToTable(element)
 {
     //Accedo a los atributos
 
     let option = $(element);
+
     let maquina = option.attr('maquina').toString();
     let operario = option.attr('operario').toString();
     let id_maq_op = option.attr('id_maq_op').toString();
+
+
 
     let table = $('#tabladata').DataTable();
 
@@ -1113,72 +982,22 @@ function loadMaquinaSelectToTable(element)
         '<span class="fas fa-trash-alt" aria-hidden="true"></span></a>';
 
 
-    let trDOM = table.row.add([number_count,
+    let trDOM = table.row.add([number_count, id_maq_op,
         maquina, operario, alqTon, icon_delete] ).draw().node();
+
 
     $( trDOM ).addClass('dt-center');
 
+
     let table_maq_modal = $('#tabladata_maq_modal').DataTable();
 
-    // table_maq_modal.row(':eq( ' + idrow + ')').remove().draw();
+   // table_maq_modal.row(':eq( ' + idrow + ')').remove().draw();
+
     table_maq_modal.row( option.parents('tr') )
-        .remove()
-        .draw();
+    .remove()
+    .draw();
 
 }
-
-function addMaquinaToRemito(element)
-{
-    //Accedo a los atributos
-
-    let option = $(element);
-
-    //Debo obtener los IDS
-
-    let id_maquina = option.attr('id_maquina').toString();
-    let id_operario = option.attr('id_operario').toString();
-    let id_maq_op = option.attr('id_maq_op').toString();
-
-    let remito_id = $("#remito_number").attr('attr');
-
-    let alq_ton = $("#input_" + id_maq_op).val();
-
-
-    let url = '../../RemitosMaquinas/addRemitoMaquina';
-
-    $.ajax({
-        type: "POST",
-        async: true,
-        url: url,
-        data: {'remitos_idremitos' : remito_id, 'alquiler_ton': alq_ton, 'operarios_idoperarios': id_operario, 'maquinas_idmaquinas': id_maquina},
-
-        beforeSend: function (xhr) { // Add this line
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        },
-        success: function(data, textStatus){
-
-            console.log(data);
-            //Si esta todo okey hagamos el add a la tabla
-
-            loadMaquinaSelectToTable(element);
-
-            location.reload(true);
-
-        },
-        error: function (data) {
-
-            console.log(data);
-
-        }
-    });
-
-
-
-
-}
-
-
-
 
 function deleteRowRemitos(element)
 {
@@ -1217,653 +1036,6 @@ function addRowToTableMaquinasOperarios(element)
 
 
 }
-
-
-
-function selectLoteRemito(object) {
-
-    let id_function = $(object).attr('id').toString();
-
-
-    let variable = $(object).attr('attr').toString();
-    let id = $(object).attr('attr2').toString();
-
-    //aca debo cambiar
-
-    //$("#input_lotes").val(variable);
-    //$("#lotes_idlotes").val(id);
-
-    $('#lotes_idlotes').empty();
-
-    $('#lotes_idlotes').append($('<option>', {
-        value: id,
-        text: variable
-    }));
-
-    $("#lotes_idlotes").val(id);
-
-
-    //Si el id es usomaquinaria_add traigo las parcelas
-    //Le paso el control lotes parcelas
-
-    if (id_function === undefined || id_function === '' || id_function == null){
-        console.log("error");
-    } else {
-
-        //Verifico si es el EDIT
-        if (id_function === 'remitos_edit'){
-
-            getParcelaByLoteEdit($("#lotes_idlotes"));
-        } else {
-            getParcelaByLote($("#lotes_idlotes"));
-        }
-
-    }
-    closeModalById('modal_lotes');
-
-}
-
-
-function selectPropRemito(object)
-{
-    let variable = $(object).attr('attr').toString(); //input_prop
-    let id = $(object).attr('attr2').toString(); //input_prop propietarios_idpropietarios
-
-
-    //$("#input_prop").val(variable);
-    //$("#propietarios_idpropietarios").val(id);
-
-
-    $('#propietarios_idpropietarios').empty();
-
-    $('#propietarios_idpropietarios').append($('<option>', {
-        value: id,
-        text: variable
-    }));
-
-    $("#propietarios_idpropietarios").val(id);
-
-    closeModalById('modal_propietarios');
-}
-
-
-
-function selectDestinoRemito(object) {
-
-    let id_function = $(object).attr('id').toString();
-
-    let variable = $(object).attr('attr').toString();
-    let id = $(object).attr('attr2').toString();
-
-    //$("#input_dest").val(variable);
-    //$("#destinos_iddestinos").val(id);
-
-
-
-    $('#destinos_iddestinos').empty();
-
-    $('#destinos_iddestinos').append($('<option>', {
-        value: id,
-        text: variable
-    }));
-
-    $("#destinos_iddestinos").val(id);
-
-
-    //Si el id es usomaquinaria_add traigo las parcelas
-    //Le paso el control lotes parcelas
-
-    closeModalById('modal_destinos');
-
-}
-
-function selectProductosRemito(object) {
-
-    let id_function = $(object).attr('id').toString();
-
-    let variable = $(object).attr('attr').toString();
-    let id = $(object).attr('attr2').toString();
-
-
-
-    $('#productos_idproductos').empty();
-
-    $('#productos_idproductos').append($('<option>', {
-        value: id,
-        text: variable
-    }));
-
-    $("#productos_idproductos").val(id);
-
-    //Si el id es usomaquinaria_add traigo las parcelas
-    //Le paso el control lotes parcelas selectProductosRemito
-
-    closeModalById('modal_productos');
-
-}
-
-
-/** Filtro Remitos **
-
- */
-
-let option_filter_remitos = null;
-let value_filter_remitos = null;
-let all_date_remitos = null;
-
-function selectTypeFilterRemitos(option){
-
-    let option_select = $(option).val().toString();
-    let empresa = $(option).attr('attr_emp').toString();
-
-    //seteo la variable global
-    option_filter_remitos = option_select;
-
-    if (option_select === undefined || option_select === '' || option_select == null)
-    {
-        //no hago nada
-    } else if (option_select === 'Fecha')
-    {
-
-        //Tengo que cambiar el visibiliti de todos los demas
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-        $("#div-filter-fecha").css("display", "flex");
-
-    } else if (option_select === 'Grupo'){
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-        getGroups(empresa);
-
-
-        $("#div-filter-grupo").css("display", "block");
-
-    } else if (option_select === 'Maquina'){
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-        getMaquinas(empresa);
-
-
-        $("#div-filter-maquinas").css("display", "block");
-
-    } else if (option_select === 'Lote'){
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-        getLotes(empresa);
-        $("#div-filter-lote").css("display", "block");
-
-    } else if (option_select === 'Parcela'){
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-        getParcelas(empresa);
-
-
-        $("#div-filter-parcelas").css("display", "block");
-
-    } else if (option_select === 'Propietario'){
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-
-        $("#div-filter-propietarios").css("display", "block");
-
-    } else if (option_select === 'Producto'){
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-
-        getProductos(empresa);
-
-        $("#div-filter-productos").css("display", "block");
-
-    } else if (option_select === 'Destino'){
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-usuarios").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-
-        getDestinos(empresa);
-        $("#div-filter-destinos").css("display", "block");
-
-    } else if (option_select === 'Usuario'){
-
-        $("#div-filter-fecha").css("display", "none");
-        $("#div-filter-grupo").css("display", "none");
-        $("#div-filter-maquinas").css("display", "none");
-        $("#div-filter-parcelas").css("display", "none");
-        $("#div-filter-lote").css("display", "none");
-        $("#div-filter-propietarios").css("display", "none");
-        $("#div-filter-productos").css("display", "none");
-        $("#div-filter-destinos").css("display", "none");
-
-        getUsuarios(empresa);
-
-        $("#div-filter-usuarios").css("display", "block");
-
-    }
-}
-
-function filterRemitos()
-{
-
-    var table = $('#tabladata').DataTable();
-
-    table.clear();
-    table.draw();
-
-
-    //AHora hago el pedido de datos basado en el tipo de filtro
-    if(option_filter_remitos !== false)
-    {
-        const values = [];
-        //COnsutlo la opcion elegida para obtener el valor
-        if(option_filter_remitos === 'Fecha'){
-            //Obtengo las fechas de los inputs
-            let value_fecha_1 = $("#fecha_desde").val().toString();
-            let value_fecha_2 = $("#fecha_hasta").val().toString();
-            all_date_remitos = null;
-            values.push(value_fecha_1);
-            values.push(value_fecha_2);
-
-        } else if (option_filter_remitos === 'Grupo') {
-            value_filter_remitos = $("#groups_modal").val();
-            all_date_remitos = $("#groups_alldata_modal").val();
-            values.push(value_filter_remitos);
-
-        } else if (option_filter_remitos === 'Maquina') {
-            value_filter_remitos = $("#maquinas_modal").val();
-            all_date_remitos = $("#maquinas_alldata_modal").val();
-            values.push(value_filter_remitos);
-
-        } else if (option_filter_remitos === 'Parcela') {
-            value_filter_remitos = $("#parcelas_modal").val();
-            all_date_remitos = $("#parcelas_alldata_modal").val();
-            values.push(value_filter_remitos);
-
-        } else if (option_filter_remitos === 'Usuario') {
-            value_filter_remitos = $("#usuarios_modal").val();
-            all_date_remitos = $("#usuarios_alldata_modal").val();
-            values.push(value_filter_remitos);
-
-        } else if (option_filter_remitos === 'Lote'){
-            value_filter_remitos = $("#lotes_modal").val();
-            all_date_remitos = $("#lotes_alldata_modal").val();
-            values.push(value_filter_remitos);
-
-        } else if (option_filter_remitos === 'Propietario'){
-            value_filter_remitos = $("#prop_modal").val();
-            all_date_remitos = $("#propietarios_alldata_modal").val();
-            values.push(value_filter_remitos);
-        } else if (option_filter_remitos === 'Producto'){
-            value_filter_remitos = $("#productos_modal").val();
-            all_date_remitos = $("#productos_alldata_modal").val();
-            values.push(value_filter_remitos);
-
-        } else if (option_filter_remitos === 'Destino'){
-            value_filter_remitos = $("#destinos_modal").val();
-            all_date_remitos = $("#destinos_alldata_modal").val();
-            values.push(value_filter_remitos);
-        }
-        //console.log(all_date);
-
-        $.ajax({
-            type: "POST",
-            async: true,
-            url: 'Remitos/getDataFromRemitos',
-            data: {'option_select' : option_filter_remitos, 'data' : values, 'all_date' : all_date_remitos},
-
-            beforeSend: function (xhr) { // Add this line
-                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                $("#content_loading").show();
-            },
-            success: function(data, textStatus){
-
-                //console.log(data);
-                setTimeout(function (){
-                    loadDataToTableRemitos(table, data);
-                    $("#content_loading").hide();
-                }, 2000);
-
-            },
-            error: function (data) {
-                console.log('errorrrr');
-            }
-        });
-    }
-}
-
-
-
-function loadDataToTableRemitos(table, data)
-{
-    for (let i = 0; i < data.length; i++){
-
-        let url = "/simm/remitos/view/" + data[i].idremitos.toString();
-        let icon_eye = '<a href='+ url + ' class="btn bg-navy" escape="false" target= "_blank" ><span class="fas fa-eye" aria-hidden="true"></span></a>';
-
-        let url_edit = "/simm/remitos/edit/" + data[i].idremitos.toString();
-        let icon_edit = '<a href='+ url_edit + ' class="btn bg-purple" escape="false" style="margin-right: 4px;"><span class="fas fa-edit" aria-hidden="true"></span></a>';
-
-        let icon_delete = '<a href="#" class="btn btn-danger" escape="false"  attr="'+ data[i].idremitos + '" onclick="deleteRowFilterRemitos(this)">' +
-            '<span class="fas fa-trash-alt" aria-hidden="true"></span></a>';
-
-
-        let url_maq = "/simm/remitos/add-maquinas/" + data[i].idremitos.toString();
-        let icon_maq = '<a href='+ url_edit + ' class="btn bg-green" escape="false" style="margin-right: 4px;"><span class="fas fa-truck" aria-hidden="true"></span></a>';
-
-
-
-        //Compruebo si el propietario es empresa o persona
-        let tipo_prop = null;
-
-        if(data[i].propietario.tipo === 'Empresa'){
-            tipo_prop = data[i].propietario.name;
-        } else {
-            tipo_prop = data[i].propietario.firstname + " " + data[i].propietario.lastname;
-        }
-
-
-        var trDOM = table.row.add([icon_eye,
-            data[i].remito_number,
-            data[i].fecha.toString().substr(0,10),
-            data[i].worksgroup.name,
-            data[i].parcela.lote.name,
-            data[i].parcela.name,
-            tipo_prop,
-            data[i].producto.name,
-            data[i].ton,
-            data[i].precio_ton,
-            data[i].destino.name,
-            data[i].user.firstname + ' ' + data[i].user.lastname,
-            icon_maq,
-            icon_edit + icon_delete] ).draw().node();
-        $( trDOM ).addClass('dt-center');
-
-    }
-
-    closeModalById('modal_filter');
-    changeBtnFilterRemitos();
-
-}
-
-function changeBtnFilterRemitos() {
-    $("#btn-filter").removeClass('bg-yellow');
-    $("#btn-filter").addClass('bg-green');
-
-    let text = '<span class="fas fa-eye" aria-hidden="true"> ' + option_filter_remitos.toString() + '</span>'
-
-    $("#btn-filter").html(text);
-}
-
-
-function deleteRowFilterRemitos(id){
-
-    let vlue = $(id).attr('attr');
-
-    let row = $(id).parent().parent();
-
-
-    alertConfirmRemitos(vlue, row);
-
-}
-
-function alertConfirmRemitos(vlue, row) {
-    let text = "Eliminar " + vlue.toString() + "?";
-    if (confirm(text) == true) {
-        //procedo a eliminar
-        $.ajax({
-            type: "POST",
-            async: true,
-            url: 'Remitos/delete',
-            data: {'id' : vlue},
-
-            beforeSend: function (xhr) { // Add this line
-                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-            },
-            success: function(data, textStatus){
-
-                //console.log(data);
-
-                if(data.result == true){
-                    deleteRow(row);
-                }
-
-            },
-            error: function (data) {
-            }
-        });
-
-    } else {
-        console.log('fue false');
-    }
-
-}
-
-
-
-function getLotes(empresa)
-{
-    $.ajax({
-        type: "POST",
-        async: true,
-        url: 'remitos/getLotes',
-        data: {'empresa' : empresa},
-
-        beforeSend: function (xhr) { // Add this line
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        },
-        success: function(data, textStatus){
-
-            //console.log(data);
-            loadLotesToSelectModal(data);
-        },
-        error: function (data) {
-        }
-    });
-
-}
-
-function loadLotesToSelectModal(data){
-    let control = $("#lotes_modal");
-    //Limpio el select primero
-    control.empty();
-    control.append(new Option('(Elija una Opción)', null));
-
-    for (let i = 0; i < data.length; i++){
-        let optionText = data[i].name;
-        let optionValue = data[i].idlotes;
-        control.append(new Option(optionText, optionValue));
-
-    }
-}
-
-
-function getPropietarios(element)
-{
-    //Obtengo el tipo de propietario
-    let control = $(element);
-    let option_select = control.val().toString();
-
-    let empresa = control.attr('attr_emp').toString();
-
-    $.ajax({
-        type: "POST",
-        async: true,
-        url: 'remitos/getPropietarios',
-        data: {'empresa' : empresa, 'tipo' : option_select},
-
-        beforeSend: function (xhr) { // Add this line
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        },
-        success: function(data, textStatus){
-
-            //console.log(data);
-            loadPropietariosToSelectModal(data, option_select);
-        },
-        error: function (data) {
-        }
-    });
-
-}
-
-function loadPropietariosToSelectModal(data, tipo){
-    let control = $("#prop_modal");
-    //Limpio el select primero
-    control.empty();
-    control.append(new Option('(Elija una opción)', null));
-
-    //console.log(tipo);
-
-    if(tipo === 'Empresa'){
-
-        for (let i = 0; i < data.length; i++){
-            let optionText = data[i].name;
-            let optionValue = data[i].idpropietarios;
-            control.append(new Option(optionText, optionValue));
-
-        }
-
-    } else {
-        for (let i = 0; i < data.length; i++){
-            let optionText = data[i].firstname + " " + data[i].lastname;
-            let optionValue = data[i].idpropietarios;
-            control.append(new Option(optionText, optionValue));
-
-        }
-    }
-
-
-}
-
-
-function getProductos(empresa)
-{
-    $.ajax({
-        type: "POST",
-        async: true,
-        url: 'remitos/getProductos',
-        data: {'empresa' : empresa},
-
-        beforeSend: function (xhr) { // Add this line
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        },
-        success: function(data, textStatus){
-
-            //console.log(data);
-            loadProductosToSelectModal(data);
-        },
-        error: function (data) {
-        }
-    });
-
-}
-
-function loadProductosToSelectModal(data){
-    let control = $("#productos_modal");
-    //Limpio el select primero
-    control.empty();
-    control.append(new Option('(Elija una Opción)', null));
-
-    for (let i = 0; i < data.length; i++){
-        let optionText = data[i].name;
-        let optionValue = data[i].idproductos;
-        control.append(new Option(optionText, optionValue));
-
-    }
-}
-
-
-
-
-function getDestinos(empresa)
-{
-    $.ajax({
-        type: "POST",
-        async: true,
-        url: 'remitos/getDestinos',
-        data: {'empresa' : empresa},
-
-        beforeSend: function (xhr) { // Add this line
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        },
-        success: function(data, textStatus){
-
-            //console.log(data);
-            loadDestinosToSelectModal(data);
-        },
-        error: function (data) {
-        }
-    });
-
-}
-
-
-function loadDestinosToSelectModal(data){
-    let control = $("#destinos_modal");
-    //Limpio el select primero
-    control.empty();
-    control.append(new Option('(Elija una Opción)', null));
-
-    for (let i = 0; i < data.length; i++){
-        let optionText = data[i].name;
-        let optionValue = data[i].iddestinos;
-        control.append(new Option(optionText, optionValue));
-
-    }
-}
-
 
 
 

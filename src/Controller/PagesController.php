@@ -145,18 +145,21 @@ class PagesController extends AppController
         $seccion = 'inicio';
         $sub_seccion = null;
 
-        $this->set(compact('seccion'));
-        $this->set(compact('sub_seccion'));
+
 
         try{
             //Consulto si no es el administrador el que esta ingresando
             if($user_role == 'admin')
             {
                 $id_empresa = $id;
+                $seccion = 'inicio_emp';
             }
             //Traigo los datos de la empresa
             //Consulto si la empresa esta activa, sino la llevo a otro lado
             $empresa = $this->Empresastable->get($id_empresa, []);
+
+            $this->set(compact('seccion'));
+            $this->set(compact('sub_seccion'));
 
             $session->write('Auth.User.Empresa', $empresa);
 

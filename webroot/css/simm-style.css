@@ -527,6 +527,71 @@ div.jfilestyle label{
 }
 
 
+
+#div_tabladata_prop_1{
+    font-size: small;
+}
+
+#div_tabladata_prop_1 thead tr th{
+    text-align: center;
+}
+#div_tabladata_prop_1 thead tr th a{
+    color: navy;
+}
+
+#div_tabladata_prop_1 tbody tr td{
+    vertical-align: middle;
+}
+
+#div_tabladata_prop_2{
+    font-size: small;
+}
+
+#div_tabladata_prop_2 thead tr th{
+    text-align: center;
+}
+#div_tabladata_prop_2 thead tr th a{
+    color: navy;
+}
+
+#div_tabladata_prop_2 tbody tr td{
+    vertical-align: middle;
+}
+
+#div_tabladata_destinos{
+    font-size: small;
+}
+
+#div_tabladata_destinos thead tr th{
+    text-align: center;
+}
+#div_tabladata_destinos thead tr th a{
+    color: navy;
+}
+
+#div_tabladata_destinos tbody tr td{
+    vertical-align: middle;
+}
+
+
+#div_tabladata_productos{
+    font-size: small;
+}
+
+#div_tabladata_productos thead tr th{
+    text-align: center;
+}
+#div_tabladata_productos thead tr th a{
+    color: navy;
+}
+
+#div_tabladata_productos tbody tr td{
+    vertical-align: middle;
+}
+
+
+
+
 .dt-center
 {
     text-align: center;
@@ -647,4 +712,36 @@ div.jfilestyle label{
     padding-right: 0px !important;
 }
 
+
+/*BUTONS reitos seccion*/
+.btn-remito-styles{
+    display: block;
+    margin: 0 auto;
+    height: 39px;
+}
+
+#tabladata_maq_modal thead tr th{
+    text-align: center;
+}
+#tabladata_maq_modal thead tr th a{
+    color: navy;
+}
+
+#tabladata_maq_modal tbody tr td{
+    vertical-align: middle;
+}
+
+#tabladata_maq_modal_filter {
+    text-align: right;
+}
+
+.select{
+    width: 100%;
+}
+
+#img_loading{
+    width: 50px;
+    height: 50px;
+    float: left;
+}
 

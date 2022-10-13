@@ -49,6 +49,10 @@ class OperariosMaquinasTable extends Table
             'bindingKey' => 'operarios_idoperarios', //actual
             'joinType' => 'INNER'
         ]);
+
+        //LO puedo relacionar con costos
+
+
     }
 
     /**

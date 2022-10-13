@@ -53,11 +53,10 @@
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group flex-vertical" role="group" aria-label="Third group">
                             <div>
+
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 'btn_remito']], ['class' => 'btn-simm btn-remito btn btn-default',
-                                        'escape' => false, 'onmouseover' => 'showPopover()']) ?>
+                                    ['controller' => 'Remitos', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-remito btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div>
                                 <p class="center text-color-navy">Remitos</p>

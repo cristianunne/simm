@@ -86,11 +86,13 @@ class OperariosMaquinasController extends AppController
                 ->where(['operarios_idoperarios' => $id]);
 
 
+            //Debo filtrar por empresa
+
             $lista_maquinas =  $model_maquinas->find('list', [
                 'keyField' => 'idmaquinas',
                 'valueField' => ['marca', 'name'],
                 'order' => ['name' => 'ASC']
-            ])->where(['idmaquinas NOT IN' => $operarios_maq_query])
+            ])->where(['idmaquinas NOT IN' => $operarios_maq_query, 'empresas_idempresas' => $id_empresa])
                 ->toArray();
 
 

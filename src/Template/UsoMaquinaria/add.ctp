@@ -1,3 +1,8 @@
+<!-- DataTables -->
+<?= $this->Html->css('../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') ?>
+<?= $this->Html->css('../plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>
+<?= $this->Html->css('../plugins/datatables-buttons/css/buttons.bootstrap4.min.css') ?>
+
 <?= $this->element('header')?>
 <?= $this->element('sidebar')?>
 

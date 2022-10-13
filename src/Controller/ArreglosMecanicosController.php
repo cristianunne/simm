@@ -157,7 +157,6 @@ class ArreglosMecanicosController extends AppController
     public function view($id = null)
     {
 
-
         if(is_null($id))
         {
             return $this->redirect(['controller' => 'ArreglosMecanicos', 'action' => 'index']);
@@ -450,27 +449,27 @@ class ArreglosMecanicosController extends AppController
             {
                 $fecha_desde = $data[0];
                 $fecha_hasta = $data[1];
-                $array_data = $this->getDataByFecha($fecha_desde, $fecha_hasta);
+                $array_data = $this->getDataByFecha($fecha_desde, $fecha_hasta, $id_empresa);
 
             } elseif ($option_select == 'Grupo') {
 
                 $value_option = $data[0];
-                $array_data = $this->getDataByGrupo($value_option, $all_date);
+                $array_data = $this->getDataByGrupo($value_option, $all_date, $id_empresa);
 
             } elseif ($option_select == 'Maquina') {
 
                 $value_option = $data[0];
-                $array_data = $this->getDataByMaquina($value_option, $all_date);
+                $array_data = $this->getDataByMaquina($value_option, $all_date, $id_empresa);
 
             } elseif ($option_select == 'Parcela') {
                 $value_option = $data[0];
 
-                $array_data = $this->getDataByParcela($value_option, $all_date);
+                $array_data = $this->getDataByParcela($value_option, $all_date, $id_empresa);
 
             } elseif ($option_select == 'Usuario') {
 
                 $value_option = $data[0];
-                $array_data = $this->getDataByUsuario($value_option, $all_date);
+                $array_data = $this->getDataByUsuario($value_option, $all_date, $id_empresa);
             }
 
         }
@@ -481,7 +480,7 @@ class ArreglosMecanicosController extends AppController
     }
 
 
-    private function getDataByFecha($fecha_desde = null, $fecha_hasta = null)
+    private function getDataByFecha($fecha_desde = null, $fecha_hasta = null, $id_empresa = null)
     {
         $this->autoRender =  false;
         $data = [];
@@ -492,13 +491,14 @@ class ArreglosMecanicosController extends AppController
 
         $data = $this->ArreglosMecanicos->find('all', [
             'contain' => ['Users', 'Maquinas', 'Worksgroups']
-        ])->where(['ArreglosMecanicos.fecha >=' => strval($fecha_desde), 'ArreglosMecanicos.fecha <=' => strval($fecha_hasta)])
+        ])->where(['ArreglosMecanicos.fecha >=' => strval($fecha_desde), 'ArreglosMecanicos.fecha <=' => strval($fecha_hasta),
+            'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
             ->toArray();
 
         return $data;
     }
 
-    private function getDataByGrupo($grupo = null, $all_date = null)
+    private function getDataByGrupo($grupo = null, $all_date = null, $id_empresa = null)
     {
         $this->autoRender =  false;
         $data = [];
@@ -508,7 +508,7 @@ class ArreglosMecanicosController extends AppController
         {
             $data = $this->ArreglosMecanicos->find('all', [
                 'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['worksgroups_idworksgroups' => $grupo])
+            ])->where(['worksgroups_idworksgroups' => $grupo, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
         } else {
@@ -516,7 +516,7 @@ class ArreglosMecanicosController extends AppController
             $arreglos_model = $this->loadModel('ArreglosMecanicosYear');
             $data = $arreglos_model->find('all', [
                 'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['worksgroups_idworksgroups' => $grupo])
+            ])->where(['worksgroups_idworksgroups' => $grupo,  'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
         }
@@ -525,7 +525,7 @@ class ArreglosMecanicosController extends AppController
 
     }
 
-    private function getDataByMaquina($maquina = null, $all_date = null)
+    private function getDataByMaquina($maquina = null, $all_date = null, $id_empresa = null)
     {
         $this->autoRender =  false;
         $data = [];
@@ -535,7 +535,7 @@ class ArreglosMecanicosController extends AppController
             //Uso la tabla arreglos mecanicos
             $data = $this->ArreglosMecanicos->find('all', [
                 'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['maquinas_idmaquinas' => $maquina])
+            ])->where(['maquinas_idmaquinas' => $maquina, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
 
@@ -547,7 +547,7 @@ class ArreglosMecanicosController extends AppController
             //Uso la tabla arreglos mecanicos
             $data = $arreglos_model->find('all', [
                 'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['maquinas_idmaquinas' => $maquina])
+            ])->where(['maquinas_idmaquinas' => $maquina, 'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
 
@@ -556,37 +556,7 @@ class ArreglosMecanicosController extends AppController
         return $data;
     }
 
-    private function getDataByParcela($parcela = null, $all_date = null)
-    {
-
-        $this->autoRender =  false;
-        $data = [];
-
-        if($all_date == 'SI')
-        {
-            //Uso la tabla arreglos mecanicos
-            $data = $this->ArreglosMecanicos->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['parcelas_idparcelas' => $parcela])
-                ->toArray();
-
-        } else {
-            //Uso la Vista arreglos mecanicos year
-            $arreglos_model = $this->loadModel('ArreglosMecanicosYear');
-
-            //Uso la tabla arreglos mecanicos
-            $data = $arreglos_model->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['parcelas_idparcelas' => $parcela])
-                ->toArray();
-        }
-
-
-        return $data;
-
-    }
-
-    private function getDataByUsuario($usuario = null, $all_date = null)
+    private function getDataByParcela($parcela = null, $all_date = null, $id_empresa = null)
     {
 
         $this->autoRender =  false;
@@ -597,7 +567,7 @@ class ArreglosMecanicosController extends AppController
             //Uso la tabla arreglos mecanicos
             $data = $this->ArreglosMecanicos->find('all', [
                 'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['ArreglosMecanicos.users_idusers' => $usuario])
+            ])->where(['parcelas_idparcelas' => $parcela, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
         } else {
@@ -607,7 +577,37 @@ class ArreglosMecanicosController extends AppController
             //Uso la tabla arreglos mecanicos
             $data = $arreglos_model->find('all', [
                 'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['ArreglosMecanicosYear.users_idusers' => $usuario])
+            ])->where(['parcelas_idparcelas' => $parcela, 'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
+                ->toArray();
+        }
+
+
+        return $data;
+
+    }
+
+    private function getDataByUsuario($usuario = null, $all_date = null, $id_empresa = null)
+    {
+
+        $this->autoRender =  false;
+        $data = [];
+
+        if($all_date == 'SI')
+        {
+            //Uso la tabla arreglos mecanicos
+            $data = $this->ArreglosMecanicos->find('all', [
+                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+            ])->where(['ArreglosMecanicos.users_idusers' => $usuario, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
+                ->toArray();
+
+        } else {
+            //Uso la Vista arreglos mecanicos year
+            $arreglos_model = $this->loadModel('ArreglosMecanicosYear');
+
+            //Uso la tabla arreglos mecanicos
+            $data = $arreglos_model->find('all', [
+                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+            ])->where(['ArreglosMecanicosYear.users_idusers' => $usuario, 'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
                 ->toArray();
         }
 

@@ -64,6 +64,12 @@ class MaquinasTable extends Table
             'joinType' => 'INNER'
         ]);
 
+        $this->hasMany('CostosMaquinas', [
+            'foreignKey' => 'maquinas_idmaquinas',
+            'bindingKey' => 'idmaquinas', //actual
+            'joinType' => 'INNER'
+        ]);
+
 
     }
 

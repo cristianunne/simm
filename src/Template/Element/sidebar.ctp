@@ -5,6 +5,7 @@
     <?php
         $session = $this->request->getSession();
         $empresa = $session->read('Auth.User.Empresa');
+        $user_role = $session->read('Auth.User.role');
     ?>
 
 
@@ -55,21 +56,50 @@
             </ul>
 
             <!-- INICIO DE EMPRESA-->
+            <?php if($user_role == 'admin') :  ?>
 
-            <?php if(!empty($empresa)) :  ?>
-                <ul class="nav nav-pills nav-sidebar flex-column" id="prueba_padre">
-                    <li class="nav-item">
-                        <?=  $this->Html->link(
-                            '<i class="nav-icon fas fa-tachometer-alt"></i> Inicio Empresa',
-                            ['controller' => 'Pages', 'action' => 'indexUser', $empresa->idempresas], ['class' => 'nav-link', 'escape' => false, 'id' => 'nav-icon-inicio']) ?>
-                    </li>
-                </ul>
+                <?php if(!empty($empresa)) :  ?>
+                    <ul class="nav nav-pills nav-sidebar flex-column" id="prueba_padre">
+                        <li class="nav-item">
+                            <?=  $this->Html->link(
+                                '<i class="nav-icon fas fa-building"></i> Inicio Empresa',
+                                ['controller' => 'Pages', 'action' => 'indexUser', $empresa->idempresas],
+                                ['class' => 'nav-link', 'escape' => false, 'id' => 'nav-icon-inicio_emp']) ?>
+                        </li>
+                    </ul>
+                <?php endif;?>
             <?php endif;?>
 
 
 
 
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+
+                <li class="nav-item menu-close" id="remitos">
+
+                    <a href="#" class="nav-link" id="title-remitos">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>
+                            Remitos
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+
+                            <?=  $this->Html->link(
+                                '<i class="far fa-circle nav-icon"></i> Inicio',
+                                ['controller' => 'Remitos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-remitos-Inicio']) ?>
+                        </li>
+
+                    </ul>
+                </li>
+
+
 
                 <li class="nav-item menu-close" id="uso_maquinaria">
 
