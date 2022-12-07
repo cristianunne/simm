@@ -71,52 +71,52 @@ class MetodCostosTable extends Table
 
         $validator
             ->scalar('interes')
-            ->maxLength('interes', 100)
+            ->maxLength('interes', 250)
             ->allowEmptyString('interes');
 
         $validator
             ->scalar('seguro')
-            ->maxLength('seguro', 100)
+            ->maxLength('seguro', 250)
             ->allowEmptyString('seguro');
 
         $validator
             ->scalar('dep_maq')
-            ->maxLength('dep_maq', 100)
+            ->maxLength('dep_maq', 250)
             ->allowEmptyString('dep_maq');
 
         $validator
             ->scalar('dep_neum')
-            ->maxLength('dep_neum', 100)
+            ->maxLength('dep_neum', 250)
             ->allowEmptyString('dep_neum');
 
         $validator
             ->scalar('arreglos_maq')
-            ->maxLength('arreglos_maq', 100)
+            ->maxLength('arreglos_maq', 250)
             ->allowEmptyString('arreglos_maq');
 
         $validator
             ->scalar('cons_comb')
-            ->maxLength('cons_comb', 100)
+            ->maxLength('cons_comb', 250)
             ->allowEmptyString('cons_comb');
 
         $validator
             ->scalar('cons_lub')
-            ->maxLength('cons_lub', 100)
+            ->maxLength('cons_lub', 250)
             ->allowEmptyString('cons_lub');
 
         $validator
             ->scalar('operador')
-            ->maxLength('operador', 100)
+            ->maxLength('operador', 250)
             ->allowEmptyString('operador');
 
         $validator
             ->scalar('mantenimiento')
-            ->maxLength('mantenimiento', 150)
+            ->maxLength('mantenimiento', 250)
             ->allowEmptyString('mantenimiento');
 
         $validator
             ->scalar('administracion')
-            ->maxLength('administracion', 150)
+            ->maxLength('administracion', 250)
             ->allowEmptyString('administracion');
 
         $validator
