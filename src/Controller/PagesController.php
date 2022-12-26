@@ -109,6 +109,9 @@ class PagesController extends AppController
 
         if($user_role == 'admin')
         {
+
+
+
             return $this->redirect(['controller' => 'Pages', 'action' => 'indexAdmin']);
 
         } else {
@@ -130,6 +133,10 @@ class PagesController extends AppController
 
     public function indexAdmin()
     {
+        $session = $this->request->getSession();
+        //Seteo la session id empresa a null
+        $session->write('Auth.User.Empresa.idempresas', null);
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
 
     }
 

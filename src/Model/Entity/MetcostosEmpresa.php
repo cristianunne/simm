@@ -4,11 +4,13 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * ListaConstantesFilter Entity
+ * MetcostosEmpresa Entity
  *
- * @property string|null $name
+ * @property int $idmetcostos_empresas
+ * @property int $metcostos_idmetcostos
+ * @property int $empresas_idempresas
  */
-class ListaConstantesFilter extends Entity
+class MetcostosEmpresa extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -20,6 +22,7 @@ class ListaConstantesFilter extends Entity
      * @var array
      */
     protected $_accessible = [
-        'name' => true,
+        'metcostos_idmetcostos' => true,
+        'empresas_idempresas' => true,
     ];
 }

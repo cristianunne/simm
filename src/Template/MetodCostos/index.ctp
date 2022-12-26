@@ -5,7 +5,13 @@
 
 
 <?= $this->element('header')?>
-<?= $this->element('sidebar')?>
+
+<?php if($current_user['role'] == 'admin' and $id_empresa == null):  ?>
+    <?= $this->element('sidebar_admin')?>
+<?php else:?>
+    <?= $this->element('sidebar')?>
+<?php endif;?>
+
 
 <div class="content-wrapper">
     <div class="container">
@@ -24,11 +30,14 @@
 
 
             <div class="card-body table-responsive">
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Metodología', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'MetodCostos', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
-                <br>
+                <?php if($current_user['role'] == 'admin'):  ?>
+                    <div>
+                        <?= $this->Html->link($this->Html->tag('span', ' Agregar Metodología', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
+                            ['controller' => 'MetodCostos', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                    </div>
+                    <br>
+                <?php endif;?>
+
                 <div>
                     <?= $this->Html->link($this->Html->tag('span', ' Ver Todos', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
                         ['controller' => 'MetodCostos', 'action' => 'viewAll'], ['class' => 'btn btn-warning', 'escape' => false]) ?>
@@ -66,16 +75,15 @@
                             <td class="dt-center"><?= h($met->user->lastname . ' ' . $met->user->firstname) ?></td>
 
                             <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-sync', 'aria-hidden' => 'true']),
+
+                                <?php if($current_user['role'] == 'admin'):  ?>
+                                    <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-sync', 'aria-hidden' => 'true']),
                                     ['action' => 'edit', $met->idmetod_costos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                         ['action' => 'delete', $met->idmetod_costos],
                                         ['confirm' => __('Eliminar {0}?', $met->name), 'class' => 'btn btn-danger','escape' => false]) ?>
                                 <?php endif;?>
-
-
 
                             </td>
 

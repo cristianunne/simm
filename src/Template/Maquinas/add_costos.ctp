@@ -48,7 +48,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <?= $this->Form->control('metod_costos_idmetod_costos', ['options' => $metod_costos_data,
+                                    <?= $this->Form->control('metod_costos_hashmetod_costos', ['options' => $metod_costos_data,
                                         'empty' => '(Elija una opción)', 'type' => 'select',
                                         'class' => 'form-control',
                                         'label' => 'Metodología de Costos:', 'required']) ?>

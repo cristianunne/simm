@@ -41,25 +41,22 @@ class ListaConstantesController extends AppController
         $session = $this->request->getSession();
         $user_id = $session->read('Auth.User.idusers');
         $user_role = $session->read('Auth.User.role');
-        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
 
         $lista_constantes_ent =  $this->ListaConstantes->newEntity();
 
-        if(empty($id_empresa)){
-            $this->Flash->error(__('Tenemos problemas para procesar la información. Inicie Sesión nuevamente.'));
-        } else {
+
             $lista_constantes =  $this->ListaConstantes->find('all', [
                 'contain' => 'Users'
-            ])->where(['ListaConstantes.empresas_idempresas' => $id_empresa]);
+            ]);
             $this->set(compact('lista_constantes'));
-        }
+
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $lista_constantes_ent = $this->ListaConstantes->patchEntity($lista_constantes_ent, $this->request->getData());
 
             //AGrego lo datos falantes
-            $lista_constantes_ent->empresas_idempresas = $id_empresa;
             $lista_constantes_ent->users_idusers = $user_id;
 
             if($this->ListaConstantes->save($lista_constantes_ent)){

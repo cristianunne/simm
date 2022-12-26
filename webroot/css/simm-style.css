@@ -452,8 +452,10 @@
 }
 
 .div_content{
-    max-width: fit-content;
+    max-width: min-content;
     margin: 0 auto;
+    line-height: 17px;
+    padding-top: 10px;
 }
 
 /*-----------USERS ADMIN--------------- */

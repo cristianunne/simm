@@ -22,10 +22,9 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenDate|null $finished
  * @property bool $active
  * @property int $users_idusers
- * @property int $empresas_idempresas
+ * @property string $id_hash
  *
  * @property \App\Model\Entity\User $user
- * @property \App\Model\Entity\Empresa $empresa
  */
 class MetodCosto extends Entity
 {
@@ -54,8 +53,7 @@ class MetodCosto extends Entity
         'finished' => true,
         'active' => true,
         'users_idusers' => true,
-        'empresas_idempresas' => true,
+        'id_hash' => true,
         'user' => true,
-        'empresa' => true,
     ];
 }

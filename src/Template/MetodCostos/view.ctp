@@ -1,5 +1,10 @@
 <?= $this->element('header')?>
-<?= $this->element('sidebar')?>
+
+<?php if($current_user['role'] == 'admin' and $id_empresa == null):  ?>
+    <?= $this->element('sidebar_admin')?>
+<?php else:?>
+    <?= $this->element('sidebar')?>
+<?php endif;?>
 
 <div class="content-wrapper">
     <div class="container">

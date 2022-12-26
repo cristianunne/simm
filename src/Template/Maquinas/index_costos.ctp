@@ -65,7 +65,18 @@
                             <td class="dt-center"><?= h($maq->worksgroup->name) ?></td>
 
                             <td class="dt-center"><?= h($maq->centros_costo->name) ?></td>
-                            <td class="dt-center"><?= h($maq->metod_costo->name) ?></td>
+
+                            <!-- Uso un for para la metodologia de costos-->
+                            <?php foreach ($met_costos_tabla as $met): ?>
+
+                                <?php if($met->id_hash == $maq->metod_costos_hashmetod_costos):  ?>
+                                    <td class="dt-center"><?= h($met->name) ?></td>
+                                <?php else: ?>
+                                    <td class="dt-center"></td>
+                                <?php endif;?>
+
+                            <?php endforeach; ?>
+
                             <td class="dt-center"><?= h($maq->created->format('d-m-Y')) ?></td>
 
                             <td class="dt-center"><?= h($maq->user->lastname . ' ' . $maq->user->firstname) ?></td>

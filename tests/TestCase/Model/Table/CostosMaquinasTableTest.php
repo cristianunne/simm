@@ -27,7 +27,6 @@ class CostosMaquinasTableTest extends TestCase
         'app.Maquinas',
         'app.Worksgroups',
         'app.CentrosCostos',
-        'app.MetodCostos',
         'app.Users',
     ];
 

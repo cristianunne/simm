@@ -44,11 +44,6 @@ class MetodCostosTable extends Table
             'joinType' => 'INNER'
         ]);
 
-        $this->hasOne('Empresas', [
-            'foreignKey' => 'idempresas',
-            'bindingKey' => 'empresas_idempresas', //actual
-            'joinType' => 'INNER'
-        ]);
     }
 
     /**
@@ -133,9 +128,10 @@ class MetodCostosTable extends Table
             ->notEmptyString('users_idusers');
 
         $validator
-            ->integer('empresas_idempresas')
-            ->requirePresence('empresas_idempresas', 'create')
-            ->notEmptyString('empresas_idempresas');
+            ->scalar('id_hash')
+            ->maxLength('id_hash', 255)
+            ->requirePresence('id_hash', 'create')
+            ->notEmptyString('id_hash');
 
         return $validator;
     }

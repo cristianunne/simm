@@ -1,21 +1,21 @@
 <?php
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\MetodCostosTable;
+use App\Model\Table\MetcostosEmpresasTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\MetodCostosTable Test Case
+ * App\Model\Table\MetcostosEmpresasTable Test Case
  */
-class MetodCostosTableTest extends TestCase
+class MetcostosEmpresasTableTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \App\Model\Table\MetodCostosTable
+     * @var \App\Model\Table\MetcostosEmpresasTable
      */
-    public $MetodCostos;
+    public $MetcostosEmpresas;
 
     /**
      * Fixtures
@@ -23,8 +23,7 @@ class MetodCostosTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.MetodCostos',
-        'app.Users',
+        'app.MetcostosEmpresas',
     ];
 
     /**
@@ -35,8 +34,8 @@ class MetodCostosTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::getTableLocator()->exists('MetodCostos') ? [] : ['className' => MetodCostosTable::class];
-        $this->MetodCostos = TableRegistry::getTableLocator()->get('MetodCostos', $config);
+        $config = TableRegistry::getTableLocator()->exists('MetcostosEmpresas') ? [] : ['className' => MetcostosEmpresasTable::class];
+        $this->MetcostosEmpresas = TableRegistry::getTableLocator()->get('MetcostosEmpresas', $config);
     }
 
     /**
@@ -46,7 +45,7 @@ class MetodCostosTableTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->MetodCostos);
+        unset($this->MetcostosEmpresas);
 
         parent::tearDown();
     }

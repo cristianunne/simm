@@ -28,13 +28,13 @@ use Cake\ORM\Entity;
  * @property int $users_idusers
  * @property int $worksgroups_idworksgroups
  * @property int $centros_costos_idcentros_costos
- * @property int $metod_costos_idmetod_costos
+ * @property string $metod_costos_hashmetod_costos
  * @property string $hash_id
+ * @property bool $alquilada
  *
  * @property \App\Model\Entity\Maquina $maquina
  * @property \App\Model\Entity\Worksgroup $worksgroup
  * @property \App\Model\Entity\CentrosCosto $centros_costo
- * @property \App\Model\Entity\MetodCosto $metod_costo
  * @property \App\Model\Entity\User $user
  */
 class CostosMaquina extends Entity
@@ -70,12 +70,12 @@ class CostosMaquina extends Entity
         'users_idusers' => true,
         'worksgroups_idworksgroups' => true,
         'centros_costos_idcentros_costos' => true,
-        'metod_costos_idmetod_costos' => true,
+        'metod_costos_hashmetod_costos' => true,
         'hash_id' => true,
+        'alquilada' => true,
         'maquina' => true,
         'worksgroup' => true,
         'centros_costo' => true,
-        'metod_costo' => true,
         'user' => true,
     ];
 }

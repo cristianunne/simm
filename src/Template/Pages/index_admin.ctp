@@ -41,6 +41,29 @@
                             </div>
                         </div>
 
+                        <div class="btn-group flex-vertical " role="group" aria-label="Third group">
+                            <div>
+                                <?= $this->Html->link('',
+                                    ['controller' => 'Constantes', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-constantes btn btn-default', 'escape' => false]) ?>
+                            </div>
+                            <div class="div_content">
+                                <p class="center text-color-navy">Constantes</p>
+                            </div>
+                        </div>
+
+
+                        <div class="btn-group flex-vertical " role="group" aria-label="Third group">
+                            <div>
+                                <?= $this->Html->link('',
+                                    ['controller' => 'MetodCostos', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-met-costos btn btn-default', 'escape' => false]) ?>
+                            </div>
+                            <div class="div_content">
+                                <p class="center text-color-navy">Metodología de Costos</p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

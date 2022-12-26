@@ -45,13 +45,7 @@ class ListaConstantesFilterTable extends Table
         $validator
             ->scalar('name')
             ->maxLength('name', 45)
-            ->requirePresence('name', 'create')
-            ->notEmptyString('name');
-
-        $validator
-            ->integer('empresas_idempresas')
-            ->requirePresence('empresas_idempresas', 'create')
-            ->notEmptyString('empresas_idempresas');
+            ->allowEmptyString('name');
 
         return $validator;
     }

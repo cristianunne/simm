@@ -59,6 +59,7 @@ class UsersAdministrationController extends AppController
         $this->set(compact('users'));
         $this->set(compact('id_empresa'));
 
+
     }
 
     public function add()

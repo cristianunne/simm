@@ -33,7 +33,7 @@
                                     <?= $this->Form->control('worksgroups_idworksgroups', ['options' => $grupos_data,
                                         'empty' => '(Elija una opción)', 'type' => 'select',
                                         'class' => 'form-control',
-                                        'label' => 'Grupo:', 'disabled']) ?>
+                                        'label' => 'Grupo:']) ?>
                                 </div>
 
                             </div>
@@ -43,96 +43,197 @@
                                     <?= $this->Form->control('centros_costos_idcentros_costos', ['options' => $centro_costo_data,
                                         'empty' => '(Elija una opción)', 'type' => 'select',
                                         'class' => 'form-control',
-                                        'label' => 'Centro de Costos:', 'disabled', 'id' => 'select_centro_costos']) ?>
+                                        'label' => 'Centro de Costos:', 'id' => 'select_centro_costos']) ?>
                                 </div>
 
                                 <div class="form-group">
-                                    <?= $this->Form->control('metod_costos_idmetod_costos', ['options' => $metod_costos_data,
+                                    <?= $this->Form->control('metod_costos_hashmetod_costos', ['options' => $metod_costos_data,
                                         'empty' => '(Elija una opción)', 'type' => 'select',
                                         'class' => 'form-control',
-                                        'label' => 'Metodología de Costos:', 'disabled']) ?>
+                                        'label' => 'Metodología de Costos:']) ?>
                                 </div>
 
                             </div>
 
                             <hr style="width: 97%; margin-top: 25px;">
 
-                            <div class="col-md-5">
-                                <br>
-                                <br>
+                            <div class="col-md-12">
 
-                                <div class="form-group">
-                                    <?= $this->Form->input('val_adq', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Adquisición ($): ']) ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= $this->Form->input('vida_util', ['class' => 'form-control', 'type' => 'number', 'label' => 'Vida útil (Años): ']) ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= $this->Form->input('horas_total_uso', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Horas totales de uso (horas): ']) ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= $this->Form->input('horas_mens_uso', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Horas mensuales de uso (horas): ']) ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= $this->Form->input('tasa_int_simple', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Tasa de interés simple: ']) ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= $this->Form->input('consumo', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Consumo (litros/hora): ']) ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= $this->Form->input('costo_alquiler', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Alquiler ($/ton): ']) ?>
+                                <div class="col-md-5" style="margin: auto;">
+                                    <?= $this->Form->control('alquilada', ['options' => [1 => 'SI', 0 => 'NO'],
+                                        'empty' => '(Elija una opción)', 'type' => 'select',
+                                        'class' => 'form-control', 'placeholder' => '', 'id' => 'select_conditions',
+                                        'label' => '¿La Máquina es Alquilada?', 'onchange' => 'selectConditionsMaquina(this)']) ?>
+                                    <br>
                                 </div>
 
                             </div>
 
-                            <div class="col-md-5" style="margin-left: auto;">
-                                <br>
-                                <br>
-                                <div class="form-group">
-                                    <?= $this->Form->input('val_neum', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Neum./Piezas de Reposición ($): ']) ?>
+                            <!-- Cmpruebo si es alquilada o no-->
+                            <?php if ($maquinas_costos->alquilada == true):?>
+
+                                <div class="col-md-5">
+                                    <br>
+                                    <br>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('val_adq', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Adquisición ($): ',
+                                            'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('vida_util', ['class' => 'form-control', 'type' => 'number', 'label' => 'Vida útil (Años): ',
+                                            'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_total_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas totales de uso (horas): ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_mens_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas mensuales de uso (horas): ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('tasa_int_simple', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Tasa de interés simple: ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('consumo', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Consumo (litros/hora): ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('costo_alquiler', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Alquiler ($/ton): ']) ?>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-5" style="margin-left: auto;">
+                                    <br>
+                                    <br>
+                                    <div class="form-group">
+                                        <?= $this->Form->input('val_neum', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Neum./Piezas de Reposición ($): ',
+                                            'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('vida_util_neum', ['class' => 'form-control', 'type' => 'number', 'label' => 'Vida útil Neumáticos (horas): ',
+                                            'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_efec_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas efectivas de uso anual (horas): ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_dia_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas diarias de uso (horas): ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('factor_cor', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Factor de correción: ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('coef_err_mec', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Coeficiente de arreglos mecánicos: ',  'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('lubricante', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Lubricante (litros/hora): ',  'disabled']) ?>
+                                    </div>
+
                                 </div>
 
-                                <div class="form-group">
-                                    <?= $this->Form->input('vida_util_neum', ['class' => 'form-control', 'type' => 'number', 'label' => 'Vida útil Neumáticos (horas): ']) ?>
+                            <?php else: ?>
+
+                                <div class="col-md-5">
+                                    <br>
+                                    <br>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('val_adq', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Adquisición ($): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('vida_util', ['class' => 'form-control', 'type' => 'number', 'label' => 'Vida útil (Años): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_total_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas totales de uso (horas): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_mens_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas mensuales de uso (horas): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('tasa_int_simple', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Tasa de interés simple: ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('consumo', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Consumo (litros/hora): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('costo_alquiler', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Alquiler ($/ton): ', 'disabled']) ?>
+                                    </div>
+
                                 </div>
 
-                                <div class="form-group">
-                                    <?= $this->Form->input('horas_efec_uso', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Horas efectivas de uso anual (horas): ']) ?>
+                                <div class="col-md-5" style="margin-left: auto;">
+                                    <br>
+                                    <br>
+                                    <div class="form-group">
+                                        <?= $this->Form->input('val_neum', ['class' => 'form-control', 'type' => 'number', 'label' => 'Valor de Neum./Piezas de Reposición ($): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('vida_util_neum', ['class' => 'form-control', 'type' => 'number', 'label' => 'Vida útil Neumáticos (horas): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_efec_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas efectivas de uso anual (horas): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('horas_dia_uso', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Horas diarias de uso (horas): ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('factor_cor', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Factor de correción: ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('coef_err_mec', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Coeficiente de arreglos mecánicos: ']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->input('lubricante', ['class' => 'form-control', 'type' => 'number',
+                                            'label' => 'Lubricante (litros/hora): ']) ?>
+                                    </div>
+
                                 </div>
 
-                                <div class="form-group">
-                                    <?= $this->Form->input('horas_dia_uso', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Horas diarias de uso (horas): ']) ?>
-                                </div>
+                            <?php endif; ?>
 
-                                <div class="form-group">
-                                    <?= $this->Form->input('factor_cor', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Factor de correción: ']) ?>
-                                </div>
 
-                                <div class="form-group">
-                                    <?= $this->Form->input('coef_err_mec', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Coeficiente de arreglos mecánicos: ']) ?>
-                                </div>
-
-                                <div class="form-group">
-                                    <?= $this->Form->input('lubricante', ['class' => 'form-control', 'type' => 'number',
-                                        'label' => 'Lubricante (litros/hora): ']) ?>
-                                </div>
-
-                            </div>
                         </div>
                         <hr>
                         <div class="form-group" style="margin-top: 40px;">

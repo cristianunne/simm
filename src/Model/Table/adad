@@ -1,0 +1,89 @@
+   $this->hasOne('Maquinas', [
+            'foreignKey' => 'idmaquinas',
+            'bindingKey' => 'maquinas_idmaquinas', //actual
+            'joinType' => 'INNER'
+        ]);
+
+        $this->hasOne('Worksgroups', [
+            'foreignKey' => 'idworksgroups',
+            'bindingKey' => 'worksgroups_idworksgroups', //actual
+            'joinType' => 'INNER'
+        ]);
+
+        $this->hasOne('CentrosCostos', [
+            'foreignKey' => 'idcentros_costos',
+            'bindingKey' => 'centros_costos_idcentros_costos', //actual
+            'joinType' => 'INNER'
+        ]);
+
+        $this->hasOne('MetodCostos', [
+            'foreignKey' => 'idmetod_costos',
+            'bindingKey' => 'metod_costos_idmetod_costos', //actual
+            'joinType' => 'INNER'
+        ]);
+
+        $this->hasOne('Users', [
+            'foreignKey' => 'idusers',
+            'bindingKey' => 'users_idusers', //actual
+            'joinType' => 'INNER'
+        ]);
+
+
+
+
+
+
+         $this->hasOne('Maquinas', [
+                    'foreignKey' => 'idmaquinas',
+                    'bindingKey' => 'maquinas_idmaquinas', //actual
+                    'joinType' => 'INNER'
+                ]);
+
+                $this->hasOne('Worksgroups', [
+                    'foreignKey' => 'idworksgroups',
+                    'bindingKey' => 'worksgroups_idworksgroups', //actual
+                    'joinType' => 'INNER'
+                ]);
+
+                $this->hasOne('CentrosCostos', [
+                    'foreignKey' => 'idcentros_costos',
+                    'bindingKey' => 'centros_costos_idcentros_costos', //actual
+                    'joinType' => 'INNER'
+                ]);
+
+
+                $this->hasOne('Users', [
+                    'foreignKey' => 'idusers',
+                    'bindingKey' => 'users_idusers', //actual
+                    'joinType' => 'INNER'
+                ]);
+
+
+
+
+
+
+                        $this->hasOne('Maquinas', [
+                            'foreignKey' => 'idmaquinas',
+                            'bindingKey' => 'maquinas_idmaquinas', //actual
+                            'joinType' => 'INNER'
+                        ]);
+
+                        $this->hasOne('Worksgroups', [
+                            'foreignKey' => 'idworksgroups',
+                            'bindingKey' => 'worksgroups_idworksgroups', //actual
+                            'joinType' => 'INNER'
+                        ]);
+
+                        $this->hasOne('CentrosCostos', [
+                            'foreignKey' => 'idcentros_costos',
+                            'bindingKey' => 'centros_costos_idcentros_costos', //actual
+                            'joinType' => 'INNER'
+                        ]);
+
+
+                        $this->hasOne('Users', [
+                            'foreignKey' => 'idusers',
+                            'bindingKey' => 'users_idusers', //actual
+                            'joinType' => 'INNER'
+                        ]);

@@ -29,7 +29,34 @@ class MetodCostosController extends AppController
 
     public function index()
     {
+        //Variable usada para el sidebar
+        $seccion = 'system';
+        $sub_seccion = 'MetodCostos';
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
 
+        //Consulto si la empresa no esta vacia
+        //Traigo los datos de la sesion
+
+        //Consulto si la empresa no esta vacia
+        //Traigo los datos de la sesion
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+
+
+        $metod_costos =  $this->MetodCostos->find('all', [
+                'contain' => 'Users'
+            ])->where(['MetodCostos.active' => true]);
+
+        $this->set(compact('metod_costos'));
+        $this->set(compact('id_empresa'));
+
+
+    }
+
+    public function indexEmpresa()
+    {
         //Variable usada para el sidebar
         $seccion = 'system';
         $sub_seccion = 'MetodCostos';
@@ -50,6 +77,7 @@ class MetodCostosController extends AppController
             $this->set(compact('metod_costos'));
         }
 
+
     }
 
 
@@ -60,6 +88,11 @@ class MetodCostosController extends AppController
         $sub_seccion = 'MetodCostos';
         $this->set(compact('seccion'));
         $this->set(compact('sub_seccion'));
+
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        $this->set(compact('id_empresa'));
 
         if(empty($id))
         {
@@ -93,18 +126,21 @@ class MetodCostosController extends AppController
 
         //Consulto si la empresa no esta vacia
         //Traigo los datos de la sesion
+        //Consulto si la empresa no esta vacia
+        //Traigo los datos de la sesion
         $session = $this->request->getSession();
+
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
 
-        if(empty($id_empresa)){
-            $this->Flash->error(__('Tenemos problemas para procesar la información. Inicie Sesión nuevamente.'));
-        } else {
-            $metod_costos =  $this->MetodCostos->find('all', [
+        $this->set(compact('id_empresa'));
+
+
+        $metod_costos =  $this->MetodCostos->find('all', [
                 'contain' => 'Users'
-            ])->where(['MetodCostos.empresas_idempresas' => $id_empresa])
+            ])
                 ->order(['MetodCostos.name ASC']);
-            $this->set(compact('metod_costos'));
-        }
+        $this->set(compact('metod_costos'));
+
 
     }
 
@@ -121,19 +157,21 @@ class MetodCostosController extends AppController
         //Consulto si la empresa no esta vacia
         //Traigo los datos de la sesion
         $session = $this->request->getSession();
+
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        $this->set(compact('id_empresa'));
+
 
         $name = $this->request->getQuery(['name']);
 
-        if(empty($id_empresa)){
-            $this->Flash->error(__('Tenemos problemas para procesar la información. Inicie Sesión nuevamente.'));
-        } else {
+
             $metod_costos =  $this->MetodCostos->find('all', [
                 'contain' => 'Users'
-            ])->where(['MetodCostos.active' => false, 'MetodCostos.empresas_idempresas' => $id_empresa, 'MetodCostos.name' => $name])
+            ])->where(['MetodCostos.active' => false, 'MetodCostos.name' => $name])
                 ->order(['MetodCostos.created DESC']);
             $this->set(compact('metod_costos'));
-        }
+
     }
 
 
@@ -161,7 +199,7 @@ class MetodCostosController extends AppController
             'keyField' => 'name',
             'valueField' => 'name',
             'order' => ['name' => 'ASC']
-        ])->where(['empresas_idempresas' => $id_empresa])->toArray();
+        ])->toArray();
 
         //debo verificar que no este ya usada
 
@@ -175,8 +213,11 @@ class MetodCostosController extends AppController
 
             //AGrego lo datos falantes
             $metodologia->created = date("Y-m-d");
-            $metodologia->empresas_idempresas = $id_empresa;
             $metodologia->users_idusers = $user_id;
+            //Creo el hash_id
+            $metodologia->id_hash = hash('sha256' , ($metodologia->name . date("Y-m-d")));
+
+
 
             if($this->MetodCostos->save($metodologia)){
                 $this->Flash->success(__('La Metodología se ha almacenado correctamente'));
@@ -207,7 +248,12 @@ class MetodCostosController extends AppController
             $session = $this->request->getSession();
             $user_id = $session->read('Auth.User.idusers');
             $user_role = $session->read('Auth.User.role');
+
+
             $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+            $this->set(compact('id_empresa'));
+
 
             $metodologia =  $this->MetodCostos->get($id);
 
@@ -218,7 +264,7 @@ class MetodCostosController extends AppController
                 'keyField' => 'name',
                 'valueField' => 'name',
                 'order' => ['name' => 'ASC']
-            ])->where(['empresas_idempresas' => $id_empresa])->toArray();
+            ])->toArray();
 
             //debo verificar que no este ya usada
 
@@ -247,8 +293,12 @@ class MetodCostosController extends AppController
 
                          //AGrego lo datos falantes
                          $metodologia_new->created = date("Y-m-d");
-                         $metodologia_new->empresas_idempresas = $id_empresa;
+
                          $metodologia_new->users_idusers = $user_id;
+                         //copio el hash_id
+                         $metodologia_new->id_hash = $metodologia->id_hash;
+
+
 
                          if($this->MetodCostos->save($metodologia_new)){
                              $this->Flash->success(__('La Matodología se ha actualizado correctamente'));

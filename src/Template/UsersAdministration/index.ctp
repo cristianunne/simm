@@ -9,7 +9,15 @@
 
 <?php if(!empty($id_empresa)): ?>
 
-<?= $this->element('sidebar')?>
+    <?= $this->element('sidebar')?>
+
+<?php else:?>
+
+    <?php if($current_user['role'] == 'admin'):  ?>
+        <?= $this->element('sidebar_admin')?>
+    <?php else:?>
+        <?= $this->element('sidebar')?>
+    <?php endif;?>
 
 <?php endif; ?>
 

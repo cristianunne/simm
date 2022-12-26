@@ -896,8 +896,8 @@ function getCostosMaquinaByIdDb(id_costo, element, history_costos) {
         },
         success: function(data, textStatus){
 
-            console.log(data);
-            loadDataToCostosMaquinaView(data, element);
+            //console.log(data);
+            loadDataToCostosMaquinaView(data, element, history_costos);
 
         },
         error: function (data) {
@@ -906,7 +906,7 @@ function getCostosMaquinaByIdDb(id_costo, element, history_costos) {
 
 }
 
-function loadDataToCostosMaquinaView(data, element) {
+function loadDataToCostosMaquinaView(data, element, history_costos) {
 
     let maq_name = $("#maq_name");
     let grupo_name = $("#grupo_name");
@@ -957,7 +957,7 @@ function loadDataToCostosMaquinaView(data, element) {
     maq_name.html(data[0].maquina.marca.toString() + ": " + data[0].maquina.name.toString());
     grupo_name.html(data[0].worksgroup.name.toString());
     centro_costo_name.html(data[0].centros_costo.name.toString());
-    met_costo_name.html(data[0].metod_costo.name.toString());
+
 
     val_adq.html(data[0].val_adq);
     vida_util.html(data[0].vida_util);
@@ -976,9 +976,45 @@ function loadDataToCostosMaquinaView(data, element) {
     coef_arr_mec.html(data[0].coef_err_mec);
     lubricante.html(data[0].lubricante);
 
+    //Hago una consulta para metodologia de costos en particular
+    getMetodologiaCostos(data[0].metod_costos_hashmetod_costos, met_costo_name, history_costos);
+
 
     showModalAll(element)
 }
+
+
+function getMetodologiaCostos(hash_id, met_costo_name, history_costos) {
+
+    if(history_costos === 'history_costos'){
+        url = '../../getMetodologiaCostosByHashId';
+    } else {
+        url = '../getMetodologiaCostosByHashId';
+    }
+
+
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: url,
+        data: {'hash_id' : hash_id},
+
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        },
+        success: function(data, textStatus){
+
+            //console.log(data);
+            //return data;
+            met_costo_name.html(data[0].name.toString());
+            //loadDataToCostosMaquinaView(data, element);
+
+        },
+        error: function (data) {
+        }
+    });
+}
+
 
 function selectConditionsMaquina(object)
 {

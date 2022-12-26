@@ -102,7 +102,7 @@
 
                             </div>
                             <div class="pull-left">
-                                <?= $this->Html->link("Volver", ['controller' => 'Empresas', 'action' => 'index'], ['class' => 'btn btn-danger btn-flat']) ?>
+                                <?= $this->Html->link("Volver", ['controller' => 'UsersAdministration', 'action' => 'index'], ['class' => 'btn btn-danger btn-flat']) ?>
                             </div>
 
                         </div>

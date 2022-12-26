@@ -240,12 +240,23 @@ class MaquinasController extends AppController
         try {
 
             $maquinas_costos = $costos_maq_model->find('all', [
-                'contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos', 'MetodCostos', 'Users']
+                'contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos', 'Users']
             ])
                 ->where(['maquinas_idmaquinas' => $id, 'CostosMaquinas.active' => true]);
 
 
+            //TRaigo las metodologias de costos
+            $met_costos_model = $this->loadModel('metod_costos');
+            $met_costos_tabla = $met_costos_model->find('all', [])
+                ->where(['active' => true]);
+
+
+            //debug($met_costos_tabla->toArray());
+
             $this->set(compact('maquinas_costos'));
+            $this->set(compact('met_costos_tabla'));
+
+            //debug($maquinas_costos->toArray());
 
         } catch (InvalidPrimaryKeyException $e) {
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
@@ -307,10 +318,10 @@ class MaquinasController extends AppController
             $metod_costos_model = $this->loadModel('MetodCostos');
 
             $metod_costos_data = $metod_costos_model->find('list', [
-                'keyField' => 'idmetod_costos',
+                'keyField' => 'id_hash',
                 'valueField' => 'name'
             ])
-                ->where(['active' => true, 'empresas_idempresas' => $id_empresa])
+                ->where(['active' => true])
                 ->toArray();
 
             //Guardo la informacion
@@ -380,7 +391,7 @@ class MaquinasController extends AppController
 
             //agregare un where si o si USARE UN FIND
             $maquinas_costos = $costos_maq_model->get($id,
-                ['contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos', 'MetodCostos'],
+                ['contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos'],
                     'conditions' => ['CostosMaquinas.active' => true]]);
 
 
@@ -419,24 +430,97 @@ class MaquinasController extends AppController
             $metod_costos_model = $this->loadModel('MetodCostos');
 
             $metod_costos_data = $metod_costos_model->find('list', [
-                'keyField' => 'idmetod_costos',
+                'keyField' => 'id_hash',
                 'valueField' => 'name'
             ])
-                ->where(['active' => true, 'empresas_idempresas' => $id_empresa])
+                ->where(['active' => true])
                 ->toArray();
-
 
 
             if ($this->request->is(['patch', 'post', 'put'])) {
 
-                $maquinas_costos = $costos_maq_model->patchEntity($maquinas_costos, $this->request->getData());
+                //$maquinas_costos = $costos_maq_model->patchEntity($maquinas_costos, $this->request->getData());
 
-                if ($costos_maq_model->save($maquinas_costos)) {
+                if($this->request->getData()['alquilada'] == 0)
+                {
+                    //NO esta alquilada//// Car
+
+                    //Tengo que verificar si hubo cambios de alquilada a no
+
+                    if($maquinas_costos->alquilada){
+                        $maquinas_costos->costo_alquiler = null;
+                    }
+
+                    $maquinas_costos = $costos_maq_model->patchEntity($maquinas_costos, $this->request->getData());
+
+
+                    if ($costos_maq_model->save($maquinas_costos)) {
+                        $this->Flash->success(__('La Máquina se ha almacenado correctamente'));
+                        return $this->redirect(['action' => 'indexCostos', $id_maquina]);
+                    } else {
+                        $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
+                    }
+
+
+                } else {
+                    //SI esta alquilada, compruebo que el valor de alquiler haya sido modificado
+
+                    if($this->checkChangesOnEditAlquiler($this->request->getData()['costo_alquiler'], $maquinas_costos->costo_alquiler)){
+
+                        //Creo una nueva entidad si o si
+
+
+                        //SI era alquilada borro los datos
+                        if(!$maquinas_costos->alquilada){
+                            $maquinas_costos->val_adq = null;
+                            $maquinas_costos->val_neum = null;
+                            $maquinas_costos->vida_util = null;
+                            $maquinas_costos->vida_util_neum = null;
+                            $maquinas_costos->horas_total_uso = null;
+                            $maquinas_costos->horas_efec_uso = null;
+                            $maquinas_costos->horas_mens_uso = null;
+                            $maquinas_costos->horas_dia_uso = null;
+                            $maquinas_costos->tasa_int_simple = null;
+                            $maquinas_costos->factor_cor = null;
+                            $maquinas_costos->coef_err_mec = null;
+                            $maquinas_costos->consumo = null;
+                            $maquinas_costos->lubricante = null;
+
+                        } else {
+                            $maquinas_costos->costo_alquiler = null;
+                        }
+
+                        $maquinas_costos = $costos_maq_model->patchEntity($maquinas_costos, $this->request->getData());
+
+
+                        if ($costos_maq_model->save($maquinas_costos)) {
+                            $this->Flash->success(__('La Máquina se ha almacenado correctamente'));
+
+                            return $this->redirect(['action' => 'indexCostos', $id_maquina]);
+                        } else {
+                            $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
+                        }
+
+
+                    } else {
+                        debug("NO HUBO CAMBIOS");
+
+                    }
+
+                }
+
+
+
+
+
+
+                //debo controlar que haya cambios en los datos
+                /*if ($costos_maq_model->save($maquinas_costos)) {
                     $this->Flash->success(__('La Máquina se ha almacenado correctamente'));
                     return $this->redirect(['action' => 'indexCostos', $id_maquina]);
                 } else {
                     $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
-                }
+                }*/
             }
 
 
@@ -478,7 +562,6 @@ class MaquinasController extends AppController
         $this->set(compact('seccion'));
         $this->set(compact('sub_seccion'));
 
-
         //Traigo los datos de la sesion
         $session = $this->request->getSession();
         $user_id = $session->read('Auth.User.idusers');
@@ -492,12 +575,10 @@ class MaquinasController extends AppController
 
         try {
 
-
             //agregare un where si o si USARE UN FIND
             $maquinas_costos = $costos_maq_model->get($id,
-                ['contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos', 'MetodCostos'],
+                ['contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos'],
                     'conditions' => ['CostosMaquinas.active' => true]]);
-
 
             //COnsulto si esta undefinido y vuelvo
             if (!isset($maquinas_costos)) {
@@ -534,10 +615,10 @@ class MaquinasController extends AppController
             $metod_costos_model = $this->loadModel('MetodCostos');
 
             $metod_costos_data = $metod_costos_model->find('list', [
-                'keyField' => 'idmetod_costos',
+                'keyField' => 'id_hash',
                 'valueField' => 'name'
             ])
-                ->where(['active' => true, 'empresas_idempresas' => $id_empresa])
+                ->where(['active' => true])
                 ->toArray();
 
 
@@ -552,14 +633,14 @@ class MaquinasController extends AppController
 
                 $new_costos_maquina->maquinas_idmaquinas = $maquinas_costos->maquina->idmaquinas;
                 $new_costos_maquina->worksgroups_idworksgroups = $maquinas_costos->worksgroup->idworksgroups;
-                $new_costos_maquina->centros_costos_idcentros_costos = $maquinas_costos->centros_costo->idcentros_costos;
-                $new_costos_maquina->metod_costos_idmetod_costos = $maquinas_costos->metod_costo->idmetod_costos;
 
+                //El centro de costo ahora es un hash
+                $new_costos_maquina->centros_costos_idcentros_costos = $maquinas_costos->centros_costo->idcentros_costos;
+                $new_costos_maquina->metod_costos_hashmetod_costos = $maquinas_costos->metod_costos_hashmetod_costos;
+                $new_costos_maquina->alquilada = $maquinas_costos->alquilada;
                 $new_costos_maquina->active = true;
                 $new_costos_maquina->users_idusers = $user_id;
-
                 $new_costos_maquina->hash_id = $maquinas_costos->hash_id;
-
 
                 //Primero comparo el array
 
@@ -630,6 +711,17 @@ class MaquinasController extends AppController
 
     }
 
+    private function checkChangesOnEditAlquiler($alquiler_new = null, $alquiler_old = null)
+    {
+
+        if($alquiler_new == $alquiler_old){
+            return false;
+        }
+        return true;
+    }
+
+
+
     public function viewCostosMaq()
     {
         $this->autoRender = false;
@@ -644,7 +736,7 @@ class MaquinasController extends AppController
 
             //Utilizo el subquery para traer los datos
             $array_data = $costos_maq_model->find('all', [
-                'contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos', 'MetodCostos']
+                'contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos']
             ])
                 ->where(['idcostos_maquinas' => $id_costo_maq]) ->toArray();
         }
@@ -679,16 +771,25 @@ class MaquinasController extends AppController
 
         try{
 
-            $maquinas_costos =  $costos_maq_model->find('all', [
-                'contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos', 'MetodCostos', 'Users']
-            ])
-                ->where(['CostosMaquinas.hash_id' => $hash_id]);
+            //Aca tengo que filtrar la maquina por su id
 
+            $maquinas_costos =  $costos_maq_model->find('all', [
+                'contain' => ['Maquinas', 'Worksgroups', 'CentrosCostos', 'Users']
+            ])->where(['maquinas_idmaquinas' => $id_maquina]);
+
+            //TRaigo los valores de la metodología de costos
+            $metod_costos_model = $this->loadModel('MetodCostos');
+
+            //TRaigo las metodologias de costos
+            $met_costos_model = $this->loadModel('metod_costos');
+            $met_costos_tabla = $met_costos_model->find('all', [])
+                ->where(['active' => true]);
 
 
             $this->set(compact('maquinas_costos'));
             $this->set(compact('hash_id'));
             $this->set(compact('id_maquina'));
+            $this->set(compact('met_costos_tabla'));
 
         } catch (InvalidPrimaryKeyException $e){
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
@@ -852,6 +953,32 @@ class MaquinasController extends AppController
     }
 
 
+
+    public function getMetodologiaCostosByHashId()
+    {
+
+        $this->autoRender = false;
+
+
+        $hash_id = $_POST['hash_id'];
+
+        $met_costos_model = $this->loadModel('MetodCostos');
+
+        $array_data = [];
+
+        if($this->request->is('ajax')) {
+
+            $array_data = $met_costos_model->find('all', [
+            ])
+                ->where(['id_hash' => $hash_id])
+                ->toArray();
+
+        }
+
+        return $this->json($array_data);
+
+
+    }
 
 
 

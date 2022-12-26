@@ -7,6 +7,11 @@
 <?= $this->element('header')?>
 
 
+<?php if($current_user['role'] == 'admin' and $id_empresa == null):  ?>
+    <?= $this->element('sidebar_admin')?>
+<?php endif;?>
+
+
 <div class="content-wrapper">
     <div class="container">
         <?= $this->Flash->render() ?>

@@ -70,10 +70,6 @@ class ListaConstantesTable extends Table
             ->requirePresence('users_idusers', 'create')
             ->notEmptyString('users_idusers');
 
-        $validator
-            ->integer('empresas_idempresas')
-            ->requirePresence('empresas_idempresas', 'create')
-            ->notEmptyString('empresas_idempresas');
 
         return $validator;
     }

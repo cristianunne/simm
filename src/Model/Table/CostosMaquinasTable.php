@@ -40,7 +40,6 @@ class CostosMaquinasTable extends Table
 
         $this->addBehavior('Timestamp');
 
-
         $this->hasOne('Maquinas', [
             'foreignKey' => 'idmaquinas',
             'bindingKey' => 'maquinas_idmaquinas', //actual
@@ -59,18 +58,12 @@ class CostosMaquinasTable extends Table
             'joinType' => 'INNER'
         ]);
 
-        $this->hasOne('MetodCostos', [
-            'foreignKey' => 'idmetod_costos',
-            'bindingKey' => 'metod_costos_idmetod_costos', //actual
-            'joinType' => 'INNER'
-        ]);
 
         $this->hasOne('Users', [
             'foreignKey' => 'idusers',
             'bindingKey' => 'users_idusers', //actual
             'joinType' => 'INNER'
         ]);
-
     }
 
     /**
@@ -172,9 +165,15 @@ class CostosMaquinasTable extends Table
             ->notEmptyString('centros_costos_idcentros_costos');
 
         $validator
-            ->integer('metod_costos_idmetod_costos')
-            ->requirePresence('metod_costos_idmetod_costos', 'create')
-            ->notEmptyString('metod_costos_idmetod_costos');
+            ->scalar('metod_costos_hashmetod_costos')
+            ->maxLength('metod_costos_hashmetod_costos', 255)
+            ->requirePresence('metod_costos_hashmetod_costos', 'create')
+            ->notEmptyString('metod_costos_hashmetod_costos');
+
+        $validator
+            ->boolean('alquilada')
+            ->requirePresence('alquilada', 'create')
+            ->notEmptyString('alquilada');
 
         return $validator;
     }
@@ -189,6 +188,7 @@ class CostosMaquinasTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->isUnique(['idcostos_maquinas']));
+
 
         return $rules;
     }

@@ -37,7 +37,7 @@ class ConstantesController extends AppController
         $session = $this->request->getSession();
         $user = $session->read('Auth.User');
 
-        if ((isset($user['role']) and $user['role'] === 'user'))  {
+        if ((isset($user['role']) and $user['role'] === 'user') or (isset($user['role']) and $user['role'] === 'supervisor'))  {
             return $this->redirect(['action' => 'view']);
         }
 
@@ -87,14 +87,21 @@ class ConstantesController extends AppController
         $user_role = $session->read('Auth.User.role');
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
 
+
+        //traigo la lista de constastes utilizadas por empresa con un distinc
+        $constantes_aux = $this->Constantes->find()
+            ->select(['name'])
+            ->where(['empresas_idempresas' => $id_empresa]);
+
         //Traigo la Lista de Contantes
-        $model_lista_constantes =  $this->loadModel('ListaConstantesFilter');
+        $model_lista_constantes =  $this->loadModel('ListaConstantes');
 
         $lista_constantes =  $model_lista_constantes->find('list', [
             'keyField' => 'name',
             'valueField' => 'name',
             'order' => ['name' => 'ASC']
-        ])->where(['empresas_idempresas' => $id_empresa])->toArray();
+        ]) ->where(['(name) NOT IN' => $constantes_aux])
+            ->toArray();
 
         //debo verificar que no este ya usada
 
@@ -147,7 +154,7 @@ class ConstantesController extends AppController
                 'keyField' => 'name',
                 'valueField' => 'name',
                 'order' => ['name' => 'ASC']
-            ])->where(['empresas_idempresas' => $id_empresa])->toArray();
+            ])->toArray();
 
             $this->set(compact('lista_constantes'));
 

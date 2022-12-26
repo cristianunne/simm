@@ -5,7 +5,12 @@
 
 
 <?= $this->element('header')?>
-<?= $this->element('sidebar')?>
+
+<?php if($current_user['role'] == 'admin'):  ?>
+
+    <?= $this->element('sidebar_admin')?>
+<?php endif;?>
+
 
 <div class="content-wrapper">
     <div class="container" style="max-width: 600px;">

@@ -58,7 +58,7 @@
                                     ['controller' => 'Remitos', 'action' => 'index'],
                                     ['class' => 'btn-simm btn-remito btn btn-default', 'escape' => false]) ?>
                             </div>
-                            <div>
+                            <div style="padding-top: 10px;">
                                 <p class="center text-color-navy">Remitos</p>
                             </div>
                         </div>

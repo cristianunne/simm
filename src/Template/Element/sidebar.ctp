@@ -180,7 +180,7 @@
                         <li class="nav-item">
                             <?=  $this->Html->link(
                                 '<i class="far fa-circle nav-icon"></i> Constantes',
-                                ['controller' => 'Constantes', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                ['controller' => 'Constantes', 'action' => 'view'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Constantes']) ?>
                         </li>
 

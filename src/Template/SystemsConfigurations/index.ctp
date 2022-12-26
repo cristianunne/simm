@@ -25,7 +25,7 @@
                                     ['class' => 'btn-simm btn-destinos btn btn-default',
                                         'escape' => false]) ?>
                             </div>
-                            <div>
+                            <div class="div_content">
                                 <p class="center text-color-navy">Destinos</p>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
                                     ['controller' => 'Lotes', 'action' => 'index'],
                                     ['class' => 'btn-simm btn-lotes btn btn-default', 'escape' => false]) ?>
                             </div>
-                            <div>
+                            <div class="div_content">
                                 <p class="center text-color-navy">Lotes</p>
                             </div>
                         </div>
@@ -68,7 +68,7 @@
                                     ['controller' => 'Parcelas', 'action' => 'index'],
                                     ['class' => 'btn-simm btn-parcela btn btn-default', 'escape' => false]) ?>
                             </div>
-                            <div>
+                            <div class="div_content">
                                 <p class="center text-color-navy">Parcelas</p>
                             </div>
                         </div>
@@ -99,7 +99,7 @@
                                     ['controller' => 'Maquinas', 'action' => 'index'],
                                     ['class' => 'btn-simm btn-maquina btn btn-default', 'escape' => false]) ?>
                             </div>
-                            <div>
+                            <div class="div_content">
                                 <p class="center text-color-navy">Maquinarias</p>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                                     ['controller' => 'Operarios', 'action' => 'index']
                                     ,['class' => 'btn-simm btn-operarios btn btn-default', 'escape' => false]) ?>
                             </div>
-                            <div>
+                            <div class="div_content">
                                 <p class="center text-color-navy">Operarios</p>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'Constantes', 'action' => 'index'],
+                                    ['controller' => 'Constantes', 'action' => 'view'],
                                     ['class' => 'btn-simm btn-constantes btn btn-default', 'escape' => false]) ?>
                             </div>
                             <div class="div_content">

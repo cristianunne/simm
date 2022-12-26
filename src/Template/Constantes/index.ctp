@@ -1,6 +1,10 @@
 <?= $this->element('header')?>
 
-<?= $this->element('sidebar')?>
+<?php if($current_user['role'] == 'admin'):  ?>
+
+    <?= $this->element('sidebar_admin')?>
+<?php endif;?>
+
 
 <div class="content-wrapper content-wrapper-user">
 
@@ -31,6 +35,8 @@
                                 <p class="center text-color-navy">Lista de Constantes</p>
                             </div>
                         </div>
+
+                        <!---
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
@@ -41,7 +47,7 @@
                                 <p class="center text-color-navy">Constantes</p>
                             </div>
                         </div>
-
+                        -->
 
                     </div>
                 </div>

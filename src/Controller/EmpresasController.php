@@ -28,6 +28,17 @@ class EmpresasController extends AppController
         $this->set(compact('empresas_active'));
         $this->set(compact('empresas_dactive'));
 
+        //Traigo los datos de la sesion
+        $session = $this->request->getSession();
+        $user_id = $session->read('Auth.User.idusers');
+        $user_role = $session->read('Auth.User.role');
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        $id_empresa = null;
+
+
+        $this->set(compact('id_empresa'));
+
     }
     public function add()
     {
