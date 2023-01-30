@@ -175,6 +175,10 @@ class CostosMaquinasTable extends Table
             ->requirePresence('alquilada', 'create')
             ->notEmptyString('alquilada');
 
+        $validator
+            ->boolean('credito')
+            ->allowEmptyString('credito');
+
         return $validator;
     }
 

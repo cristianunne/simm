@@ -1,6 +1,9 @@
 <?= $this->element('header')?>
 <?= $this->element('sidebar')?>
 
+
+<?= $this->Html->css('jquery-confirm.min.css') ?>
+
 <div class="content-wrapper">
     <div class="container">
         <?= $this->Flash->render() ?>
@@ -18,7 +21,7 @@
 
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 card box-simm-shadow" style="margin: 0 auto; padding: 1.25rem">
+                    <div class="col-md-8 card box-simm-shadow" style="margin: 0 auto; padding: 1.25rem">
                         <?= $this->Form->create($uso_maquina, ['']) ?>
 
                         <?= $this->Form->control('maquinas_idmaquinas', ['options' => $maquinas_data,
@@ -86,18 +89,156 @@
                         <br>
 
                         <div class="form-group">
-                            <?= $this->Form->input('horas_trabajo', ['class' => 'form-control', 'type' => 'number', 'label' => 'Horas de Trabajo (h): ']) ?>
+                            <?= $this->Form->control('horas_trabajo', ['class' => 'form-control', 'type' => 'number', 'label' => 'Horas de Trabajo (h): ']) ?>
                         </div>
 
-                        <div class="form-group">
-                            <?= $this->Form->input('combustible', ['class' => 'form-control', 'type' => 'number', 'label' => 'Combustibles ($): ']) ?>
+                        <div class="content-usomaq">
+                            <label for="option_comb">Combustible:</label>
+                            <?= $this->Form->control('option_comb', ['options' => $combustibles,
+                                'empty' => '(Elija una opción)', 'type' => 'select', 'id' => 'category_comb',
+                                'class' => 'form-control select-uso', 'placeholder' => '',
+                                'label' => false]) ?>
+
+
+                            <div class="form-group">
+                                <?= $this->Form->control('litros', ['class' => 'form-control', 'type' => 'number',
+                                    'label' => false, 'placeholder' => 'Litros (l)', 'id' => 'litros_comb']) ?>
+                            </div>
+
+                            <div class="form-group">
+                                <?= $this->Form->control('precio', ['class' => 'form-control', 'type' => 'number',
+                                    'label' => false, 'placeholder' => '($)/l', 'id' => 'precio_comb']) ?>
+                            </div>
+
+                            <div class="form-group" id="div_btn_check_comb">
+                                <button type="button" class="btn btn-success" aria-label="Left Align" onclick="editCombustible()"
+                                        id="btn-editcomb" attr="<?= h($uso_maquina->iduso_maquinaria) ?>">
+                                    <span class="fas fa-check" aria-hidden="true"></span>
+                                </button>
+                            </div>
+
                         </div>
 
-                        <div class="form-group">
-                            <?= $this->Form->input('lubricante', ['class' => 'form-control', 'type' => 'number', 'label' => 'Lubricantes ($): ']) ?>
+                        <div class="col-md-12">
+                            <hr style="margin-top: 5px;">
+                            <table id="tabladata" class="table table-bordered table-hover dataTable">
+                                <thead>
+                                <tr>
+
+                                    <th scope="col"><?= $this->Paginator->sort('N°') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Categoria') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Producto') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Litros') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Precio ($/l)') ?></th>
+                                    <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                    <?php $i = 1; ?>
+                                    <?php foreach ($uso_maquina->uso_comb_lub as $comb): ?>
+                                    <?php if ($comb->categoria == 'Combustible'): ?>
+                                    <tr>
+                                            <td class="dt-center"><?= h($i) ?></td>
+                                            <td class="dt-center"><?= h('Combustible') ?></td>
+                                            <td class="dt-center"><?= h($comb->producto) ?></td>
+                                            <td class="dt-center"><?= h($comb->litros) ?></td>
+                                            <td class="dt-center"><?= h($comb->precio) ?></td>
+                                            <td class="dt-center">
+
+                                                <button type="button" class="btn btn-danger" aria-label="Left Align"
+                                                        id="<?= h($comb->iduso_comb_lub) ?>" producto="<?= h($comb->producto) ?>"
+                                                        onclick="deleteProductUsoMaqComb(this)">
+                                                    <span class="fas fa-trash" aria-hidden="true" ></span>
+                                                </button>
+
+                                            </td>
+
+                                            <?php $i = $i + 1; ?>
+                                    </tr>
+                                    <?php endif; ?>
+
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <br>
+                        <br>
+
+                        <div class="content-usomaq">
+                            <label for="option_comb">Lubricante:</label>
+                            <?= $this->Form->control('option_comb', ['options' => $lubricantes,
+                                'empty' => '(Elija una opción)', 'type' => 'select', 'id' => 'category_lub',
+                                'class' => 'form-control select-uso', 'placeholder' => '',
+                                'label' => false]) ?>
+
+
+                            <div class="form-group">
+                                <?= $this->Form->control('litros', ['class' => 'form-control', 'type' => 'number',
+                                    'label' => false, 'placeholder' => 'Litros (l)', 'id' => 'litros_lub']) ?>
+                            </div>
+
+                            <div class="form-group">
+                                <?= $this->Form->control('precio', ['class' => 'form-control', 'type' => 'number',
+                                    'label' => false, 'placeholder' => '($)/l', 'id' => 'precio_lub']) ?>
+                            </div>
+
+
+                            <div class="form-group" id="div_btn_check_lub">
+                                <button type="button" class="btn btn-success" aria-label="Left Align" onclick="editLubricante()"
+                                        id="btn-editlub" attr="<?= h($uso_maquina->iduso_maquinaria) ?>">
+                                    <span class="fas fa-check" aria-hidden="true"></span>
+                                </button>
+                            </div>
+
                         </div>
 
 
+                        <div class="col-md-12">
+                            <hr style="margin-top: 5px;">
+
+                            <table id="tabladata_2" class="table table-bordered table-hover dataTable">
+                                <thead>
+                                <tr>
+
+                                    <th scope="col"><?= $this->Paginator->sort('N°') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Categoria') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Producto') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Litros') ?></th>
+                                    <th scope="col"><?= $this->Paginator->sort('Precio ($/l)') ?></th>
+                                    <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                <?php $i = 1; ?>
+                                <?php foreach ($uso_maquina->uso_comb_lub as $comb): ?>
+                                <?php if ($comb->categoria == 'Lubricante'): ?>
+                                <tr>
+                                    <td class="dt-center"><?= h($i) ?></td>
+                                    <td class="dt-center"><?= h('Lubricante') ?></td>
+                                    <td class="dt-center"><?= h($comb->producto) ?></td>
+                                    <td class="dt-center"><?= h($comb->litros) ?></td>
+                                    <td class="dt-center"><?= h($comb->precio) ?></td>
+                                    <td class="dt-center">
+
+                                        <button type="button" class="btn btn-danger" aria-label="Left Align"
+                                                id="<?= h($comb->iduso_comb_lub) ?>" producto="<?= h($comb->producto) ?>"
+                                                onclick="deleteProductUsoMaqLub(this)">
+                                            <span class="fas fa-trash" aria-hidden="true" ></span>
+                                        </button>
+
+                                    </td>
+
+                                    <?php $i = $i + 1; ?>
+                                </tr>
+                                    <?php endif; ?>
+
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div class="form-group" style="margin-top: 40px;">
                             <div class="pull-right">
@@ -183,12 +324,25 @@
 <?= $this->Html->script('../plugins/datatables-buttons/js/buttons.print.min.js') ?>
 <?= $this->Html->script('../plugins/datatables-buttons/js/buttons.colVis.min.js') ?>
 
+<?= $this->Html->script('jquery-confirm.min.js') ?>
+
 <script>
     $(function () {
         $('#tabladata').DataTable({
-            "paging": true,
+            "paging": false,
             "lengthChange": false,
-            "searching": true,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+            "pageLength": 10
+        });
+
+        $('#tabladata_2').DataTable({
+            "paging": false,
+            "lengthChange": false,
+            "searching": false,
             "ordering": true,
             "info": true,
             "autoWidth": false,

@@ -97,3 +97,10 @@ define('LOGOS_SHORT', DS .'img'. DS . 'logos'. DS);
 
 define('OTROS', IMG . 'otros'. DS);
 define('OTROS_SHORT', DS .'img'. DS . 'otros'. DS);
+//DEfino un path para los excels que se guardan
+
+define('FILES', WWW_ROOT . 'files'. DS);
+define('FILES_SHORT', WWW_ROOT .'files'. DS);
+
+define('EXCELS', FILES  . 'excels'. DS);
+define('EXCELS_SHORT', FILES  . 'excels'. DS);

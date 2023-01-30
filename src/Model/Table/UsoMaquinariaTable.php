@@ -62,6 +62,13 @@ class UsoMaquinariaTable extends Table
             'joinType' => 'LEFT'
         ]);
 
+        $this->hasMany('UsoCombLub', [
+            'foreignKey' => 'uso_maquinaria_iduso_maquinaria',
+            'bindingKey' => 'iduso_maquinaria', //actual
+            'joinType' => 'INNER'
+        ]);
+
+
     }
 
     /**
@@ -93,14 +100,6 @@ class UsoMaquinariaTable extends Table
         $validator
             ->numeric('horas_trabajo')
             ->allowEmptyString('horas_trabajo');
-
-        $validator
-            ->numeric('combustible')
-            ->allowEmptyString('combustible');
-
-        $validator
-            ->numeric('lubricante')
-            ->allowEmptyString('lubricante');
 
         $validator
             ->integer('users_idusers')

@@ -20,11 +20,6 @@ use Cake\ORM\Entity;
  * @property int $users_idusers
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
- *
- * @property \App\Model\Entity\User $user
- * @property \App\Model\Entity\Worksgroup $worksgroup
- * @property \App\Model\Entity\Maquina $maquina
- * @property \App\Model\Entity\Parcela $parcela
  */
 class ArreglosMecanicosYear extends Entity
 {
@@ -52,9 +47,5 @@ class ArreglosMecanicosYear extends Entity
         'users_idusers' => true,
         'created' => true,
         'modified' => true,
-        'user' => true,
-        'worksgroup' => true,
-        'maquina' => true,
-        'parcela' => true,
     ];
 }

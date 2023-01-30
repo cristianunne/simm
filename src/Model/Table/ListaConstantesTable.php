@@ -39,12 +39,6 @@ class ListaConstantesTable extends Table
             'bindingKey' => 'users_idusers', //actual
             'joinType' => 'INNER'
         ]);
-
-        $this->hasOne('Empresas', [
-            'foreignKey' => 'idempresas',
-            'bindingKey' => 'empresas_idempresas', //actual
-            'joinType' => 'INNER'
-        ]);
     }
 
     /**
@@ -62,29 +56,13 @@ class ListaConstantesTable extends Table
         $validator
             ->scalar('name')
             ->maxLength('name', 45)
-            ->requirePresence('name', 'create')
-            ->notEmptyString('name');
+            ->allowEmptyString('name');
 
         $validator
             ->integer('users_idusers')
             ->requirePresence('users_idusers', 'create')
             ->notEmptyString('users_idusers');
 
-
         return $validator;
-    }
-
-    /**
-     * Returns a rules checker object that will be used for validating
-     * application integrity.
-     *
-     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
-     * @return \Cake\ORM\RulesChecker
-     */
-    public function buildRules(RulesChecker $rules)
-    {
-        $rules->add($rules->isUnique(['name'], 'Este nombre ya ha sido utilizado en una Constante.'));
-
-        return $rules;
     }
 }

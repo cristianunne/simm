@@ -895,6 +895,7 @@ function loadDataToCostosMaquinaView(data, element) {
     let tasa_int = $("#tasa_int");
     let cons_lit_h = $("#cons_lit_h");
     let alquiler = $("#alquiler");
+    let credito = $("#credito");
 
     val_adq.empty();
     vida_util.empty();
@@ -903,6 +904,7 @@ function loadDataToCostosMaquinaView(data, element) {
     tasa_int.empty();
     cons_lit_h.empty();
     alquiler.empty();
+    credito.empty();
 
 
     let val_neum = $("#val_neum");
@@ -934,6 +936,7 @@ function loadDataToCostosMaquinaView(data, element) {
     tasa_int.html(data[0].tasa_int_simple);
     cons_lit_h.html(data[0].consumo);
     alquiler.html(data[0].costo_alquiler);
+    credito.html(data[0].credito);
 
     val_neum.html(data[0].val_neum);
     vida_util_neum.html(data[0].vida_util_neum);
@@ -943,6 +946,8 @@ function loadDataToCostosMaquinaView(data, element) {
     fat_corr.html(data[0].factor_cor);
     coef_arr_mec.html(data[0].coef_err_mec);
     lubricante.html(data[0].lubricante);
+
+
 
 
     showModalAll(element)

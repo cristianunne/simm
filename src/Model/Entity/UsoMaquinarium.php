@@ -11,12 +11,15 @@ use Cake\ORM\Entity;
  * @property int|null $parcelas_idparcelas
  * @property \Cake\I18n\FrozenDate $fecha
  * @property float|null $horas_trabajo
- * @property float|null $combustible
- * @property float|null $lubricante
  * @property int $users_idusers
  * @property int $empresas_idempresas
  * @property \Cake\I18n\FrozenTime $created
  * @property \Cake\I18n\FrozenTime|null $modified
+ *
+ * @property \App\Model\Entity\User $user
+ * @property \App\Model\Entity\Maquina $maquina
+ * @property \App\Model\Entity\Empresa $empresa
+ * @property \App\Model\Entity\Parcela $parcela
  */
 class UsoMaquinarium extends Entity
 {
@@ -34,11 +37,13 @@ class UsoMaquinarium extends Entity
         'parcelas_idparcelas' => true,
         'fecha' => true,
         'horas_trabajo' => true,
-        'combustible' => true,
-        'lubricante' => true,
         'users_idusers' => true,
         'empresas_idempresas' => true,
         'created' => true,
         'modified' => true,
+        'user' => true,
+        'maquina' => true,
+        'empresa' => true,
+        'parcela' => true,
     ];
 }

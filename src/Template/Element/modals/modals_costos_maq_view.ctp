@@ -51,7 +51,12 @@
 
                     <hr style="width: 98%;">
 
+                    <div class="col-lg-12 col-md-12" style="display: flex; justify-content: center; column-gap: 1rem;">
 
+                           <p style="font-weight: bold;">¿Alquilada?: </p>
+                            <p id="alquilada"></p>
+
+                    </div>
                     <div class="col-lg-6 col-md-6" style="margin-top: 30px;">
                         <div id="div_tabladata">
                             <table id="tabladata" name="tabla_persona" class="table table-view">
@@ -84,6 +89,12 @@
                                     <th style="width: 50%;">Alquiler ($/ton):</th>
                                     <td id="alquiler"></td>
                                 </tr>
+
+                                <tr>
+                                    <th style="width: 50%;">¿Crédito?:</th>
+                                    <td id="credito"></td>
+                                </tr>
+
                                 </tbody>
                             </table>
                         </div>

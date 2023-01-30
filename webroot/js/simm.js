@@ -8,6 +8,9 @@ function showPopover (){
 
 
 
+
+
+
 /*FUNCIONES DESTINADA A TRAER LOS DEPARTAMENTOS Y LOCALIDADES */
 
 function loadDptosFromDb(variable) {
@@ -159,6 +162,29 @@ function selectTypePropietarioModal(element)
         $("#div_tabladata_prop_2").show();
     }
 }
+
+function selectPropAll() {
+    let variable = 'Todos';
+    let id = 0;
+
+    //aca debo cambiar
+
+    //$("#input_lotes").val(variable);
+    //$("#lotes_idlotes").val(id);
+
+    $('#propietarios_idpropietarios').empty();
+
+    $('#propietarios_idpropietarios').append($('<option>', {
+        value: id,
+        text: variable
+    }));
+
+    $("#propietarios_idpropietarios").val(id);
+
+    closeModalById('modal_propietarios');
+}
+
+
 
 function selectProp(object)
 {
@@ -919,7 +945,7 @@ function loadDataToCostosMaquinaView(data, element, history_costos) {
     centro_costo_name.empty();
     met_costo_name.empty();
 
-
+    let alquilada = $("#alquilada");
     let val_adq = $("#val_adq");
     let vida_util = $("#vida_util");
     let horas_tot = $("#horas_tot");
@@ -927,7 +953,9 @@ function loadDataToCostosMaquinaView(data, element, history_costos) {
     let tasa_int = $("#tasa_int");
     let cons_lit_h = $("#cons_lit_h");
     let alquiler = $("#alquiler");
+    let credito = $("#credito");
 
+    alquilada.empty();
     val_adq.empty();
     vida_util.empty();
     horas_tot.empty();
@@ -935,6 +963,7 @@ function loadDataToCostosMaquinaView(data, element, history_costos) {
     tasa_int.empty();
     cons_lit_h.empty();
     alquiler.empty();
+    credito.empty();
 
 
     let val_neum = $("#val_neum");
@@ -959,6 +988,12 @@ function loadDataToCostosMaquinaView(data, element, history_costos) {
     centro_costo_name.html(data[0].centros_costo.name.toString());
 
 
+    if(data[0].alquilada){
+        alquilada.html('SI');
+    } else {
+        alquilada.html('NO');
+    }
+
     val_adq.html(data[0].val_adq);
     vida_util.html(data[0].vida_util);
     horas_tot.html(data[0].horas_total_uso);
@@ -966,6 +1001,14 @@ function loadDataToCostosMaquinaView(data, element, history_costos) {
     tasa_int.html(data[0].tasa_int_simple);
     cons_lit_h.html(data[0].consumo);
     alquiler.html(data[0].costo_alquiler);
+
+    if(data[0].credito){
+        credito.html('SI');
+    } else {
+        credito.html('NO');
+    }
+
+
 
     val_neum.html(data[0].val_neum);
     vida_util_neum.html(data[0].vida_util_neum);
@@ -1040,6 +1083,8 @@ function selectConditionsMaquina(object)
         $("[name='coef_err_mec']").prop('disabled', false);
         $("[name='lubricante']").prop('disabled', false);
 
+        $("[name='credito']").prop('disabled', false);
+
         //desactivo el required
 
         $("[name='val_adq']").attr('required', 'required');
@@ -1055,6 +1100,8 @@ function selectConditionsMaquina(object)
         $("[name='factor_cor']").attr('required', 'required');
         $("[name='coef_err_mec']").attr('required', 'required');
         $("[name='lubricante']").attr('required', 'required');
+
+        $("[name='credito']").attr('required', 'required');
 
 
         $("[name='costo_alquiler']").removeAttr('required');
@@ -1079,6 +1126,7 @@ function selectConditionsMaquina(object)
         $("[name='factor_cor']").prop('disabled', true);
         $("[name='coef_err_mec']").prop('disabled', true);
         $("[name='lubricante']").prop('disabled', true);
+        $("[name='credito']").prop('disabled', true);
 
         //Activo el required
 
@@ -1096,6 +1144,7 @@ function selectConditionsMaquina(object)
         $("[name='factor_cor']").removeAttr('required');
         $("[name='coef_err_mec']").removeAttr('required');
         $("[name='lubricante']").removeAttr('required');
+        $("[name='credito']").removeAttr('required');
 
 
         //limpio las celdas
@@ -1299,6 +1348,35 @@ function selectLoteRemito(object) {
 
 }
 
+function selectLotesAll()
+{
+
+
+    let variable = 'Todos';
+    let id = 0;
+
+    //aca debo cambiar
+
+    //$("#input_lotes").val(variable);
+    //$("#lotes_idlotes").val(id);
+
+    $('#lotes_idlotes').empty();
+
+    $('#lotes_idlotes').append($('<option>', {
+        value: id,
+        text: variable
+    }));
+
+    $("#lotes_idlotes").val(id);
+
+    let control = $("#parcela");
+    //Limpio el select primero
+    control.empty();
+    control.append(new Option('Todos', 0));
+
+
+    closeModalById('modal_lotes');
+}
 
 function selectPropRemito(object)
 {
@@ -1901,6 +1979,320 @@ function loadDestinosToSelectModal(data){
 }
 
 
+/***  METODOS PARA USO DE MAQUINARIA****/
+
+function addCombustibleToTable()
+{
+    //Accedo a los valores de los inputs
+    let categoria = "Combustible";
+    let producto = $("#category_comb").val();
+    let litros = $("#litros_comb").val();
+    let precio = $("#precio_comb").val();
+
+
+    let table = $('#tabladata').DataTable();
+
+    let number_count = table.rows().count() + 1;
+
+
+    let icon_delete =   '<button type="button" class="btn btn-danger" aria-label="Left Align" onClick="deleteRowUsos(this)"' +
+                        'attr="' + producto + '">' +
+                        '<span class="fas fa-trash" aria-hidden="true"></span></button>';
+
+
+    let name = categoria.toString() + number_count.toString() + '[]';
+
+    let cat_input = '<input type="hidden" name="' + name +'" value="' + categoria + '">';
+    let producto_input = '<input type="hidden" name="' + name +'" value="' + producto + '">';
+    let litros_input = '<input type="hidden" name="' + name +'" value="' + litros + '">';
+    let precio_input = '<input type="hidden" name="' + name +'" value="' + precio + '">';
+
+    //esta variable la uso para procesar en el php el arreglo de combustibes
+    if(number_count > 1){
+        //elimino el que existe y creo el nuevo
+        $("#cant_combustible").remove();
+    }
+
+    let cant_combustible = '<input type="hidden" name="cant_combustible"  id="cant_combustible" value="' + number_count.toString() + '">';
+
+
+    let trDOM = table.row.add([number_count,
+        categoria, producto, litros, precio, icon_delete] ).draw().node();
+
+    $( trDOM ).addClass('dt-center');
+
+    let div_ = '<div>' + cat_input + producto_input + litros_input + precio_input + cant_combustible + '</div>';
+    $('#combustible_hidden').append(div_);
+
+
+    $("#litros_comb").val('');
+    $("#precio_comb").val('');
+
+    //ELimino la opcion del input
+    $("#category_comb").find("option[value='"+producto.toString() +"']").remove();
+
+
+}
+
+function deleteRowUsos(element)
+{
+    let table = $('#tabladata').DataTable();
+    let option = $(element);
+
+   // console.log();
+    // table_maq_modal.row(':eq( ' + idrow + ')').remove().draw();
+    let producto = option.attr('attr');
+
+
+    let res = table.row( option.parents('tr') )
+        .remove();
+    table.draw();
+
+    if((res !== null) && (res !== undefined)){
+
+        //Devolvio un objeto, restauro el input
+
+        $('#category_comb').append($('<option>', {
+            value: producto,
+            text: producto
+        }));
+
+    }
+
+    //AL eliminar tengo que restaurar
+
+    //addRowToTableMaquinasOperarios(element)
+}
+
+function addLubricanteToTable(element) {
+
+    //Accedo a los valores de los inputs
+    let categoria = "Lubricante";
+    let producto = $("#category_lub");
+    let litros = $("#litros_lub");
+    let precio = $("#precio_lub");
+
+    let table = $('#tabladata_2').DataTable();
+
+    let number_count = table.rows().count() + 1;
+
+    let icon_delete =   '<button type="button" class="btn btn-danger" aria-label="Left Align" onClick="deleteRowUsos(this)"' +
+        'attr="' + producto.val() + '">' +
+        '<span class="fas fa-trash" aria-hidden="true"></span></button>';
+
+    let name = categoria + number_count.toString() + '[]';
+
+    let cat_input = '<input type="hidden" name="' + name +'" value="' + categoria + '">';
+    let producto_input = '<input type="hidden" name="' + name +'" value="' + producto.val() + '">';
+    let litros_input = '<input type="hidden" name="' + name +'" value="' + litros.val() + '">';
+    let precio_input = '<input type="hidden" name="' + name +'" value="' + precio.val() + '">';
+
+    //esta variable la uso para procesar en el php el arreglo de combustibes
+    if(number_count > 1){
+        //elimino el que existe y creo el nuevo
+        $("#cant_lubricante").remove();
+    }
+
+    let cant_lubricante = '<input type="hidden" name="cant_lubricante"  id="cant_lubricante" value="' + number_count.toString() + '">';
+
+    let trDOM = table.row.add([number_count,
+        categoria, producto.val(), litros.val(), precio.val(), icon_delete] ).draw().node();
+
+    $( trDOM ).addClass('dt-center');
+
+    let div_ = '<div>' + cat_input + producto_input + litros_input + precio_input + cant_lubricante + '</div>';
+    $('#lubricante_hidden').append(div_);
+
+
+    litros.val('');
+    precio.val('');
+
+    //ELimino la opcion del input
+    producto.find("option[value='"+producto.val().toString() +"']").remove();
+
+}
+
+/**  EL EDIT DE USO_MAQUINARIA LO PROCESO A PARTIR DE JQUERY, SOLAMENTE LOS PRODUCTOS**/
+
+
+
+function deleteProductUsoMaqComb(element) {
+
+    let url = '../deleteUsoComb';
+
+    let id_ = $(element).attr('id');
+    let producto = $(element).attr('producto');
+
+    let table_uso_maq = $('#tabladata').DataTable();
+
+    $.confirm({
+        title: 'Confirmar!',
+        content: '¿Desea Eliminar el Combustible?',
+        buttons: {
+            aceptar: function () {
+                //Si confirma proceso
+
+                $.ajax({
+                    type: "POST",
+                    async: true,
+                    url: url,
+                    data: {id_uso : id_},
+
+                    beforeSend: function (xhr) { // Add this line
+                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    },
+                    success: function(data, textStatus){
+
+                      //Actualizo el row
+                     location.reload();
+                    },
+                    error: function (data) {
+                        console.log('error ' + data);
+                    }
+                });
+
+            },
+            cancelar: function () {
+
+            },
+        }
+    });
+
+}
+
+function editCombustible()
+{
+    //Accedo a los valores de los inputs
+    let categoria = "Combustible";
+    let producto = $("#category_comb").val();
+    let litros = $("#litros_comb").val();
+    let precio = $("#precio_comb").val();
+    let uso_maquinaria_iduso_maquinaria = $("#btn-editcomb").attr('attr');
+
+
+    let table = $('#tabladata').DataTable();
+
+
+
+    //Proceso el agregado
+    //COmpruebo que todos los campos esten completos
+    if(categoria !== '' && producto !== '' && litros !== '' && precio !== '' && uso_maquinaria_iduso_maquinaria !== ''){
+        let url = '../addUsoMaqAjax';
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: url,
+            data: {categoria : categoria, producto: producto, litros: litros, precio: precio, uso_maquinaria_iduso_maquinaria: uso_maquinaria_iduso_maquinaria},
+
+           beforeSend: function (xhr) { // Add this line
+               xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+           },
+           success: function(data, textStatus){
+                location.reload();
+           },
+           error: function (data) {
+               console.log('error ' + data);
+           }
+        });
+
+    }
+
+
+}
+
+
+
+function editLubricante()
+{
+
+    //Accedo a los valores de los inputs
+    let categoria = "Lubricante";
+    let producto = $("#category_lub").val();
+    let litros = $("#litros_lub").val();
+    let precio = $("#precio_lub").val();
+    let uso_maquinaria_iduso_maquinaria = $("#btn-editlub").attr('attr');
+
+
+    //Proceso el agregado
+    //COmpruebo que todos los campos esten completos
+    if(categoria !== '' && producto !== '' && litros !== '' && precio !== '' && uso_maquinaria_iduso_maquinaria !== ''){
+        let url = '../addUsoMaqAjax';
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: url,
+            data: {categoria : categoria, producto: producto, litros: litros, precio: precio,
+                uso_maquinaria_iduso_maquinaria: uso_maquinaria_iduso_maquinaria},
+
+            beforeSend: function (xhr) { // Add this line
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            },
+            success: function(data, textStatus){
+                location.reload();
+            },
+            error: function (data) {
+                console.log('error ' + data);
+            }
+        });
+
+    }
+
+
+}
+
+function deleteProductUsoMaqLub(element) {
+
+    let url = '../deleteUsoComb';
+
+    let id_ = $(element).attr('id');
+    let producto = $(element).attr('producto');
+
+    let table_uso_maq = $('#tabladata_2').DataTable();
+
+    $.confirm({
+        title: 'Confirmar!',
+        content: '¿Desea Eliminar el Lubricante?',
+        buttons: {
+            aceptar: function () {
+                //Si confirma proceso
+
+                $.ajax({
+                    type: "POST",
+                    async: true,
+                    url: url,
+                    data: {id_uso : id_},
+
+                    beforeSend: function (xhr) { // Add this line
+                        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                    },
+                    success: function(data, textStatus){
+
+                        //Actualizo el row
+                        location.reload();
+                    },
+                    error: function (data) {
+                        console.log('error ' + data);
+                    }
+                });
+
+            },
+            cancelar: function () {
+
+            },
+        }
+    });
+
+    /***** Creo los modals con jquery *****/
+
+    function showModalCombLub(element)
+    {
+
+
+    }
+
+
+
+}
 
 
 

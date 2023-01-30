@@ -23,11 +23,11 @@ class ArreglosMecanicosYearFixture extends TestFixture
     public $fields = [
         'idarreglos_mecanicos' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => '0', 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'fecha' => ['type' => 'date', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
-        'num_comprobante' => ['type' => 'string', 'length' => 100, 'null' => true, 'default' => null, 'collate' => 'utf8mb4_0900_ai_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
-        'concepto' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'collate' => 'utf8mb4_0900_ai_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'num_comprobante' => ['type' => 'string', 'length' => 100, 'null' => true, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'concepto' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'mano_obra' => ['type' => 'decimal', 'length' => 10, 'precision' => 5, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
         'repuestos' => ['type' => 'decimal', 'length' => 10, 'precision' => 5, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
-        'total' => ['type' => 'decimal', 'length' => 10, 'precision' => 5, 'unsigned' => false, 'null' => true, 'default' => '(_utf8mb4\\\'mano_obra\\\' + _utf8mb4\\\'repuestos\\\')', 'comment' => ''],
+        'total' => ['type' => 'decimal', 'length' => 10, 'precision' => 5, 'unsigned' => false, 'null' => true, 'default' => '(`mano_obra` + `repuestos`)', 'comment' => ''],
         'worksgroups_idworksgroups' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'maquinas_idmaquinas' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'parcelas_idparcelas' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
@@ -51,7 +51,7 @@ class ArreglosMecanicosYearFixture extends TestFixture
         $this->records = [
             [
                 'idarreglos_mecanicos' => 1,
-                'fecha' => '2022-08-19',
+                'fecha' => '2023-01-30',
                 'num_comprobante' => 'Lorem ipsum dolor sit amet',
                 'concepto' => 'Lorem ipsum dolor sit amet',
                 'mano_obra' => 1.5,
@@ -62,8 +62,8 @@ class ArreglosMecanicosYearFixture extends TestFixture
                 'parcelas_idparcelas' => 1,
                 'empresas_idempresas' => 1,
                 'users_idusers' => 1,
-                'created' => 1660885052,
-                'modified' => 1660885052,
+                'created' => 1675058898,
+                'modified' => 1675058898,
             ],
         ];
         parent::init();

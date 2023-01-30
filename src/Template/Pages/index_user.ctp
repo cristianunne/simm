@@ -96,11 +96,10 @@
                         <?php if($user_role == 'supervisor' or $user_role == 'admin'):  ?>
                             <div class="btn-group flex-vertical" role="group" aria-label="Third group">
                                 <div>
+
                                     <?= $this->Html->link('',
-                                        ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                            ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                                'id' => 'btn_remito']], ['class' => 'btn-simm btn-costos btn btn-default',
-                                            'escape' => false, 'onmouseover' => 'showPopover()']) ?>
+                                        ['controller' => 'AnalisisCostos', 'action' => 'index'],
+                                        ['class' => 'btn-simm btn-arreglos btn btn-default', 'escape' => false]) ?>
                                 </div>
                                 <div class="div_content">
                                     <p class="center text-color-navy">Análisis de Costos</p>
@@ -111,10 +110,11 @@
 
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
+
+
                                 <?= $this->Html->link('',
-                                    ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
-                                        ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                            'id' => 1]], ['class' => 'btn-simm btn-informes btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                    ['controller' => 'Informes', 'action' => 'index'],
+                                       ['class' => 'btn-simm btn-informes btn btn-default', 'escape' => false ]) ?>
                             </div>
                             <div>
                                 <p class="center text-color-navy">Informes</p>

@@ -60,7 +60,6 @@ class ArreglosMecanicosYearTable extends Table
             'joinType' => 'INNER'
         ]);
 
-
     }
 
     /**

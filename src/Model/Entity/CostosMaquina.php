@@ -31,6 +31,7 @@ use Cake\ORM\Entity;
  * @property string $metod_costos_hashmetod_costos
  * @property string $hash_id
  * @property bool $alquilada
+ * @property bool|null $credito
  *
  * @property \App\Model\Entity\Maquina $maquina
  * @property \App\Model\Entity\Worksgroup $worksgroup
@@ -73,6 +74,7 @@ class CostosMaquina extends Entity
         'metod_costos_hashmetod_costos' => true,
         'hash_id' => true,
         'alquilada' => true,
+        'credito' => true,
         'maquina' => true,
         'worksgroup' => true,
         'centros_costo' => true,

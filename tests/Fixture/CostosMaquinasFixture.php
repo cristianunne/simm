@@ -37,9 +37,10 @@ class CostosMaquinasFixture extends TestFixture
         'users_idusers' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'worksgroups_idworksgroups' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'centros_costos_idcentros_costos' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
-        'metod_costos_hashmetod_costos' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_0900_ai_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
-        'hash_id' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_0900_ai_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'metod_costos_hashmetod_costos' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'hash_id' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'alquilada' => ['type' => 'boolean', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
+        'credito' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         '_indexes' => [
             'fk_costos_maquinas_maquinas1_idx' => ['type' => 'index', 'columns' => ['maquinas_idmaquinas'], 'length' => []],
             'fk_costos_maquinas_users1_idx' => ['type' => 'index', 'columns' => ['users_idusers'], 'length' => []],
@@ -50,13 +51,13 @@ class CostosMaquinasFixture extends TestFixture
             'primary' => ['type' => 'primary', 'columns' => ['idcostos_maquinas'], 'length' => []],
             'idcostos_maquinas_UNIQUE' => ['type' => 'unique', 'columns' => ['idcostos_maquinas'], 'length' => []],
             'fk_costos_maquinas_centros_costos1' => ['type' => 'foreign', 'columns' => ['centros_costos_idcentros_costos'], 'references' => ['centros_costos', 'idcentros_costos'], 'update' => 'noAction', 'delete' => 'noAction', 'length' => []],
-            'fk_costos_maquinas_maquinas1' => ['type' => 'foreign', 'columns' => ['maquinas_idmaquinas'], 'references' => ['maquinas', 'idmaquinas'], 'update' => 'noAction', 'delete' => 'noAction', 'length' => []],
+            'fk_costos_maquinas_maquinas1' => ['type' => 'foreign', 'columns' => ['maquinas_idmaquinas'], 'references' => ['maquinas', 'idmaquinas'], 'update' => 'noAction', 'delete' => 'cascade', 'length' => []],
             'fk_costos_maquinas_users1' => ['type' => 'foreign', 'columns' => ['users_idusers'], 'references' => ['users', 'idusers'], 'update' => 'noAction', 'delete' => 'noAction', 'length' => []],
             'fk_costos_maquinas_worksgroups1' => ['type' => 'foreign', 'columns' => ['worksgroups_idworksgroups'], 'references' => ['worksgroups', 'idworksgroups'], 'update' => 'noAction', 'delete' => 'noAction', 'length' => []],
         ],
         '_options' => [
             'engine' => 'InnoDB',
-            'collation' => 'utf8mb4_0900_ai_ci'
+            'collation' => 'utf8mb4_unicode_ci'
         ],
     ];
     // @codingStandardsIgnoreEnd
@@ -85,8 +86,8 @@ class CostosMaquinasFixture extends TestFixture
                 'lubricante' => 1,
                 'costo_alquiler' => 1,
                 'maquinas_idmaquinas' => 1,
-                'created' => 1671218341,
-                'finished' => '2022-12-16',
+                'created' => 1674574688,
+                'finished' => '2023-01-24',
                 'active' => 1,
                 'users_idusers' => 1,
                 'worksgroups_idworksgroups' => 1,
@@ -94,6 +95,7 @@ class CostosMaquinasFixture extends TestFixture
                 'metod_costos_hashmetod_costos' => 'Lorem ipsum dolor sit amet',
                 'hash_id' => 'Lorem ipsum dolor sit amet',
                 'alquilada' => 1,
+                'credito' => 1,
             ],
         ];
         parent::init();

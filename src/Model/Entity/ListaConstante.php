@@ -7,9 +7,10 @@ use Cake\ORM\Entity;
  * ListaConstante Entity
  *
  * @property int $idlista_constantes
- * @property string $name
+ * @property string|null $name
  * @property int $users_idusers
- * @property int $empresas_idempresas
+ *
+ * @property \App\Model\Entity\User $user
  */
 class ListaConstante extends Entity
 {
@@ -25,6 +26,6 @@ class ListaConstante extends Entity
     protected $_accessible = [
         'name' => true,
         'users_idusers' => true,
-        'empresas_idempresas' => true,
+        'user' => true,
     ];
 }

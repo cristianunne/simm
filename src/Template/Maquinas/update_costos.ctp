@@ -97,6 +97,14 @@
                                             'label' => 'Alquiler ($/ton): ']) ?>
                                     </div>
 
+                                    <div class="form-group">
+                                        <?= $this->Form->control('credito', ['options' => [1 => 'SI', 0 => 'NO'],
+                                            'empty' => '(Elija una opción)', 'type' => 'select',
+                                            'class' => 'form-control', 'placeholder' => '', 'disabled',
+                                            'label' => '¿Comprada con crédito?']) ?>
+                                    </div>
+
+
                                 </div>
                                 <div class="col-md-5" style="margin-left: auto;">
                                     <br>
@@ -173,6 +181,13 @@
                                     <div class="form-group">
                                         <?= $this->Form->input('costo_alquiler', ['class' => 'form-control', 'type' => 'number',
                                             'label' => 'Alquiler ($/ton): ', 'disabled']) ?>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <?= $this->Form->control('credito', ['options' => [1 => 'SI', 0 => 'NO'],
+                                            'empty' => '(Elija una opción)', 'type' => 'select',
+                                            'class' => 'form-control', 'placeholder' => '',
+                                            'label' => '¿Comprada con crédito?']) ?>
                                     </div>
 
                                 </div>

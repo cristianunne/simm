@@ -747,3 +747,46 @@ div.jfilestyle label{
     float: left;
 }
 
+
+
+/****** **/
+.sandbox-container{
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    column-gap: 5px;
+}
+.label-m10{
+    margin-right: 10px;
+}
+
+.title-box-ac{
+    font-weight: bold;
+    font-size: large;
+}
+.width-45px{
+    width: 45px;
+}
+
+.div-costos-header{
+    padding-top: 10px;
+    background-color: lightgray;
+    border-bottom: solid 2px #afaeae;
+
+}
+
+
+.content-usomaq{
+    display: flex;
+    column-count: 4;
+    column-gap: 10px;
+    align-items: baseline;
+}
+
+.content-usomaq .select{
+    width: 70% !important;
+}
+#div_btn_check_comb > button{
+    vertical-align: baseline;
+}
+

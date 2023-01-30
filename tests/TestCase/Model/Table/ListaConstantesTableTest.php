@@ -24,6 +24,7 @@ class ListaConstantesTableTest extends TestCase
      */
     public $fixtures = [
         'app.ListaConstantes',
+        'app.Users',
     ];
 
     /**

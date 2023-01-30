@@ -324,6 +324,7 @@ class MaquinasController extends AppController
                 ->where(['active' => true])
                 ->toArray();
 
+
             //Guardo la informacion
             if ($this->request->is('post')) {
 
@@ -510,17 +511,6 @@ class MaquinasController extends AppController
                 }
 
 
-
-
-
-
-                //debo controlar que haya cambios en los datos
-                /*if ($costos_maq_model->save($maquinas_costos)) {
-                    $this->Flash->success(__('La Máquina se ha almacenado correctamente'));
-                    return $this->redirect(['action' => 'indexCostos', $id_maquina]);
-                } else {
-                    $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
-                }*/
             }
 
 
@@ -703,7 +693,8 @@ class MaquinasController extends AppController
             $array_current->horas_mens_uso != $array_new->horas_mens_uso or $array_current->horas_dia_uso != $array_new->horas_dia_uso or
             $array_current->tasa_int_simple != $array_new->tasa_int_simple or $array_current->factor_cor != $array_new->factor_cor or
             $array_current->coef_err_mec != $array_new->coef_err_mec or $array_current->consumo != $array_new->consumo or
-            $array_current->lubricante != $array_new->lubricante or $array_current->costo_alquiler != $array_new->costo_alquiler) {
+            $array_current->lubricante != $array_new->lubricante or $array_current->costo_alquiler != $array_new->costo_alquiler or
+            $array_current->credito != $array_new->credito) {
             return true;
         }
 

@@ -24,10 +24,6 @@ class ArreglosMecanicosYearTableTest extends TestCase
      */
     public $fixtures = [
         'app.ArreglosMecanicosYear',
-        'app.Users',
-        'app.Worksgroups',
-        'app.Maquinas',
-        'app.Parcelas',
     ];
 
     /**

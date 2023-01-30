@@ -103,7 +103,7 @@
                                     <?= $this->Html->link('',
                                         ['controller' => 'LegislacionRegister', 'action' => 'verLegislaciones', '?' =>
                                             ['Accion' => 'Editar Museos', 'Categoria' => 'Museos', 'Tabla_name' => 'Museos',
-                                                'id' => 1]], ['class' => 'btn-simm btn-informes btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
+                                                'id' => 1]], ['class' => 'btn-simm btn-Informes btn btn-default', 'escape' => false, 'target' => '_blank']) ?>
                                 </div>
                                 <div>
                                     <p class="center text-color-navy">Informes</p>

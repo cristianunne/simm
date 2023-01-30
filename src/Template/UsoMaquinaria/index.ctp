@@ -38,8 +38,7 @@
                         <th scope="col"><?= $this->Paginator->sort('Parcela') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Horas de Trabajo') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Combustibles') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Lubricantes') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Combustibles/Lubricantes') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Modificación') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Usuario') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
@@ -70,8 +69,13 @@
                             <td class="dt-center"><?= h($uso_maq->fecha->format('d-m-Y')) ?></td>
 
                             <td class="dt-center"><?= h($uso_maq->horas_trabajo) ?></td>
-                            <td class="dt-center"><?= h($uso_maq->combustible) ?></td>
-                            <td class="dt-center"><?= h($uso_maq->lubricante) ?></td>
+                            <td class="actions" style="text-align: center">
+
+                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
+                                    ['action' => 'viewCombLub', $uso_maq->iduso_maquinaria], ['class' => 'btn bg-navy', 'escape' => false,
+                                        'target=' => '_blank']) ?>
+
+                            </td>
 
                             <td class="dt-center"><?= h($uso_maq->modified->format('d-m-Y (H:i:s)')) ?></td>
 
@@ -104,6 +108,8 @@
                 </table>
             </div>
         </div>
+
+
     </div>
 </div>
 
@@ -121,6 +127,26 @@
 <script>
     $(function () {
         $('#tabladata').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false
+        });
+
+        $('#tabladata_2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false
+        });
+
+        $('#tabladata_3').DataTable({
             "paging": true,
             "lengthChange": false,
             "searching": true,

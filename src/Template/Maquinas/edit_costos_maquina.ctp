@@ -111,6 +111,14 @@
                                             'label' => 'Alquiler ($/ton): ']) ?>
                                     </div>
 
+                                    <div class="form-group">
+                                        <?= $this->Form->control('credito', ['options' => [1 => 'SI', 0 => 'NO'],
+                                            'empty' => '(Elija una opción)', 'type' => 'select',
+                                            'class' => 'form-control', 'placeholder' => '', 'disabled',
+                                            'label' => '¿Comprada con crédito?']) ?>
+                                    </div>
+
+
                                 </div>
                                 <div class="col-md-5" style="margin-left: auto;">
                                     <br>
@@ -191,6 +199,13 @@
                                             'label' => 'Alquiler ($/ton): ', 'disabled']) ?>
                                     </div>
 
+                                    <div class="form-group">
+                                        <?= $this->Form->control('credito', ['options' => [1 => 'SI', 0 => 'NO'],
+                                            'empty' => '(Elija una opción)', 'type' => 'select',
+                                            'class' => 'form-control', 'placeholder' => '',
+                                            'label' => '¿Comprada con crédito?']) ?>
+                                    </div>
+
                                 </div>
 
                                 <div class="col-md-5" style="margin-left: auto;">
@@ -228,6 +243,8 @@
                                         <?= $this->Form->input('lubricante', ['class' => 'form-control', 'type' => 'number',
                                             'label' => 'Lubricante (litros/hora): ']) ?>
                                     </div>
+
+
 
                                 </div>
 

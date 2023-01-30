@@ -200,7 +200,7 @@ class RemitosController extends AppController
             $remitos_entity->remito_number = $remito_number_value;
 
             $remitos_entity->hash_id = hash('sha256' , ($remito_number_value . date("Y-m-d")));
-
+            //debug($remitos_entity);
             if($this->Remitos->save($remitos_entity)){
 
                 $succes_var = true;
