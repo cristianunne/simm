@@ -32,6 +32,13 @@
                                 <?= $this->Form->text('orden', ['class' => 'form-control', 'placeholder' => 'Orden', 'required']) ?>
                             </div>
 
+                            <div class="form-group">
+                                <?= $this->Form->control('categoria', ['options' => $categorias,
+                                    'empty' => '(Elija una Categoria)', 'type' => 'select',
+                                    'class' => 'form-control', 'placeholder' => '',
+                                    'label' => 'Categoria:']) ?>
+                            </div>
+
 
                             <div class="form-group" style="margin-top: 40px;">
                                 <div class="pull-right">

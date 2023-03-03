@@ -93,6 +93,12 @@ class CentrosCostosTable extends Table
             ->requirePresence('users_idusers', 'create')
             ->notEmptyString('users_idusers');
 
+        $validator
+            ->scalar('categoria')
+            ->maxLength('categoria', 45)
+            ->requirePresence('categoria', 'create')
+            ->notEmptyString('categoria');
+
         return $validator;
     }
 }

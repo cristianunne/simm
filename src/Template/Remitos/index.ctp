@@ -76,8 +76,22 @@
                             <td class="dt-center"><?= h($rem->remito_number) ?></td>
                             <td class="dt-center"><?= h($rem->fecha->format('d-m-Y')) ?></td>
                             <td class="dt-center"><?= h($rem->worksgroup->name) ?></td>
-                            <td class="dt-center"><?= h($rem->parcela->lote->name) ?></td>
-                            <td class="dt-center"><?= h($rem->parcela->name) ?></td>
+
+                            <!-- NO deben estar vacios -->
+
+                            <?php if (!is_null($rem->lote)): ?>
+                                <td class="dt-center"><?= h($rem->lote->name) ?></td>
+                            <?php else: ?>
+                                <td class="dt-center"></td>
+                            <?php endif; ?>
+
+                            <?php if (!is_null($rem->parcela)): ?>
+                                <td class="dt-center"><?= h($rem->parcela->name) ?></td>
+                            <?php else: ?>
+                                <td class="dt-center"></td>
+                            <?php endif; ?>
+
+
 
                             <!-- COnsulto por el tipo de propietario -->
                             <?php if ($rem->propietario->tipo == 'Empresa'): ?>

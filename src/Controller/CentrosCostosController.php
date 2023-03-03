@@ -72,6 +72,12 @@ class CentrosCostosController extends AppController
         $user_role = $session->read('Auth.User.role');
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
 
+        //CAtegorias
+        $categorias = ['Elaboracion' => 'Elaboracion', 'Transporte' => 'Transporte'];
+
+
+
+
         if ($this->request->is('post')) {
 
             $centros_costos = $this->CentrosCostos->patchEntity($centros_costos, $this->request->getData());
@@ -88,6 +94,7 @@ class CentrosCostosController extends AppController
             }
         }
 
+        $this->set(compact('categorias'));
         $this->set(compact('centros_costos'));
     }
 
@@ -106,6 +113,11 @@ class CentrosCostosController extends AppController
             $this->set(compact('sub_seccion'));
 
             $centros_costos =  $this->CentrosCostos->get($id);
+
+            //CAtegorias
+            $categorias = ['Elaboracion' => 'Elaboracion', 'Transporte' => 'Transporte'];
+            $this->set(compact('categorias'));
+
 
             if ($this->request->is(['patch', 'post', 'put'])) {
                 $data = $this->request->getData();

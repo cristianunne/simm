@@ -14,6 +14,10 @@ use Cake\ORM\Entity;
  * @property bool $active
  * @property int $empresas_idempresas
  * @property int $users_idusers
+ * @property string $categoria
+ *
+ * @property \App\Model\Entity\User $user
+ * @property \App\Model\Entity\Empresa $empresa
  */
 class CentrosCosto extends Entity
 {
@@ -34,5 +38,8 @@ class CentrosCosto extends Entity
         'active' => true,
         'empresas_idempresas' => true,
         'users_idusers' => true,
+        'categoria' => true,
+        'user' => true,
+        'empresa' => true,
     ];
 }

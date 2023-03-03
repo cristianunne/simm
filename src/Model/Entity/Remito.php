@@ -11,7 +11,7 @@ use Cake\ORM\Entity;
  * @property string $hash_id
  * @property \Cake\I18n\FrozenDate $fecha
  * @property int $worksgroups_idworksgroups
- * @property int $parcelas_idparcelas
+ * @property int|null $parcelas_idparcelas
  * @property int $propietarios_idpropietarios
  * @property int $productos_idproductos
  * @property float $precio_ton
@@ -21,14 +21,17 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenTime $modified
  * @property bool $active
  * @property int $destinos_iddestinos
- * @property string|null $ton
+ * @property float|null $ton
+ * @property int $lotes_idlotes
  *
  * @property \App\Model\Entity\User $user
  * @property \App\Model\Entity\Worksgroup $worksgroup
  * @property \App\Model\Entity\Propietario $propietario
+ * @property \App\Model\Entity\Lote $lote
  * @property \App\Model\Entity\Parcela $parcela
  * @property \App\Model\Entity\Producto $producto
  * @property \App\Model\Entity\Destino $destino
+ * @property \App\Model\Entity\RemitosMaquina[] $remitos_maquinas
  */
 class Remito extends Entity
 {
@@ -57,11 +60,14 @@ class Remito extends Entity
         'active' => true,
         'destinos_iddestinos' => true,
         'ton' => true,
+        'lotes_idlotes' => true,
         'user' => true,
         'worksgroup' => true,
         'propietario' => true,
+        'lote' => true,
         'parcela' => true,
         'producto' => true,
         'destino' => true,
+        'remitos_maquinas' => true,
     ];
 }

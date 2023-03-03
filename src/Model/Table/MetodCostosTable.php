@@ -135,4 +135,18 @@ class MetodCostosTable extends Table
 
         return $validator;
     }
+
+    public function findGetMetodCostosByHash(Query $query, $options = [])
+    {
+
+        $conditions = [
+            'id_hash LIKE' => $options['hash'],
+            'active' => true
+        ];
+
+        $result = $query->where([$conditions]);
+
+        return $result;
+    }
+
 }

@@ -77,9 +77,9 @@
 
                                 <div style="display: flex;">
 
-                                    <?= $this->Form->control('parcela.lotes_idlotes', ['options' => $lote,
+                                    <?= $this->Form->control('lotes_idlotes', ['options' => $lote,
                                         'empty' => 'Elija un Lote', 'type' => 'select',
-                                        'class' => 'form-control', 'placeholder' => 'Parcela',
+                                        'class' => 'form-control', 'placeholder' => 'Lote',
                                         'label' => false, 'id' => 'lotes_idlotes', 'required']) ?>
 
 

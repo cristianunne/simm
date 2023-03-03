@@ -58,6 +58,9 @@ class MaquinasTable extends Table
             'joinType' => 'INNER'
         ]);
 
+        //AGregare una relacion BelongTo aqui
+
+
         $this->hasMany('OperariosMaquinas', [
             'foreignKey' => 'maquinas_idmaquinas',
             'bindingKey' => 'idmaquinas', //actual
@@ -69,6 +72,29 @@ class MaquinasTable extends Table
             'bindingKey' => 'idmaquinas', //actual
             'joinType' => 'INNER'
         ]);
+
+        $this->hasMany('UsoMaquinaria', [
+            'foreignKey' => 'maquinas_idmaquinas',
+            'bindingKey' => 'idmaquinas', //actual
+            'joinType' => 'INNER'
+        ]);
+
+        $this->hasMany('ArreglosMecanicos', [
+            'foreignKey' => 'maquinas_idmaquinas',
+            'bindingKey' => 'idmaquinas', //actual
+            'joinType' => 'INNER'
+        ]);
+
+        /** Esto es un BelonTo **/
+
+        $this->belongsToMany('Remitos', [
+            'foreignKey' => 'maquinas_idmaquinas',
+            'bindingKey' => 'idmaquinas', //actual
+            'targetForeignKey' => 'remitos_idremitos',
+            'joinTable' => 'RemitosMaquinas',
+            'joinType' => 'INNER'
+        ]);
+
 
 
     }
@@ -136,4 +162,24 @@ class MaquinasTable extends Table
 
         return $rules;
     }
+
+    /**
+     * @param Query $
+     * @param $option
+     * @return array
+     * Return maquinas by date especified in remitos
+     */
+    public function findGetMaquinasByDateRemitos(Query query, $option = [])
+    {
+
+        $array_maquinas = [];
+
+
+
+
+
+        return $array_maquinas;
+    }
+
+
 }

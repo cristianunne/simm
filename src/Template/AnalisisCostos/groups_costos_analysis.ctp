@@ -3,7 +3,7 @@
 <?= $this->Html->css('../plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>
 <?= $this->Html->css('../plugins/datatables-buttons/css/buttons.bootstrap4.min.css') ?>
 
-
+<?= $this->Html->css('jquery-confirm.min.css') ?>
 
 <?= $this->element('header')?>
 <?= $this->element('sidebar')?>
@@ -25,6 +25,7 @@
 
             <div class="card-body">
                 <div class="row">
+
                     <div class="col-md-2" style="border: solid 1px #c1c1c1;">
                         <p class="title-box-ac">Grupo de Trabajo</p>
                         <hr>
@@ -35,7 +36,10 @@
                                 'label' => 'Grupo de Trabajo:', 'id' => 'worksgroups_idworksgroups']) ?>
                         </div>
 
+
                     </div>
+
+
 
 
                     <div class="col-md-3" style="border: solid 1px #c1c1c1; margin-left: 5px;">
@@ -117,20 +121,26 @@
                         </div>
 
 
-
                     </div>
 
                     <div class="col-md-2 float-right" style="border: solid 1px #c1c1c1; margin-left: 55px;">
                         <div class="form-group">
                             <br>
                             <br>
-                            <button type="button" class="btn btn-block bg-gradient-primary">Calcular</button>
-                            <?= $this->Html->link('Prueba',
-                                ['controller' => 'AnalisisCostos', 'action' => 'calculateCostosGrupos'],
-                                ['class' => 'btn btn-success', 'escape' => false]) ?>
+                            <button type="button" class="btn btn-block bg-gradient-primary" onclick="groupsCostosCalc(this)">Calcular</button>
+
                             <br>
-                            <button type="button" class="btn btn-block bg-gradient-warning">Configurar</button>
-                            <button type="button" class="btn btn-block bg-gradient-success">Generar Informe</button>
+
+                            <div>
+
+                                <button type="button" class="btn btn-block bg-gradient-success" id="down_informe"
+                                            style="display: none;" onclick="downloadInforme(this)">
+                                    <span class="glyphicon far fa-file-excel"></span> Descargar Informe</button>
+
+
+                            </div>
+
+
                         </div>
 
                     </div>
@@ -144,51 +154,26 @@
                         <div class="row">
                             <div class="div-costos-header">
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_inicio', 'Costo/tonelada: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" value="Otro texto"/>
+                                    <?=  $this->Form->label('gen_costo', 'Costo/tonelada: ', ['class' => 'label-m11']) ?>
+                                    <input id="gen_costo" type="text" class="form-control" disabled value=""/>
 
                                 </div>
 
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_final', 'Toneladas: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" value="Otro texto"/>
+                                    <?=  $this->Form->label('gen_toneladas', 'Toneladas: ', ['class' => 'label-m11']) ?>
+                                    <input id="gen_toneladas" type="text" class="form-control" disabled value=""/>
                                 </div>
 
                             </div>
 
-                            <div>
-                                <ul id="treeview">
-                                    <li data-icon-cls="fa fa-inbox" data-expanded="true">Inbox
-                                        <ul>
-                                            <li><b>Today (2)</b></li>
-                                            <li>Monday</li>
-                                            <li>Last Week</li>
-                                        </ul>
-                                    </li>
-                                    <li data-icon-cls="fa fa-trash">Trash
-                                    </li>
-                                    <li data-icon-cls="fa fa-calendar">Calendar
-                                        <ul>
-                                            <li>Day</li>
-                                            <li>Week</li>
-                                            <li>Month</li>
-                                        </ul>
-                                    </li>
-                                    <li data-icon-cls="fa fa-user">Contacts
-                                        <ul>
-                                            <li>Alexander Stein</li>
-                                            <li>John Doe</li>
-                                            <li>Paul Smith</li>
-                                            <li>Steward Lynn</li>
-                                        </ul>
-                                    </li>
-                                    <li data-icon-cls="fa fa-folder">Folders
-                                        <ul>
-                                            <li>Backup</li>
-                                            <li>Deleted</li>
-                                            <li>Projects</li>
-                                        </ul>
-                                    </li>
+                            <div id="div_treeview_left">
+
+                                <div id="info-header-left" class="alert alert-default-info" role="alert">
+                                  Costo Tolal:
+                                </div>
+
+                                <ul id="left_tree_items" class="tree">
+
                                 </ul>
                             </div>
                         </div>
@@ -198,52 +183,24 @@
                         <div class="row">
                             <div class="div-costos-header">
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_inicio', 'Costo/tonelada: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" value="Otro texto"/>
+                                    <?=  $this->Form->label('centro_top_name', 'C. de Costos: ', ['class' => 'label-m11']) ?>
+                                    <input id="centro_top_name" type="text" class="form-control" disabled value=""/>
 
                                 </div>
 
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_final', 'Toneladas: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" disabled value="Otro texto"/>
+                                    <?=  $this->Form->label('centro_top_costo', 'Costo/t: ', ['class' => 'label-m11']) ?>
+                                    <input id="centro_top_costo" type="text" class="form-control" disabled value=""/>
                                 </div>
 
                             </div>
 
-                            <div>
-                                <ul id="treeview_transporte">
-                                    <li data-icon-cls="fa fa-inbox" data-expanded="true">Inbox
-                                        <ul>
-                                            <li><b>Today (2)</b></li>
-                                            <li>Monday</li>
-                                            <li>Last Week</li>
-                                        </ul>
-                                    </li>
-                                    <li data-icon-cls="fa fa-trash">Trash
-                                    </li>
-                                    <li data-icon-cls="fa fa-calendar">Calendar
-                                        <ul>
-                                            <li>Day</li>
-                                            <li>Week</li>
-                                            <li>Month</li>
-                                        </ul>
-                                    </li>
-                                    <li data-icon-cls="fa fa-user">Contacts
-                                        <ul>
-                                            <li>Alexander Stein</li>
-                                            <li>John Doe</li>
-                                            <li>Paul Smith</li>
-                                            <li>Steward Lynn</li>
-                                        </ul>
-                                    </li>
-                                    <li data-icon-cls="fa fa-folder">Folders
-                                        <ul>
-                                            <li>Backup</li>
-                                            <li>Deleted</li>
-                                            <li>Projects</li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                            <div id="info-header-maquinas" class="alert alert-default-info" role="alert">
+                                Costo Tolal:
+                            </div>
+
+                            <div class="accordion" id="maquinas_informacion_costos">
+
                             </div>
                         </div>
 
@@ -254,38 +211,41 @@
                         <div class="row">
                             <div class="div-costos-header">
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_inicio', 'Detalles: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" value="Otro texto"/>
+                                    <?=  $this->Form->label('fecha_inicio', 'Detalles: ', ['class' => 'label-m11']) ?>
+                                    <input id="detalles_maq" type="text" class="form-control" disabled value=""/>
 
                                 </div>
 
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_final', 'Costo/hora: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" disabled value="Otro texto"/>
+                                    <?=  $this->Form->label('fecha_final', 'Costo/hora: ', ['class' => 'label-m11']) ?>
+                                    <input id="costoh_maq" type="text" class="form-control" disabled value=""/>
                                 </div>
 
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_inicio', 'Prod./hora: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" value="Otro texto"/>
+                                    <?=  $this->Form->label('fecha_inicio', 'Prod./hora: ', ['class' => 'label-m11']) ?>
+                                    <input id="prod_maq" type="text" class="form-control" disabled value=""/>
 
                                 </div>
 
                                 <div class="form-group sandbox-container" id="sandbox-container">
-                                    <?=  $this->Form->label('fecha_final', 'Costo/t: ', ['class' => 'label-m10']) ?>
-                                    <input type="text" class="form-control" disabled value="Otro texto"/>
+                                    <?=  $this->Form->label('fecha_final', 'Costo/t: ', ['class' => 'label-m11']) ?>
+                                    <input id="costot_maq" type="text" class="form-control" disabled value=""/>
                                 </div>
 
                             </div>
 
+                            <div id="info-header-maquinas" class="alert alert-default-info" role="alert">
+                                Información de la máquina:
+                            </div>
 
+                            <div id="div-info-maquinas" class="div-info-maquinas" style="min-height: 100px;">
+
+                            </div>
                         </div>
 
                     </div>
 
                 </div>
-
-
-
 
 
             </div>
@@ -329,7 +289,7 @@
                                         <?= $this->Form->button($this->Html->tag('span', '', ['class' => 'fas fa-check', 'aria-hidden' => 'true']),
                                             ['type' => 'button', 'class' => 'btn btn-success', 'escape' => false,
                                                 'attr' => $lote->name, 'attr2' =>  $lote->idlotes,  'id' => 'remitos_add',
-                                                'onclick' => 'selectLoteRemito(this)']) ?>
+                                                'onclick' => 'selectLoteCostos(this)']) ?>
                                     </td>
 
                                 </tr>
@@ -454,6 +414,8 @@
                 </div>
                 <div class="modal-body">
 
+                    <button type="button" class="btn bg-gradient-success" onclick="selectDestAll()">Todos</button>
+                    <br>
                     <div id="div_tabladata_destinos">
                         <table id="tabladata_destinos" name="tabla_persona" class="table table-bordered table-hover dataTable">
                             <thead>
@@ -499,19 +461,11 @@
 
 
 <!-- you need to include the ShieldUI CSS and JS assets in order for the TreeView widget to work -->
-<?= $this->Html->css('shieldui/all.min.css') ?>
-<?= $this->Html->script('shieldui/shieldui-all.min.js') ?>
+<?= $this->Html->css('tree_view.css') ?>
+
+<?= $this->Html->script('jquery-confirm.min.js') ?>
 
 
-<script type="text/javascript">
-    jQuery(function ($) {
-        $("#treeview").shieldTreeView();
-    });
-
-    jQuery(function ($) {
-        $("#treeview_transporte").shieldTreeView();
-    });
-</script>
 
 
 

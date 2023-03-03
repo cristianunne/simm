@@ -4,23 +4,21 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Informe Entity
+ * Servicio Entity
  *
- * @property int $idinformes
+ * @property int $idservicios
+ * @property float $precio
  * @property \Cake\I18n\FrozenTime $created
- * @property \Cake\I18n\FrozenDate $fecha_inicio
- * @property \Cake\I18n\FrozenDate $fecha_fin
- * @property string $worksgroups
- * @property string|null $lote
- * @property string|null $parcela
- * @property string|null $propietario
- * @property string|null $destino
+ * @property \Cake\I18n\FrozenTime $modified
  * @property int $users_idusers
  * @property int $empresas_idempresas
- * @property string $name
- * @property string|null $path_file
+ * @property \Cake\I18n\FrozenDate $fecha
+ * @property string $categoria
+ *
+ * @property \App\Model\Entity\User $user
+ * @property \App\Model\Entity\Empresa $empresa
  */
-class Informe extends Entity
+class Servicio extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -32,17 +30,14 @@ class Informe extends Entity
      * @var array
      */
     protected $_accessible = [
+        'precio' => true,
         'created' => true,
-        'fecha_inicio' => true,
-        'fecha_fin' => true,
-        'worksgroups' => true,
-        'lote' => true,
-        'parcela' => true,
-        'propietario' => true,
-        'destino' => true,
+        'modified' => true,
         'users_idusers' => true,
         'empresas_idempresas' => true,
-        'name' => true,
-        'path_file' => true,
+        'fecha' => true,
+        'categoria' => true,
+        'user' => true,
+        'empresa' => true,
     ];
 }

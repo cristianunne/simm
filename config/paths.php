@@ -103,4 +103,6 @@ define('FILES', WWW_ROOT . 'files'. DS);
 define('FILES_SHORT', WWW_ROOT .'files'. DS);
 
 define('EXCELS', FILES  . 'excels'. DS);
-define('EXCELS_SHORT', FILES  . 'excels'. DS);
+define('EXCELS_SHORT', 'webroot/files/'  . 'excels'. DS);
+
+

@@ -1,63 +1,35 @@
-.tree, .tree ul {
-    margin:0;
-    padding:0;
-    list-style:none
+
+#div_treeview_left{
+    padding-left: 0px;
+    padding-right: 0px;
 }
-.tree ul {
-    margin-left:1em;
-    position:relative
+
+#info-header-left{
+    border-radius: 0px;
 }
-.tree ul ul {
-    margin-left:.5em
+
+
+#left_tree_items{
+    list-style: none;
+    padding-left: 10px;
 }
-.tree ul:before {
-    content:"";
-    display:block;
-    width:0;
-    position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    border-left:1px solid
+
+#left_tree_items li {
+    width: fit-content;
+    padding: 5px 5px 5px 5px;
+
 }
-.tree li {
-    margin:0;
-    padding:0 1em;
-    line-height:2em;
-    color:#369;
-    font-weight:700;
-    position:relative
+#left_tree_items li:hover {
+
+    color: #ffffff;
+    background-color: #001f3f;
+    cursor: pointer;
 }
-.tree ul li:before {
-    content:"";
-    display:block;
-    width:10px;
-    height:0;
-    border-top:1px solid;
-    margin-top:-1px;
-    position:absolute;
-    top:1em;
-    left:0
+.span-margin-left{
+    margin-left: 3px;
 }
-.tree ul li:last-child:before {
-    background:#fff;
-    height:auto;
-    top:1em;
-    bottom:0
-}
-.indicator {
-    margin-right:5px;
-}
-.tree li a {
-    text-decoration: none;
-    color:#369;
-}
-.tree li button, .tree li button:active, .tree li button:focus {
-    text-decoration: none;
-    color:#369;
-    border:none;
-    background:transparent;
-    margin:0px 0px 0px 0px;
-    padding:0px 0px 0px 0px;
-    outline: 0;
+
+#maquinas_informacion_costos{
+    padding-right: 0px;
+    padding-left: 0px;
 }

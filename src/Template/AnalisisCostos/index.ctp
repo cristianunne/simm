@@ -26,16 +26,6 @@
             <div class="card-body">
                 <div class="gap-3 d-md-flex justify-content-md-center mb-3 pt-1">
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                        <div class="btn-group flex-vertical" role="group" aria-label="Third group">
-                            <div>
-                                <?= $this->Html->link('',
-                                    ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'btn-simm btn-met-costos btn btn-default',
-                                        'escape' => false]) ?>
-                            </div>
-                            <div class="div_content">
-                                <p class="center text-color-navy">Costos horarios teóricos</p>
-                            </div>
-                        </div>
                         <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
@@ -46,30 +36,66 @@
                                 <p class="center text-color-navy">Análisis Costos (Grupos)</p>
                             </div>
                         </div>
-
-                        <div class="btn-group flex-vertical " role="group" aria-label="Third group">
+                        <div class="btn-group flex-vertical" role="group" aria-label="Third group">
                             <div>
                                 <?= $this->Html->link('',
-                                    ['controller' => 'AnalisisCostos', 'action' => 'index'],
-                                    ['class' => 'btn-simm btn-maquina btn btn-default', 'escape' => false]) ?>
+                                    ['controller' => 'Informes', 'action' => 'index'], ['class' => 'btn-simm btn-remito btn btn-default',
+                                        'escape' => false]) ?>
                             </div>
                             <div class="div_content">
-                                <p class="center text-color-navy">Análisis Costos (Máquinas)</p>
+                                <p class="center text-color-navy">Ver Informes</p>
                             </div>
                         </div>
 
+                    </div>
+                </div>
+                <div class="gap-3 d-md-flex justify-content-md-center mb-3 pt-1">
 
-                        <div class="btn-group flex-vertical " role="group" aria-label="Third group">
-                            <div>
-                                <?= $this->Html->link('',
-                                    ['controller' => 'AnalisisCostos', 'action' => 'index'],
-                                    ['class' => 'btn-simm btn-centro_costos btn btn-default', 'escape' => false]) ?>
-                            </div>
-                            <div class="div_content">
-                                <p class="center text-color-navy">Variaciones (Grupos y Máquinas)</p>
-                            </div>
+                    <div class="btn-group flex-vertical " role="group" aria-label="Third group">
+                        <div>
+                            <?= $this->Html->link('',
+                                ['controller' => 'AnalisisCostosMaquinas', 'action' => 'calculateCostosMaquina'],
+                                ['class' => 'btn-simm btn-maquina btn btn-default', 'escape' => false]) ?>
                         </div>
+                        <div class="div_content">
+                            <p class="center text-color-navy">Análisis Costos (Máquinas)</p>
+                        </div>
+                    </div>
 
+                    <div class="btn-group flex-vertical" role="group" aria-label="Third group">
+                        <div>
+                            <?= $this->Html->link('',
+                                ['controller' => 'Informes', 'action' => 'index'], ['class' => 'btn-simm btn-remito btn btn-default',
+                                    'escape' => false]) ?>
+                        </div>
+                        <div class="div_content">
+                            <p class="center text-color-navy">Ver Informes</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="gap-3 d-md-flex justify-content-md-center mb-3 pt-1">
+                    <div class="btn-group flex-vertical " role="group" aria-label="Third group">
+                        <div>
+                            <?= $this->Html->link('',
+                                ['controller' => 'AnalisisCostos', 'action' => 'index'],
+                                ['class' => 'btn-simm btn-centro_costos btn btn-default', 'escape' => false]) ?>
+                        </div>
+                        <div class="div_content">
+                            <p class="center text-color-navy">Variaciones (Grupos y Máquinas)</p>
+                        </div>
+                    </div>
+
+                    <div class="btn-group flex-vertical" role="group" aria-label="Third group">
+                        <div>
+                            <?= $this->Html->link('',
+                                ['controller' => 'Informes', 'action' => 'index'], ['class' => 'btn-simm btn-remito btn btn-default',
+                                    'escape' => false]) ?>
+                        </div>
+                        <div class="div_content">
+                            <p class="center text-color-navy">Ver Informes</p>
+                        </div>
                     </div>
                 </div>
             </div>

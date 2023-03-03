@@ -92,7 +92,7 @@
                                     <?= $this->Form->control('parcelas_idparcelas', ['options' => null,
                                         'empty' => '(Elija una Parcela)', 'type' => 'select',
                                         'class' => 'form-control', 'placeholder' => 'Parcela',
-                                        'label' => 'Parcela:', 'required', 'id' => 'parcela']) ?>
+                                        'label' => 'Parcela:', 'id' => 'parcela']) ?>
                                 </div>
 
 

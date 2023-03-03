@@ -116,7 +116,7 @@
                                     ['controller' => 'Informes', 'action' => 'index'],
                                        ['class' => 'btn-simm btn-informes btn btn-default', 'escape' => false ]) ?>
                             </div>
-                            <div>
+                            <div class="div_content">
                                 <p class="center text-color-navy">Informes</p>
                             </div>
                         </div>
@@ -131,6 +131,31 @@
                                 <p class="center text-color-navy">Configuración del Sistema</p>
                             </div>
                         </div>
+
+                    </div>
+                </div>
+
+                <div class="gap-3 d-md-flex justify-content-md-center mb-3 pt-1">
+
+
+                    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+
+
+
+                        <div class="btn-group flex-vertical " role="group" aria-label="Third group">
+                            <div>
+
+
+                                <?= $this->Html->link('',
+                                    ['controller' => 'Servicios', 'action' => 'index'],
+                                    ['class' => 'btn-simm btn-informes btn btn-default', 'escape' => false ]) ?>
+                            </div>
+                            <div class="div_content">
+                                <p class="center text-color-navy">Servicios</p>
+                            </div>
+                        </div>
+
+
 
                     </div>
                 </div>

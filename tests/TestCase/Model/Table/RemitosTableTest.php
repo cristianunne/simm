@@ -27,9 +27,11 @@ class RemitosTableTest extends TestCase
         'app.Users',
         'app.Worksgroups',
         'app.Propietarios',
+        'app.Lotes',
         'app.Parcelas',
         'app.Productos',
         'app.Destinos',
+        'app.RemitosMaquinas',
     ];
 
     /**
@@ -82,6 +84,26 @@ class RemitosTableTest extends TestCase
      * @return void
      */
     public function testBuildRules()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test findRemitosByConditions method
+     *
+     * @return void
+     */
+    public function testFindRemitosByConditions()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test findRemitosByDate method
+     *
+     * @return void
+     */
+    public function testFindRemitosByDate()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

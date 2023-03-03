@@ -52,7 +52,7 @@ class CostosMaquinasTable extends Table
             'joinType' => 'INNER'
         ]);
 
-        $this->hasOne('CentrosCostos', [
+        $this->hasMany('CentrosCostos', [
             'foreignKey' => 'idcentros_costos',
             'bindingKey' => 'centros_costos_idcentros_costos', //actual
             'joinType' => 'INNER'
@@ -64,6 +64,8 @@ class CostosMaquinasTable extends Table
             'bindingKey' => 'users_idusers', //actual
             'joinType' => 'INNER'
         ]);
+
+
     }
 
     /**

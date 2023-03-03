@@ -2,6 +2,9 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Datasource\Exception\InvalidPrimaryKeyException;
+use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Filesystem\File;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Style;
@@ -19,11 +22,11 @@ class InformesController extends AppController
     public function isAuthorized($user)
     {
         if (isset($user['role']) and $user['role'] === 'user') {
-            if (in_array($this->request->getParam('action'), ['index', 'generateExcel', 'edit', 'delete', 'showInactive'])) {
+            if (in_array($this->request->getParam('action'), ['index', 'generateExcel', 'edit', 'delete', 'downloadAsExcel'])) {
                 return true;
             }
         } else if (isset($user['role']) and $user['role'] === 'supervisor') {
-            if (in_array($this->request->getParam('action'), ['index', 'generateExcel', 'edit', 'delete', 'showInactive'])) {
+            if (in_array($this->request->getParam('action'), ['index', 'generateExcel', 'edit', 'delete', 'downloadAsExcel'])) {
                 return true;
             }
         }
@@ -54,7 +57,7 @@ class InformesController extends AppController
             ])->where(['empresas_idempresas' => $id_empresa]);
             $this->set(compact('informes'));
 
-            //debug($operarios->toArray());
+            //debug($informes->toArray());
         }
     }
 
@@ -317,4 +320,64 @@ class InformesController extends AppController
     }
 
 
+    public function downloadAsExcel($id = null)
+    {
+        //TRaigo el informe
+        try {
+
+            $informe = $this->Informes->get($id);
+
+            $path =  $path = WWW_ROOT.'files/excels/'.$informe->name . '.xlsx';
+
+            $response = $this->response->withFile($path,
+                ['download' => true]
+            );
+            return $response;
+
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+        }
+        catch (Exception $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+        }
+
+    }
+
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+
+        try{
+            //Variable usada para el sidebar
+            $seccion = 'system';
+            $sub_seccion = 'MetodCostos';
+            $this->set(compact('seccion'));
+            $this->set(compact('sub_seccion'));
+
+            $informe =  $this->Informes->get($id);
+
+            //debo consultar si esta constante se usa en otro lugar antes de eliminar
+
+            if ($this->Informes->delete($informe)) {
+                $this->Flash->success(__('El Registro ha sido eliminado.'));
+
+                return $this->redirect(['action' => 'index']);
+            } else {
+                $this->Flash->error(__('El Registro no pudo ser eliminada. Intente nuevamente.'));
+            }
+
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+        }
+        catch (Exception $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+        }
+    }
 }

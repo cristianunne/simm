@@ -20,7 +20,7 @@ use Cake\Validation\Validator;
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
-class InformesTable extends Table
+class InformesTable_ extends Table
 {
     /**
      * Initialize method
@@ -104,9 +104,9 @@ class InformesTable extends Table
             ->notEmptyString('name');
 
         $validator
-            ->scalar('path_file')
-            ->maxLength('path_file', 255)
-            ->allowEmptyFile('path_file');
+            ->scalar('path')
+            ->maxLength('path', 255)
+            ->allowEmptyString('path');
 
         return $validator;
     }

@@ -239,7 +239,32 @@ function selectLoteUsoMaquinaria(object) {
     }
     closeModalById('modal_lotes');
 
+
+
 }
+
+function selectDestAll() {
+    let variable = 'Todos';
+    let id = 0;
+
+    //aca debo cambiar
+
+    //$("#input_lotes").val(variable);
+    //$("#lotes_idlotes").val(id);
+
+    $('#destinos_iddestinos').empty();
+
+    $('#destinos_iddestinos').append($('<option>', {
+        value: id,
+        text: variable
+    }));
+
+    $("#destinos_iddestinos").val(id);
+
+    closeModalById('modal_destinos');
+}
+
+
 
 
 
@@ -1701,39 +1726,39 @@ function filterRemitos()
 
 function loadDataToTableRemitos(table, data)
 {
-    for (let i = 0; i < data.length; i++){
+    for (let i = 0; i < data.length; i++) {
 
         let url = "/simm/remitos/view/" + data[i].idremitos.toString();
-        let icon_eye = '<a href='+ url + ' class="btn bg-navy" escape="false" target= "_blank" ><span class="fas fa-eye" aria-hidden="true"></span></a>';
+        let icon_eye = '<a href=' + url + ' class="btn bg-navy" escape="false" target= "_blank" ><span class="fas fa-eye" aria-hidden="true"></span></a>';
 
         let url_edit = "/simm/remitos/edit/" + data[i].idremitos.toString();
-        let icon_edit = '<a href='+ url_edit + ' class="btn bg-purple" escape="false" style="margin-right: 4px;"><span class="fas fa-edit" aria-hidden="true"></span></a>';
+        let icon_edit = '<a href=' + url_edit + ' class="btn bg-purple" escape="false" style="margin-right: 4px;"><span class="fas fa-edit" aria-hidden="true"></span></a>';
 
-        let icon_delete = '<a href="#" class="btn btn-danger" escape="false"  attr="'+ data[i].idremitos + '" onclick="deleteRowFilterRemitos(this)">' +
+        let icon_delete = '<a href="#" class="btn btn-danger" escape="false"  attr="' + data[i].idremitos + '" onclick="deleteRowFilterRemitos(this)">' +
             '<span class="fas fa-trash-alt" aria-hidden="true"></span></a>';
 
 
         let url_maq = "/simm/remitos/add-maquinas/" + data[i].idremitos.toString();
-        let icon_maq = '<a href='+ url_edit + ' class="btn bg-green" escape="false" style="margin-right: 4px;"><span class="fas fa-truck" aria-hidden="true"></span></a>';
-
+        let icon_maq = '<a href=' + url_edit + ' class="btn bg-green" escape="false" style="margin-right: 4px;"><span class="fas fa-truck" aria-hidden="true"></span></a>';
 
 
         //Compruebo si el propietario es empresa o persona
         let tipo_prop = null;
 
-        if(data[i].propietario.tipo === 'Empresa'){
+        if (data[i].propietario.tipo === 'Empresa') {
             tipo_prop = data[i].propietario.name;
         } else {
             tipo_prop = data[i].propietario.firstname + " " + data[i].propietario.lastname;
         }
 
 
+
         var trDOM = table.row.add([icon_eye,
             data[i].remito_number,
             data[i].fecha.toString().substr(0,10),
             data[i].worksgroup.name,
-            data[i].parcela.lote.name,
-            data[i].parcela.name,
+            data[i].lote == null ? '' : data[i].lote.name,
+            data[i].parcela == null ? '' : data[i].parcela.name,
             tipo_prop,
             data[i].producto.name,
             data[i].ton,
@@ -2064,6 +2089,36 @@ function deleteRowUsos(element)
     //addRowToTableMaquinasOperarios(element)
 }
 
+function deleteRowUsosLub(element)
+{
+    let table = $('#tabladata_2').DataTable();
+    let option = $(element);
+
+    // console.log();
+    // table_maq_modal.row(':eq( ' + idrow + ')').remove().draw();
+    let producto = option.attr('attr');
+
+
+    let res = table.row( option.parents('tr') )
+        .remove();
+    table.draw();
+
+    if((res !== null) && (res !== undefined)){
+
+        //Devolvio un objeto, restauro el input
+
+        $('#category_lub').append($('<option>', {
+            value: producto,
+            text: producto
+        }));
+
+    }
+
+    //AL eliminar tengo que restaurar
+
+    //addRowToTableMaquinasOperarios(element)
+}
+
 function addLubricanteToTable(element) {
 
     //Accedo a los valores de los inputs
@@ -2076,7 +2131,7 @@ function addLubricanteToTable(element) {
 
     let number_count = table.rows().count() + 1;
 
-    let icon_delete =   '<button type="button" class="btn btn-danger" aria-label="Left Align" onClick="deleteRowUsos(this)"' +
+    let icon_delete =   '<button type="button" class="btn btn-danger" aria-label="Left Align" onClick="deleteRowUsosLub(this)"' +
         'attr="' + producto.val() + '">' +
         '<span class="fas fa-trash" aria-hidden="true"></span></button>';
 
@@ -2260,12 +2315,12 @@ function deleteProductUsoMaqLub(element) {
                     type: "POST",
                     async: true,
                     url: url,
-                    data: {id_uso : id_},
+                    data: {id_uso: id_},
 
                     beforeSend: function (xhr) { // Add this line
                         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                     },
-                    success: function(data, textStatus){
+                    success: function (data, textStatus) {
 
                         //Actualizo el row
                         location.reload();
@@ -2282,15 +2337,757 @@ function deleteProductUsoMaqLub(element) {
         }
     });
 
-    /***** Creo los modals con jquery *****/
+}
 
-    function showModalCombLub(element)
-    {
+    /************ Analisis de costos****/
 
+    function selectLoteCostos(object) {
+
+        let id_function = $(object).attr('id').toString();
+
+
+        let variable = $(object).attr('attr').toString();
+        let id = $(object).attr('attr2').toString();
+
+        //aca debo cambiar
+
+        //$("#input_lotes").val(variable);
+        //$("#lotes_idlotes").val(id);
+
+        $('#lotes_idlotes').empty();
+
+        $('#lotes_idlotes').append($('<option>', {
+            value: id,
+            text: variable
+        }));
+
+        $("#lotes_idlotes").val(id);
+
+
+        //Si el id es usomaquinaria_add traigo las parcelas
+        //Le paso el control lotes parcelas
+
+        if (id_function === undefined || id_function === '' || id_function == null){
+            console.log("error");
+        } else {
+
+            //Verifico si es el EDIT
+
+            getParcelaByLoteCostos($("#lotes_idlotes"));
+
+        }
+        closeModalById('modal_lotes');
 
     }
 
+function getParcelaByLoteCostos(lote) {
 
+    let option_select = $(lote).val().toString();
+
+
+    if (option_select === undefined || option_select === '' || option_select == null){
+        $("#parcela").prop('disabled', true);
+    } else {
+        $("#parcela").prop('disabled', false);
+        //alert(option_select);
+        //Llamo al metodo getDptos
+        getParcelaByLoteFromDbCostos(option_select);
+    }
+
+}
+
+
+
+function getParcelaByLoteFromDbCostos(lote) {
+
+    //Verificar si viene de un edit la peticion
+
+
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: '../Parcelas/getParcelaByLote',
+        data: {'lote' : lote},
+
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        },
+        success: function(data, textStatus){
+
+            ///console.log(data);
+            loadParcelasToSelectCostos(data);
+
+        },
+        error: function (data) {
+        }
+    });
+}
+
+
+
+function loadParcelasToSelectCostos(data){
+    let control = $("#parcela");
+    //Limpio el select primero
+    control.empty();
+    control.append(new Option('(Elija una Parcela)', null));
+    control.append(new Option('Todos', 0));
+
+    for (let i = 0; i < data.length; i++){
+        let optionText = data[i].name;
+        let optionValue = data[i].idparcelas;
+        control.append(new Option(optionText, optionValue));
+
+    }
+}
+
+
+/*** CAlculo de costos ***/
+
+var data_info = null;
+
+function groupsCostosCalc(button){
+
+    //Primero verifico que me haya pasado los datos
+    let groups_control = $("#worksgroups_idworksgroups");
+    let fecha_inicio_control = $("#fecha_inicio");
+    let fecha_final_control = $("#fecha_final");
+    let lotes_idlotes_control = $("#lotes_idlotes");
+    let parcelas_idparcelas_control = $("#parcela");
+    let propietarios_idpropietarios_control = $("#propietarios_idpropietarios");
+    let destinos_iddestinos_control = $("#destinos_iddestinos");
+
+
+
+    if(groups_control.val() === '' || fecha_inicio_control.val() === '' || fecha_final_control.val() === '' ||
+        lotes_idlotes_control.val() === '' || parcelas_idparcelas_control.val() === '' || parcelas_idparcelas_control.val() == undefined
+        || propietarios_idpropietarios_control === '' ||
+        destinos_iddestinos_control === ''){
+
+        $.confirm({
+            icon: 'fas fa-exclamation-circle',
+            title: '¡Advertencia!',
+            content: 'Debe completar todos los campos para proceder!',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                close:
+                    {
+                        text: 'Aceptar',
+                        btnClass: 'btn-red',
+                        function () {
+                }}
+            }
+        });
+    } else {
+
+        //SI paso el proceso, proceso la info :selected
+        //Creo las variables
+        let groups = groups_control.val();
+        let fecha_inicio = fecha_inicio_control.val();
+        let fecha_final = fecha_final_control.val();
+        let lotes = lotes_idlotes_control.val();
+        let parcelas = parcelas_idparcelas_control.val();
+        let propietarios = propietarios_idpropietarios_control.val();
+        let destinos = destinos_iddestinos_control.val();
+
+        //PUedo pasarle el texto tmb
+        let group_name = $("#worksgroups_idworksgroups :selected").text();
+        let lote_name = $("#lotes_idlotes :selected").text();
+        let parcelas_name = $("#parcela :selected").text();
+        let propietarios_name = $("#propietarios_idpropietarios :selected").text();
+        let destinos_name = $("#destinos_iddestinos :selected").text();
+
+        var gen_informe = null;
+
+
+        //Verifico si los filtros de Lotes, parcelas, propietarios y destinos estan activos, si lo estan
+        //notifico que el calculo puede fallar
+
+        if(lote_name !== 'Todos' || parcelas_name !== 'Todos' || propietarios_name !== 'Todos' || destinos_name !== 'Todos')
+        {
+            let lot_n = lote_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' : '<p style="color: red; display: contents;">NO</p>';
+            let par_n = parcelas_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' :'<p style="color: red; display: contents;">NO</p>';
+            let prop_n = propietarios_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' : '<p style="color: red; display: contents;">NO</p>';
+            let dest_n = destinos_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' : '<p style="color: red; display: contents;">NO</p>';
+
+
+            let text = 'Usted ha seleccionado Filtros por: <br>' +
+                'Lote: ' + lot_n +
+                '<br>Parcela: ' + par_n +
+                '<br>Propietario: ' + prop_n +
+                '<br>Destino: ' + dest_n +
+                '<br> <br> Para realizar este tipo de procesamiento la información debe estar completeamente cargada! <br><br>'
+                + '<h5>¿Desea continuar con el procesamiento?</h5>';
+
+                $.confirm({
+                icon: 'fas fa-exclamation-circle',
+                title: 'Advertencia de aplicación de Filtros',
+                content: text,
+                type: 'orange',
+                typeAnimated: true,
+                buttons: {
+                    confirm:
+                        {
+                            text: 'Aceptar',
+                            btnClass: 'btn-green',
+                            action: function() {
+
+                                //Creo un confirm para saber si almacenar el informe o no
+                                $.confirm({
+                                    icon: 'fas fa-question-circle',
+                                    title: '¿Consulta?',
+                                    content: '¿Desea generar un informe?',
+                                    type: 'green',
+                                    typeAnimated: true,
+                                    buttons: {
+                                        confirm:
+                                            {
+                                                text: 'Aceptar',
+                                                btnClass: 'btn-green',
+                                                action: function() {
+                                                    let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
+                                                        'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
+                                                        'informe' : true, 'group_name' : group_name, 'lote_name' : lote_name, 'parcelas_name' : parcelas_name,
+                                                        'propietarios_name' : propietarios_name,  'destinos_name' : destinos_name};
+                                                    processCalcCostosGroups(variables);
+                                                }
+                                            },
+                                        cancel:
+                                            {
+                                                text: 'Cancelar',
+                                                btnClass: 'btn-red',
+                                                action: function() {
+                                                    let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
+                                                        'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
+                                                        'informe' : false};
+                                                    processCalcCostosGroups(variables);
+                                                }
+                                            }
+                                    }
+                                });
+
+                            }
+                        },
+                    cancel:
+                        {
+                            text: 'Cancelar',
+                            btnClass: 'btn-red',
+                            action: function() {
+
+                            }
+                        }
+                }
+            });
+        } else {
+            //NO se aplicaron filtros
+            //Creo un confirm para saber si almacenar el informe o no
+            $.confirm({
+                icon: 'fas fa-question-circle',
+                title: '¿Consulta?',
+                content: '¿Desea generar un informe?',
+                type: 'green',
+                typeAnimated: true,
+                buttons: {
+                    confirm:
+                        {
+                            text: 'Aceptar',
+                            btnClass: 'btn-green',
+                            action: function() {
+                                let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
+                                    'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
+                                    'informe' : true, 'group_name' : group_name, 'lote_name' : lote_name, 'parcelas_name' : parcelas_name,
+                                    'propietarios_name' : propietarios_name,  'destinos_name' : destinos_name};
+                                processCalcCostosGroups(variables);
+                            }
+                        },
+                    cancel:
+                        {
+                            text: 'Cancelar',
+                            btnClass: 'btn-red',
+                            action: function() {
+                                let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
+                                    'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
+                                    'informe' : false};
+                                processCalcCostosGroups(variables);
+                            }
+                        }
+                }
+            });
+        }
+
+
+    }
+}
+
+function processCalcCostosGroups(variables)
+{
+
+    var a = $.confirm({
+        theme: 'supervan',
+        lazyOpen: true,
+        closeIcon: false,
+        type: 'blue',
+        typeAnimated: true,
+        icon: 'fa fa-spinner fa-spin',
+        title: 'Procesando!',
+        content: 'Estamos realizando el cálculo de Costos, por favor espere!',
+        buttons:false
+
+    });
+
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: 'calculateCostosGrupos',
+        data: variables,
+
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            //Debo mostrar un loading
+
+            a.open();
+
+        },
+        success: function(data, textStatus){
+
+            //controlo que el resultado no sea false
+
+          if(data.result === undefined)
+          {
+              data_info = data.centros;
+              console.log(data);
+              $.when(showDataCostosToDisplayLeft(data.centros)).then(
+                  function () {
+
+                      //DEbo verificar que el infrome este en true
+                      if(data.informe !== undefined && data.informe !== null) {
+                          if(data.informe.informe === true){
+                              let id_informe = data.informe.id;
+                              $("#down_informe").css({"display": "block"});
+                              $("#down_informe").attr('attr', data.informe.path);
+
+                          }
+
+                      }
+                  }
+              );
+
+          } else {
+              //SIn datos
+              console.log('SIN DATOS');
+          }
+
+
+            //COnsulto si el informe es ok, y en virtud de ello consulto
+
+        },
+        error: function (data, textStatus) {
+
+
+            console.log(data);
+        },
+        complete: function (data) {
+
+            setInterval(function (){
+                a.close();
+            }, 7000);
+
+        }
+    });
+
+
+}
+
+
+function showDataCostosToDisplayLeft(data) {
+    let costo_total = 0;
+    let toneladas = 0;
+    let info_header = $("#info-header-left");
+
+
+    for (let i = 0; i < data.length; i++) {
+        costo_total = costo_total + data[i].costo_total;
+        toneladas = toneladas + data[i].toneladas_total;
+        //console.log(data.centros[i]);
+    }
+
+    info_header.text("Costo Total: " + costo_total.toFixed(2) + " $/t");
+
+    let ul_left = $("#left_tree_items");
+    ul_left.html("");
+
+    for (let i = 0; i < data.length; i++) {
+        let li = createdLiLeft(data[i], costo_total);
+        ul_left.append(li);
+    }
+
+    //Tengo que procesar la informacion
+    let gen_costo = $("#gen_costo");
+    let gen_toneladas = $("#gen_toneladas");
+    gen_costo.val(costo_total.toFixed(2) + " $/t");
+    gen_toneladas.val(toneladas.toFixed(2));
+
+
+
+
+}
+
+
+function openCentroCostos(button)
+{
+
+    let id = $(button).attr('attr');
+    let centro_costo = $(button).attr('attr3');
+    let costo = $(button).attr('attr2');
+
+    let div_maq_cont = $("#maquinas_informacion_costos");
+    let header_div_cont = $("#info-header-maquinas");
+
+    //Recupero los controles superiores
+    let centro_costo_input = $("#centro_top_name");
+    let costo_input = $("#centro_top_costo");
+
+
+    //Seteo la cabecera
+    let detalles_maq_input = $("#detalles_maq");
+    let costoh_maq_input = $("#costoh_maq");
+    let prod_maq_input = $("#prod_maq");
+    let costot_maq_input = $("#costot_maq");
+
+    detalles_maq_input.val("");
+    costoh_maq_input.val("");
+    prod_maq_input.val("");
+    costot_maq_input.val("");
+
+    div_maq_cont.empty();
+
+    let div_info_maq =  $("#div-info-maquinas");
+    div_info_maq.empty();
+
+
+
+    if(data_info === undefined || data_info === null){
+
+        $.confirm({
+            icon: 'fas fa-exclamation-circle',
+            title: '¡Advertencia!',
+            content: 'Error. Realice el cálculo nuevamente!',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                close:
+                    {
+                        text: 'Aceptar',
+                        btnClass: 'btn-red',
+                        function () {
+                        }}
+            }
+        });
+
+    } else {
+
+        header_div_cont.text(centro_costo +  ": " + costo);
+        centro_costo_input.val(centro_costo);
+        costo_input.val(costo);
+
+        for (let i = 0; i < data_info.length; i++){
+
+            if(id.toString() === data_info[i].idcentros_costos.toString()){
+
+                console.log(data_info[i]);
+
+                for (let j = 0; j < data_info[i].maquinas.length; j++){
+
+                    //Llamo al constructor del item
+                    let item = createdItemAcordionMaquinas(data_info[i].maquinas[j], j, data_info[i]);
+                    div_maq_cont.append(item);
+                }
+
+            }
+        }
+
+    }
+
+}
+
+/** Crea el elemento mas chico**/
+function createdLiLeft(data, costo_total)
+{
+
+
+    let txt = '<strong>' + data.name + ": " + '</strong>';
+    let id_ = 'cc_' + data.idcentros_costos;
+
+    let costo = null;
+
+    if(data.costo_total != null){
+        costo = data.costo_total.toFixed(2) + " $/t";
+    }
+
+
+    let porcentaje = (data.costo_total * 100) / costo_total;
+
+    let porc_txt = null;
+
+    if(porcentaje != null){
+        porc_txt = ' (' + porcentaje.toFixed(2) + '% costo/t)';
+    }
+
+
+    let li = '<li id="' + id_ + '" onclick="openCentroCostos(this)" attr="' + data.idcentros_costos +
+        '" attr2="' + costo + '" attr3="' + data.name +
+         '">' +
+        '<i class="fas fa-cog"></i> <span class="span-margin-left">' + txt + costo + porc_txt + '</span>' +
+        ' </li>';
+
+    return li;
+}
+
+
+function createdItemAcordionMaquinas(maquina, id, centro_costo)
+{
+    /***Debo modifical el nombre del collapsed segun la cantidad de maquinas ***/
+
+    let name_maquina = maquina.name;
+    let name_id = "panelsStayOpen-" + id.toString();
+    let name_heading = "panelsStayOpen-heading-" + id.toString();
+
+    //Controlo que el contenido nea null
+    let costo_ton = null;
+    let toneladas = null;
+    let costo_h = null;
+    let horas = null;
+    let rendimiento = null;
+
+    if(maquina.costos.costo_ton === null){
+        costo_ton = 'Sin Datos';
+    } else {
+        costo_ton =   maquina.costos.costo_ton.toFixed(2);
+    }
+
+    if(maquina.costos.toneladas === null){
+        toneladas = 'Sin Datos';
+    } else {
+        toneladas =  maquina.costos.toneladas.toFixed(2);
+    }
+
+    if(maquina.costos.costo_h === null){
+        costo_h = 'Sin Datos';
+    } else {
+        costo_h =   maquina.costos.costo_h.toFixed(2);
+    }
+
+    if(maquina.costos.horas === null){
+        horas = 'Sin Datos';
+    } else {
+        horas =  maquina.costos.horas.toFixed(2);
+    }
+
+    if(maquina.costos.prod_rend_h === null){
+        rendimiento = 'Sin Datos';
+    } else {
+        rendimiento =   maquina.costos.prod_rend_h.toFixed(2);
+    }
+
+
+    let interes = maquina.result_metod.interes === null ? 'Sin Datos' : maquina.result_metod.interes.toFixed(2);
+    let seguro = maquina.result_metod.seguro === null ? 'Sin Datos' : maquina.result_metod.seguro.toFixed(2);;
+    let dep_maq = maquina.result_metod.dep_maq === null ? 'Sin Datos' : maquina.result_metod.dep_maq.toFixed(2);;
+    let dep_neum = maquina.result_metod.dep_neum === null ? 'Sin Datos' : maquina.result_metod.dep_neum.toFixed(2);;
+    let arreglos = maquina.result_metod.arreglos_maq === null ? 'Sin Datos' : maquina.result_metod.arreglos_maq.toFixed(2);;
+    let combustibles = maquina.result_metod.cons_comb === null ? 'Sin Datos' : maquina.result_metod.cons_comb.toFixed(2);;
+    let lubricantes = maquina.result_metod.cons_lub === null ? 'Sin Datos' : maquina.result_metod.cons_lub.toFixed(2);;
+    let operador = maquina.result_metod.operador === null ? 'Sin Datos' : maquina.result_metod.operador.toFixed(2);;
+    let mantenimiento = maquina.result_metod.mantenimiento === null ? 'Sin Datos' : maquina.result_metod.mantenimiento.toFixed(2);;
+    let administracion = maquina.result_metod.administracion === null ? 'Sin Datos' : maquina.result_metod.administracion.toFixed(2);
+    let alquiler = maquina.alquiler;
+
+
+    let item = '<div class="accordion-item">' +
+            '<h2 class="accordion-header" id="' + name_heading + '">' +
+
+                '<button class="accordion-button" type="button" data-bs-toggle="collapse" ' +
+                    'data-bs-target="#' + name_id + '" aria-expanded="true" ' +
+                    'aria-controls="' + name_id + '" onclick="showInfoMaquina(this)"'
+                        + 'attr=" ' + centro_costo.idcentros_costos + '" attr2="' + centro_costo.name + '" attr3="' + maquina.name  +
+                        '" attr4="' + maquina.idmaquinas  + '" costo="' + costo_ton + '"' +
+                                ' costo_h="' + costo_h + '"' +
+                                ' rendimiento="' + rendimiento + '"' +
+
+                                ' interes="' + interes + '"' +
+                                ' seguro="' + seguro + '"' +
+                                ' dep_maq="' + dep_maq + '"' +
+                                ' dep_neum="' + dep_neum + '"' +
+                                ' arreglos="' + arreglos + '"' +
+                                ' combustibles="' +combustibles+ '"' +
+                                ' lubricantes="' + lubricantes + '"' +
+                                ' operador="' + operador+ '"' +
+                                ' mantenimiento="' + mantenimiento + '"' +
+                                ' administracion="' + administracion + '"' +
+                                ' alquiler="' + alquiler + '"' +
+                        '>' +
+                        '<span><i class="fas fa-tractor" style="margin-right: 7px;"></i></span>' +
+                        name_maquina +
+                '</button>' +
+            '</h2>' +
+            '<div id="' + name_id  + '" class="accordion-collapse collapse" aria-labelledby="' + name_heading + '">' +
+                '<div class="accordion-body">' +
+                    //COntenido de la maquina
+                        '<ul>' +
+                           '<li> <strong>Costo/t: </strong>' + costo_ton + '</li>' +
+                            '<li><strong> Toneladas: </strong>' + toneladas + '</li>' +
+                            '<li><strong> Costo/h: </strong>' + costo_h + '</li>' +
+                            '<li> <strong>Horas: </strong>' + horas + '</li>' +
+                            '<li><strong> Rendimiento: </strong>' + rendimiento + '</li>' +
+                        '</ul>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    return item;
+
+}
+
+function showInfoMaquina(element) {
+
+    let centro_costo_id = $(element).attr('attr');
+    let centro_costo_name = $(element).attr('attr2');
+    let maquina_name = $(element).attr('attr3');
+    let maquina_id = $(element).attr('attr4');
+
+    let costo_t = $(element).attr('costo');
+    let costo_h = $(element).attr('costo_h');
+    let produccion = $(element).attr('rendimiento');
+
+    //Seteo la cabecera
+    let detalles_maq_input = $("#detalles_maq");
+    let costoh_maq_input = $("#costoh_maq");
+    let prod_maq_input = $("#prod_maq");
+    let costot_maq_input = $("#costot_maq");
+
+    detalles_maq_input.val(maquina_name);
+    costoh_maq_input.val(costo_h + " $/h");
+    prod_maq_input.val(produccion + " t/h");
+    costot_maq_input.val(costo_t + " $/h");
+
+    //TRaigo lo detalles de la maquina
+    let interes = $(element).attr('interes');
+    let seguro = $(element).attr('seguro');
+    let dep_maq = $(element).attr('dep_maq');
+    let dep_neum = $(element).attr('dep_neum');
+
+    let arreglos = $(element).attr('arreglos');
+    let combustibles = $(element).attr('combustibles');
+    let lubricantes = $(element).attr('lubricantes');
+    let operador = $(element).attr('operador');
+
+    let mantenimiento = $(element).attr('mantenimiento');
+    let administracion = $(element).attr('administracion');
+
+    let alquiler = $(element).attr('alquiler').toString();
+    let alquiler_ = alquiler === 'true' ? 'No' : 'Si';
+
+
+    //cargo el ul con el detalle
+    $("#div-info-maquinas").empty();
+    $("#div-info-maquinas").append('<ul id="ul-detalles-maquina"></ul>');
+
+    let ul_detalles = $("#ul-detalles-maquina");
+
+
+    let alquiler_li = '<li><strong>¿Máquina Propia?: </strong>' + alquiler_ + '</li>';
+
+    let interes_li = '<li><strong>Interés: </strong>' + interes + '</li>';
+    let seguro_li = '<li><strong>Seguro: </strong>' + seguro + '</li>';
+
+    let dep_maq_li = '<li><strong>Dep. Máquina: </strong>' + dep_maq + '</li>';
+    let dep_neum_li = '<li><strong>Dep. Neumáticos: </strong>' + dep_neum + '</li>';
+    let arreglos_li = '<li><strong>Arreglos Mecánicos: </strong>' + arreglos + '</li>';
+
+    let combustibles_li = '<li><strong>Combustible: </strong>' + combustibles + '</li>';
+    let lubricantes_li = '<li><strong>Lubricante: </strong>' + lubricantes + '</li>';
+
+    let operador_li = '<li><strong>Operador: </strong>' + operador + '</li>';
+    let mantenimiento_li = '<li><strong>Mantenimiento: </strong>' + mantenimiento + '</li>';
+    let administracion_li = '<li><strong>Administración: </strong>' + administracion + '</li>';
+
+    ul_detalles.append(alquiler_li);
+    ul_detalles.append('<br/>');
+    ul_detalles.append(interes_li);
+    ul_detalles.append(seguro_li);
+    ul_detalles.append('<br/>');
+    ul_detalles.append(dep_maq_li);
+    ul_detalles.append(dep_neum_li);
+    ul_detalles.append(arreglos_li);
+    ul_detalles.append('<br/>');
+    ul_detalles.append(combustibles_li);
+    ul_detalles.append(lubricantes_li);
+    ul_detalles.append('<br/>');
+    ul_detalles.append(operador_li);
+    ul_detalles.append(mantenimiento_li);
+    ul_detalles.append(administracion_li);
+
+
+}
+
+
+function createHeader(element, tipe_icon)
+{
+
+
+    let header_li = '<div class="sui-treeview-item-content">' +
+        '<span class="sui-treeview-item-toggle" style="visibility: visible;">' +
+        '<span class="sui-treeview-item-toggle-collapsed"></span>' +
+        '</span>' +
+        '<span class="sui-treeview-item-text" id="shielddw">' +
+        '<span class="sui-treeview-item-icon fas ' + tipe_icon + '"></span>'+ element +
+        '</span></div>';
+
+    return header_li;
+
+}
+
+
+function downloadInforme(button)
+{
+
+    let path = $(button).attr('attr');
+
+    if(path !== undefined && path !== null && path !== ''){
+        window.open("../" + path , '_blank');
+    } else {
+
+        //Mensaje de error
+        $.confirm({
+            icon: 'fas fa-exclamation-circle',
+            title: '¡Error!',
+            content: 'El Informe que desea descargar no existe!',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                close:
+                    {
+                        text: 'Aceptar',
+                        btnClass: 'btn-red',
+                        function () {
+                        }}
+            }
+        });
+
+    }
+
+}
+
+
+function prueba()
+{
+    var lista_left = $("#div_treeview_left");
+
+    let text = '<li class="sui-treeview-item sui-unselectable" role="treeitem" aria-describedby="shielddx">' +
+        '<div class="sui-treeview-item-content"><span class="sui-treeview-item-toggle" style="visibility: hidden;">' +
+        '<span class="sui-treeview-item-toggle-collapsed"></span></span><span class="sui-treeview-item-text" id="shielddx">otrAAA</span></div>' +
+        '<ul class="sui-treeview-list sui-treeview-item-list" role="group" style="display: none;"></ul></li>';
+
+    lista_left.append(text);
 
 }
 

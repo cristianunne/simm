@@ -123,7 +123,7 @@ class UsoMaquinariaController extends AppController
         $this->set(compact('lotes'));
 
         //Creo un array con las opciones de combustible
-        $combustibles = ['Ultra Diesel' => 'Ultra Diesel', 'Infinia Diesel' => 'Infinia Diesel'];
+        $combustibles = ['Ultra Diesel' => 'Ultra Diesel', 'Infinia Diesel' => 'Infinia Diesel', 'Nafta' => 'Nafta'];
         $this->set(compact('combustibles'));
 
         $lubricantes = ['Aceite de Motor' => 'Aceite de Motor', 'Aceite de Caja' => 'Aceite de Caja', 'Aceite Hidraulico' => 'Aceite Hidraulico',
@@ -246,7 +246,7 @@ class UsoMaquinariaController extends AppController
                 //debug($uso_maquina);
 
                 //Creo un array con las categorias y elimino las que estan presente
-                $combustible_aux = ['Ultra Diesel' => 'Ultra Diesel', 'Infinia Diesel' => 'Infinia Diesel'];
+                $combustibles = ['Ultra Diesel' => 'Ultra Diesel', 'Infinia Diesel' => 'Infinia Diesel', 'Nafta' => 'Nafta'];
                 $combustibles = [];
 
 

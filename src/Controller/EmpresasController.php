@@ -122,7 +122,19 @@ class EmpresasController extends AppController
                     if($empresa->logo != '')
                     {
                         //ELimino el archivo
-                        if($filesManager->deleteFile($empresa->logo, LOGOS)){
+                        //COnsulto con el file exist primero
+                        $file_exist = false;
+
+                        if(file_exists(LOGOS . $empresa->logo)){
+                            $file_exist = true;
+                        }
+                        //Si exite lo elimino
+
+                        if($file_exist){
+                            $filesManager->deleteFile($empresa->logo, LOGOS);
+                        }
+
+
                             //La vuelvo a subir
 
                             $result_save = $filesManager->uploadFiles($data['file'], LOGOS);
@@ -150,9 +162,6 @@ class EmpresasController extends AppController
                                 }
                             }
 
-                        } else {
-                            $this->Flash->error(__('La Empresa no pudo ser actualizada. Intente nuevamente.'));
-                        }
                     } else {
 
                         $result_save = $filesManager->uploadFiles($data['file'], LOGOS);

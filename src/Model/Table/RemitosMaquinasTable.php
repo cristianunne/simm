@@ -90,4 +90,29 @@ class RemitosMaquinasTable extends Table
 
         return $validator;
     }
+
+
+
+    public function findGetMaquinasByRemitos(Query $query, $options = [])
+    {
+
+        $array_result = [];
+
+        if(count($options) > 0)
+        {
+            $conditions['remitos_idremitos IN'] = $options;
+
+
+            $res = $query->where($conditions);
+            foreach ($query as $q){
+                $array_result[$q->maquinas_idmaquinas] = $q->maquinas_idmaquinas;
+            }
+
+            return $array_result;
+        }
+
+      return false;
+
+    }
+
 }

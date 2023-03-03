@@ -25,19 +25,21 @@
 
             <div class="card-body table-responsive">
 
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Operario', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'Informes', 'action' => 'generateExcel'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
 
 
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
                     <tr>
                         <th scope="col"><?= $this->Paginator->sort('ID') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Fecha de Informe') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Grupo') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Fecha') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Nombre') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Fecha de Inicio') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Fecha de Fin') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Lote') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Parcela') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Propietario') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Destino') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Descarga') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
 
                     </tr>
@@ -47,20 +49,33 @@
 
                         <tr>
                             <td class="dt-center"><?= h($inf->idinformes) ?></td>
-                            <td class="dt-center"><?= h($inf->grupo) ?></td>
-                            <td class="dt-center"><?= h($inf->fecha) ?></td>
-                            <td class="dt-center"><?= h($inf->name) ?></td>
+                            <td class="dt-center"><?= h($inf->created) ?></td>
+                            <td class="dt-center"><?= h($inf->worksgroups) ?></td>
+                            <td class="dt-center"><?= h($inf->fecha_inicio) ?></td>
+                            <td class="dt-center"><?= h($inf->fecha_fin) ?></td>
+                            <td class="dt-center"><?= h($inf->lote) ?></td>
+                            <td class="dt-center"><?= h($inf->parcela) ?></td>
+                            <td class="dt-center"><?= h($inf->propietario) ?></td>
+                            <td class="dt-center"><?= h($inf->destino) ?></td>
+
+                            <?php if(!empty($inf->path_file)):  ?>
+
+                                <td class="dt-center">
+                                    <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'glyphicon far fa-file-excel', 'aria-hidden' => 'true']),
+                                        ['controller' => 'Informes', 'action' => 'downloadAsExcel', $inf->idinformes],
+                                        ['class' => 'btn btn-success', 'escape' => false]) ?>
+                                </td>
+                            <?php else:?>
+                                <td class="dt-center"></td>
+                            <?php endif;?>
 
 
-                            <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
-                                    ['action' => 'edit', $inf->idinformes], ['class' => 'btn bg-purple', 'escape' => false]) ?>
-
+                            <td class="actions" style="text-align: center;">
 
                                 <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                         ['action' => 'delete', $inf->idinformes],
-                                        ['confirm' => __('Eliminar {0}?', $inf->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                        ['confirm' => __('Eliminar {0}?', $inf->idinformes), 'class' => 'btn btn-danger','escape' => false]) ?>
 
                                 <?php endif;?>
 

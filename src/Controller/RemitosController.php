@@ -60,7 +60,7 @@ class RemitosController extends AppController
 
 
             $remitos = $this->Remitos->find('all', [
-                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas' => ['Lotes'], 'Destinos', 'Productos', 'Users'],
+                'contain' => ['Worksgroups', 'Propietarios', 'Lotes', 'Parcelas', 'Destinos', 'Productos', 'Users'],
                 'conditions' => $conditions
             ])->where(['Remitos.empresas_idempresas' => $id_empresa, 'Remitos.active' => true])
                 ->order(['Remitos.remito_number ASC']);
@@ -175,6 +175,11 @@ class RemitosController extends AppController
 
             $data = $this->request->getData();
 
+            if($data['parcelas_idparcelas'] == 'null'){
+                $data['parcelas_idparcelas'] = null;
+            }
+
+
             $remitos_entity = $this->Remitos->patchEntity($remitos_entity, $data);
 
             $remitos_entity->users_idusers = $user_id;
@@ -257,8 +262,10 @@ class RemitosController extends AppController
         try {
 
             $remitos = $this->Remitos->get($id, [
-                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas' => ['Lotes'], 'Productos', 'Destinos']
+                'contain' => ['Worksgroups', 'Propietarios', 'Lotes', 'Parcelas', 'Productos', 'Destinos']
             ]);
+
+            //debug($remitos);
 
             $this->set(compact('remitos'));
 
@@ -337,7 +344,7 @@ class RemitosController extends AppController
         try {
 
             $remitos = $this->Remitos->get($id_remito, [
-                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas' => ['Lotes'], 'Productos', 'Destinos', 'Users',
+                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas', 'Lotes', 'Productos', 'Destinos', 'Users',
                     'RemitosMaquinas' => ['Maquinas', 'Operarios']]
             ]);
 
@@ -393,7 +400,7 @@ class RemitosController extends AppController
             try {
 
                 $remito = $this->Remitos->get($id, [
-                    'contain' => ['Parcelas' => 'Lotes', 'Propietarios', 'Destinos', 'Productos']
+                    'contain' => ['Parcelas', 'Lotes', 'Propietarios', 'Destinos', 'Productos']
                 ]);
 
                 //TRaigo los workgroups
@@ -444,12 +451,22 @@ class RemitosController extends AppController
 
                 //Cargo los lotes
 
-                $lote = [$remito->parcela->lote->idlotes => $remito->parcela->lote->name];
+                //Aca debo verificar la info
+                $lote = null;
+
+
+
+                if(!is_null($remito->lote)){
+                    $lote = [$remito->lote->idlotes => $remito->lote->name];
+                }
 
                 $this->set(compact('lote'));
 
+                $parcela = null;
+                if(!is_null($remito->parcela)){
+                    $parcela = [$remito->parcela->idparcelas => $remito->parcela->name];
+                }
                 //Vaores de la Parcela
-                $parcela = [$remito->parcela->idparcelas => $remito->parcela->name];
                 $this->set(compact('parcela'));
 
                 //Propietarios
@@ -475,8 +492,15 @@ class RemitosController extends AppController
 
                 if ($this->request->is(['patch', 'post', 'put'])) {
                     //debug($this->request->getData());
+                    $data = $this->request->getData();
 
-                    $remito = $this->Remitos->patchEntity($remito, $this->request->getData());
+                    if($data['parcelas_idparcelas'] == 'null'){
+                        $data['parcelas_idparcelas'] = null;
+                    }
+
+                    $remito = $this->Remitos->patchEntity($remito, $data);
+
+
 
                     if($this->Remitos->save($remito)){
                         $this->Flash->success(__('El Registro se ha almacenado correctamente'));
@@ -914,16 +938,16 @@ class RemitosController extends AppController
         {
 
             $data = $this->Remitos->find('all', [
-                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas' => ['Lotes'], 'Destinos', 'Productos', 'Users']
-            ])->where(['Parcelas.lotes_idlotes' => $lote,
+                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas', 'Lotes', 'Destinos', 'Productos', 'Users']
+            ])->where(['Remitos.lotes_idlotes' => $lote,
                 'Remitos.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
         } else {
             $data = $this->Remitos->find('all', [
-                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas' => ['Lotes'], 'Destinos', 'Productos', 'Users'],
+                'contain' => ['Worksgroups', 'Propietarios', 'Parcelas', 'Lotes', 'Destinos', 'Productos', 'Users'],
                 'conditions' => $conditions
-            ])->where(['Parcelas.lotes_idlotes' => $lote,
+            ])->where(['Remitos.lotes_idlotes' => $lote,
                 'Remitos.empresas_idempresas' => $id_empresa, 'Remitos.active' => true])
                 ->toArray();
         }
