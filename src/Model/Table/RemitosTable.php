@@ -59,10 +59,15 @@ class RemitosTable extends Table
             'joinType' => 'INNER'
         ]);
 
+        $this->hasOne('Lotes', [
+            'foreignKey' => 'idlotes',
+            'bindingKey' => 'lotes_idlotes', //actual
+            'joinType' => 'INNER'
+        ]);
+
         $this->hasOne('Parcelas', [
             'foreignKey' => 'idparcelas',
             'bindingKey' => 'parcelas_idparcelas', //actual
-            'joinType' => 'INNER'
         ]);
 
         $this->hasOne('Productos', [
@@ -82,7 +87,6 @@ class RemitosTable extends Table
             'bindingKey' => 'idremitos', //actual
             'joinType' => 'INNER'
         ]);
-
     }
 
     /**
@@ -113,8 +117,7 @@ class RemitosTable extends Table
 
         $validator
             ->integer('parcelas_idparcelas')
-            ->requirePresence('parcelas_idparcelas', 'create')
-            ->notEmptyString('parcelas_idparcelas');
+            ->allowEmptyString('parcelas_idparcelas');
 
         $validator
             ->integer('propietarios_idpropietarios')
@@ -151,9 +154,13 @@ class RemitosTable extends Table
             ->notEmptyString('destinos_iddestinos');
 
         $validator
-            ->scalar('ton')
-            ->maxLength('ton', 45)
+            ->numeric('ton')
             ->allowEmptyString('ton');
+
+        $validator
+            ->integer('lotes_idlotes')
+            ->requirePresence('lotes_idlotes', 'create')
+            ->notEmptyString('lotes_idlotes');
 
         return $validator;
     }
@@ -170,4 +177,109 @@ class RemitosTable extends Table
 
         return $rules;
     }
+
+    public function findRemitosByConditions(Query $query, array $options)
+    {
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+
+        $options = $options[0];
+
+        if($options['worksgroup'] != 0){
+            $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+        }
+
+        if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+            $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+        }
+
+        if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+            $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+        }
+
+        if($options['propietarios_idpropietarios'] != 0){
+            $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+        }
+
+        if($options['destinos_iddestinos'] != 0){
+            $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+        }
+
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+
+        $conditions['fecha >='] = $date_start;
+        $conditions['fecha <='] = $date_end;
+
+
+
+        $result = $query->where($conditions);
+
+        $array_result = [];
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->idremitos;
+        }
+
+        return $array_result;
+    }
+
+    /** Utilizo el metodo para devolver un arreglo de los remitos ***/
+    public function findRemitosByDate(Query $query, $options = [])
+    {
+
+        $array_result = [];
+
+        $options = $options[0];
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+        $conditions = [];
+
+        $conditions['fecha >='] = $date_start;
+        $conditions['fecha <='] = $date_end;
+
+        $result = $query->where($conditions);
+
+        //Recorro el resultado y lo convierto en un arreglo de una dimension
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->idremitos;
+        }
+
+        return $array_result;
+    }
+
+    public function findRemitosByRemitos(Query $query, $remitos = [])
+    {
+
+        //Aca puedo traer anidado los datos
+
+        $result = $query ->contain([
+            'RemitosMaquinas' => ['Maquinas' => ['CostosMaquinas' => ['CentrosCostos']]]
+        ])
+            ->where([
+            'Remitos.idremitos IN' => $remitos
+        ]);
+
+        return $result;
+
+    }
+
+    public function findGetTotalToneladas(Query $query, $remitos = [])
+    {
+
+        $result = $query
+            ->select(['sum' => $query->func()->sum('ton')])
+            ->where([
+                'Remitos.idremitos IN' => $remitos
+            ]);
+
+        return $result;
+
+    }
+
 }

@@ -69,7 +69,7 @@
 
                                     <tr>
                                         <th>Lote:</th>
-                                        <td><?= h($remitos->parcela->lote->name)?></td>
+                                        <td><?= h($remitos->lote->name)?></td>
                                     </tr>
 
                                     <tr>

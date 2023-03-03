@@ -80,15 +80,23 @@
 
                                 <div class="form-group">
                                     <?=  $this->Form->label('lotes_idlotes', 'Lote: ') ?>
-                                    <?= $this->Form->text('lotes_idlotes', ['value' => $remitos->parcela->lote->name,
+                                    <?= $this->Form->text('lotes_idlotes', ['value' => $remitos->lote->name,
                                         'class' => 'form-control', 'placeholder' => '', 'disabled', 'label' => false]) ?>
                                 </div>
 
 
                                 <div class="form-group">
                                     <?=  $this->Form->label('parcelas_idparcelas', 'Parcelas: ') ?>
-                                    <?= $this->Form->text('parcelas_idparcelas', ['value' => $remitos->parcela->name,
-                                        'class' => 'form-control', 'placeholder' => '', 'disabled', 'label' => false]) ?>
+
+                                    <?php if (!is_null($remitos->parcela)): ?>
+                                        <?= $this->Form->text('parcelas_idparcelas', ['value' => $remitos->parcela->name,
+                                            'class' => 'form-control', 'placeholder' => '', 'disabled', 'label' => false]) ?>
+                                    <?php else: ?>
+                                        <?= $this->Form->text('parcelas_idparcelas', ['value' => '',
+                                            'class' => 'form-control', 'placeholder' => '', 'disabled', 'label' => false]) ?>
+                                    <?php endif; ?>
+
+
                                 </div>
 
                                 <?php  if($remitos->propietario->tipo == 'Empresa'): ?>
