@@ -18,7 +18,7 @@
                 <h3 class="card-title">
                     <?php echo $this->Html->image('informes_white.png', ["alt" => 'User Image' , "class" => 'img-circle img-header',
                         'pathPrefix' => '/webroot/img/icons/']) ?>
-                    Informes
+                    Informes de Máquinas
                 </h3>
             </div>
 
@@ -32,7 +32,6 @@
                     <tr>
                         <th scope="col"><?= $this->Paginator->sort('ID') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Informe') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Grupo') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Inicio') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Fin') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Lote') ?></th>
@@ -48,9 +47,8 @@
                     <?php foreach ($informes as $inf): ?>
 
                         <tr>
-                            <td class="dt-center"><?= h($inf->idinformes) ?></td>
+                            <td class="dt-center"><?= h($inf->idinformes_maquinas) ?></td>
                             <td class="dt-center"><?= h($inf->created) ?></td>
-                            <td class="dt-center"><?= h($inf->worksgroups) ?></td>
                             <td class="dt-center"><?= h($inf->fecha_inicio) ?></td>
                             <td class="dt-center"><?= h($inf->fecha_fin) ?></td>
                             <td class="dt-center"><?= h($inf->lote) ?></td>
@@ -58,11 +56,11 @@
                             <td class="dt-center"><?= h($inf->propietario) ?></td>
                             <td class="dt-center"><?= h($inf->destino) ?></td>
 
-                            <?php if(!empty($inf->path_file)):  ?>
+                            <?php if(!empty($inf->path)):  ?>
 
                                 <td class="dt-center">
                                     <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'glyphicon far fa-file-excel', 'aria-hidden' => 'true']),
-                                        ['controller' => 'Informes', 'action' => 'downloadAsExcel', $inf->idinformes],
+                                        ['controller' => 'InformesResumen', 'action' => 'downloadAsExcel', $inf->idinformes_maquinas],
                                         ['class' => 'btn btn-success', 'escape' => false]) ?>
                                 </td>
                             <?php else:?>

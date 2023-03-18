@@ -106,7 +106,7 @@ class RemitosController extends AppController
             //ELimino de la cache
             $session->delete('success_var');
 
-            return $this->redirect(['controller' => 'Pages', 'action' => 'index']);
+            return $this->redirect(['action' => 'index']);
         }
 
         //cuento cuantos number remitos hay y tomo el valor max
@@ -276,7 +276,18 @@ class RemitosController extends AppController
                 'contain' => ['Maquinas', 'Operarios']
             ])->where(['remitos_idremitos' => $id]);
 
+            //ESte retorna
             $this->set(compact('remitos_maq_data'));
+
+            //ACa voy a hacer una busqueda de las maquinas agregadas sin operarios
+
+            $remitos_maq_data_alquilada = $remitos_maq_model->find('all', [
+                'contain' => ['Maquinas']
+            ])->where(['remitos_idremitos' => $id, 'operarios_idoperarios IS' => null]);
+
+            //ESte retorna
+            $this->set(compact('remitos_maq_data_alquilada'));
+
 
             $remitos_maq_aux = $remitos_maq_model->find()
                 ->select(['maquinas_idmaquinas', 'operarios_idoperarios'])
@@ -289,6 +300,7 @@ class RemitosController extends AppController
 
 
             //Para traer las MAquinas verifico que tenga cargado los DATOS TEORICOS
+            //El problema radica cuando la maquina es alquilada, no tiene ninguno de esos datos
 
             //Traigo las maquinas de la tabla operariosmaquinas
             $model_operario_maq = $this->loadModel('OperariosMaquinas');
@@ -298,6 +310,25 @@ class RemitosController extends AppController
                 '(idmaquinas, idoperarios) NOT IN' => $remitos_maq_aux]);
 
             $this->set(compact('oper_maq_data'));
+
+            //TRaigo las maquinas de la tabla maquinas_remitos donde el operario sea null y coincida el remito
+            $remitos_maq_alq_array = $remitos_maq_model->find()
+                ->select(['maquinas_idmaquinas'])
+                ->where(['remitos_idremitos' => $id, 'operarios_idoperarios IS' => null]);
+            //debug($remitos_maq_alq_array->toArray());
+
+
+            //Hago un filtro nuevamente con las maquinas que son alquiladas y les paso
+            //Vuelvo a recorrer en la tabla
+
+            $maquinas_model = $this->loadModel('Maquinas');
+
+            $maquinas_alquiladas = $maquinas_model->find('all', [])
+                ->where(['empresas_idempresas' => $id_empresa, 'propia' => false, 'active' => true,
+                    'idmaquinas NOT IN' => $remitos_maq_alq_array]);
+
+            $this->set(compact('maquinas_alquiladas'));
+
 
         } catch (InvalidPrimaryKeyException $e){
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));

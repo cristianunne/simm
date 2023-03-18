@@ -163,6 +163,7 @@ class AnalisisCostosController extends AppController
             //OBtengo los remitos disponibles
             $array_remitos = $this->getRemitosByConditions($array_options);
 
+
             //COntrolo que array remitos no este vacio
             if(count($array_remitos) > 0)
             {
@@ -177,15 +178,23 @@ class AnalisisCostosController extends AppController
                     //Tabla centro de costos
                     $tabla_centro_costos = $this->loadModel('CentrosCostos');
 
+                    //TRae los centros de utilizando el array de centro de costos filtrados
                     $centros_costos = $tabla_centro_costos->find('all', [
                     ])->where(['idcentros_costos IN' => $centro_costos_array])->toArray();
 
-                    //Calculo de las constantes y vairables
-                    $maquinas_with_data = $this->calculatedVariablesAndConstantes($maquinas_filter);
 
-                    $maquinas_with_result = $this->calculateGrupos($maquinas_with_data);
+                    //Calculo de las constantes y vairables
+                    //Aqui se obtienen las maquinas con los datos del centro de costos, constantes y gastos
+                    $maquinas_with_var_and_const = $this->calculatedVariablesAndConstantes($maquinas_filter);
+
+                    //debug($maquinas_with_var_and_const);
+
+                    $maquinas_with_result = $this->calculateGrupos($maquinas_with_var_and_const);
+
 
                     $data_by_centro_costos['centros'] = $this->calculatedByCentroCostos($maquinas_with_result, $centros_costos);
+                 //   debug($data_by_centro_costos);
+
 
                     return $data_by_centro_costos;
 
@@ -195,6 +204,12 @@ class AnalisisCostosController extends AppController
         }
 
         return false;
+    }
+
+
+    private function groupsCostosByCentroDeCostos($maquinas_with_result)
+    {
+
     }
 
 
@@ -268,7 +283,7 @@ class AnalisisCostosController extends AppController
 
 
                 //Proceso el informe
-                if($informe == 'true'){
+                /*if($informe == 'true'){
                     //Obtengo las variabes a almacenar
                     $group_name= $_POST['group_name'];
                     $lote_name = $_POST['lote_name'];
@@ -299,7 +314,7 @@ class AnalisisCostosController extends AppController
 
                 } else {
                     $data_by_centro_costos['informe'] = ['id' => '', 'informe' => false];
-                }
+                }*/
             } else {
                 return $this->json(['result' => false]);
             }
@@ -367,9 +382,6 @@ class AnalisisCostosController extends AppController
 
         $fec_in = new Date($fecha_inicio);
 
-        echo date("d-m-Y", strtotime($fec_in . "- 1 year"));
-
-
         $informe = true;
 
         $array_options = [];
@@ -383,39 +395,54 @@ class AnalisisCostosController extends AppController
         $array_options['destinos_iddestinos'] = $destinos;
 
         //Result costos
-        //$data_by_centro_costos = $this->calculateCostos($array_options);
+        $data_by_centro_costos = $this->calculateCostos($array_options);
+
+
 
 
         //OBtengo los remitos disponibles
         $array_remitos = $this->getRemitosByConditions($array_options);
 
-
         //Metodo nuevo
 
         $total_ton_by_cat_centro_costo = $this->getTotalTonByCategoryCentroCostos($array_remitos);
+
+
+
         //A las options le restare los datos de las fechas
         $options['fecha_inicio'] = date("Y-m-d", strtotime($fec_in . "- 3 month"));
         $options['fecha_fin'] = $fecha_final;
         $facturacion_by_item = $this->getFacturacionByItem($total_ton_by_cat_centro_costo, $options);
+        //Tengo
         $fact_pond_by_cat = $this->getFacturacionPonderadaByCategory($facturacion_by_item);
 
+        //debug($facturacion_by_item);
+        debug($fact_pond_by_cat);
 
 
         //CAlculo del mai
-        $result_mai = $this->calculateMaiEconomico($fact_pond_by_cat);
-
+        $result_mai = $this->calculateMAIEconomico($facturacion_by_item, null);
+        debug($result_mai);
 
         //Result costos
-        $data_by_centro_costos = $this->calculateCostos($array_options);
+        //$data_by_centro_costos = $this->calculateCostos($array_options);
 
 
         $total_toneladas = $this->getTotalTonRemitos($array_remitos);
 
+        $aaray_res_globales = [];
         //AGrego las toneladas en resgloab
-        $data_by_centro_costos['res_globales'] = ['total_toneladas' => $total_toneladas];
+        $aaray_res_globales['total_toneladas'] = $total_toneladas;
+        $costo_total = $this->calculateCostoTotal($data_by_centro_costos);
+        $aaray_res_globales['costo_total'] = $costo_total;
 
 
-        if ($data_by_centro_costos != false) {
+
+        $data_by_centro_costos['res_globales'] = $aaray_res_globales;
+
+        debug($data_by_centro_costos);
+
+        /*if ($data_by_centro_costos != false) {
 
 
             //Tengo que calcular los costos backtime
@@ -482,14 +509,14 @@ class AnalisisCostosController extends AppController
                 //Compruebo que el resultado no sea false de $data_by_centro_costos
                 /*if ($data_by_centro_costos != false) {
                     $data_by_centro_costos['informe'] = $this->processInforme($array_informe, $data_by_centro_costos, $costos_one_year_back, $costos_six_back);
-                }*/
+                }
 
 
             } else {
                 $data_by_centro_costos['informe'] = ['id' => '', 'informe' => false];
             }
 
-        }
+        }*/
     }
 
     private function calculateGrupos($maquinas = null)
@@ -761,9 +788,8 @@ class AnalisisCostosController extends AppController
 
         $remitos_table = $this->loadModel('Remitos');
 
-        $remitos = $remitos_table->find('RemitosByConditions', [
-            $array_options
-        ]);
+        $remitos = $remitos_table->find('RemitosByConditions',
+            $array_options);
 
         return $remitos;
     }
@@ -1108,7 +1134,6 @@ class AnalisisCostosController extends AppController
         $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $remitos);
 
 
-
         $date_start = $options['fecha_inicio'];
         $date_end = $options['fecha_fin'];
 
@@ -1174,8 +1199,15 @@ class AnalisisCostosController extends AppController
 
         foreach ($maquinas_filter as $maq){
 
-            //COnsulto si la maquina es alquilada
-            if($maq->costos_maquinas[0]->alquilada == false){
+            $gastos_sueldos = 0;
+
+            $precio_ton_aux = null;
+            $toneladas =  null;
+            $precio_ton = null;
+            $i = 0;
+
+            //COnsulto si la maquina es PROPIA
+            if($maq->propia){
                 $VAD = $maq->costos_maquinas[0]->val_adq;
                 $TIS = $maq->costos_maquinas[0]->tasa_int_simple;
                 $FCI = $maq->costos_maquinas[0]->factor_cor;
@@ -1186,10 +1218,39 @@ class AnalisisCostosController extends AppController
 
                 //DEpreciacion de los neumativos
                 $VUN = $maq->costos_maquinas[0]->vida_util_neum;
+
+                //Tengo que procesar los operarios
+
+                foreach ($maq->operarios_maquinas as $oper)
+                {
+                    $gastos_sueldos = $gastos_sueldos + $oper->sueldo;
+                }
+
+                //El precio por tonelada se calcula de forma diferente, si es alquilada esta en costos, sino esta en el remito
+                foreach ($maq->remitos as $remito) {
+
+                    //debug('toneladas: '.$remito->ton);
+                    $toneladas = $toneladas + $remito->ton;
+                    $precio_ton_aux = $precio_ton_aux + $remito->precio_ton;
+                    $i++;
+
+                }
+
+                if($i > 0){
+                    $precio_ton = $precio_ton_aux / $i;
+                }
+
+
+            } else {
+                //La maquina es alquilada, por lo tanto no tendra operarios
+                //EL precio por tonelada lo traigo de los costos teoricos
+
+                $precio_ton = $maq->costos_maquinas[0]->costo_alquiler;
+
             }
 
 
-            //COmbustibles
+            //LOs gastos de combustibles y lubricantes se calculan igual, independendiente de si es propia o no
             //Tengo que reccorer USO_MAQUINARIA y sumar los valores de combustibles y horas
             $COH = 0;
 
@@ -1218,7 +1279,6 @@ class AnalisisCostosController extends AppController
                                 $precio_comb = $precio_comb + $uso_comb->precio;
                                 $index_pre_com++;
 
-
                             }
                             if($uso_comb->categoria == 'Lubricante'){
                                 $litros_lub_tot = $litros_lub_tot + $uso_comb->litros;
@@ -1229,6 +1289,7 @@ class AnalisisCostosController extends AppController
                     }
                 }
 
+                //HME son las horas de trabajo de la maquina sacadas de USO maquinaria
                 $HME = $horas_tol;
                 $CCT = $litros_comb_tol;
                 $CLT = $litros_lub_tot;
@@ -1282,32 +1343,6 @@ class AnalisisCostosController extends AppController
             } //Llave del if uso maquinaria
 
 
-            $precio_ton_aux = null;
-            $toneladas =  null;
-            $precio_ton = null;
-            $i = 0;
-
-            foreach ($maq->remitos as $remito) {
-
-                //debug('toneladas: '.$remito->ton);
-
-                $toneladas = $toneladas + $remito->ton;
-                $precio_ton_aux = $precio_ton_aux + $remito->precio_ton;
-                $i++;
-
-            }
-
-            if($i > 0){
-                $precio_ton = $precio_ton_aux / $i;
-            }
-
-            $gastos_sueldos = 0;
-
-            foreach ($maq->operarios_maquinas as $oper)
-            {
-                $gastos_sueldos = $gastos_sueldos + $oper->sueldo;
-            }
-
 
             //Agrego los elementos al array return
             //AGrego gastos en combustibles, arreglos, sueldos operador
@@ -1347,6 +1382,15 @@ class AnalisisCostosController extends AppController
             ];
 
             $array_maquinas[] = $maquina;
+
+
+            $VAD = NULL; $VUM = NULL; $HTU = NULL; $HME = NULL; $TIS = null;
+            $FCI = null; $VAN = null; $HFU = null; $VUE = null;
+            $CCT = NULL; $CLT = NULL; $COM = NULL; $COH = NULL;
+            $LUB = NULL; $LUH = NULL; $SAL = NULL; $VUN = NULL;
+            $toneladas = null;
+            $precio_ton = null;
+
 
         } //Llave maquina
 
@@ -1412,7 +1456,7 @@ class AnalisisCostosController extends AppController
                         $total_ton = $total_ton + $maq['toneladas'];
                         $total_precio = $total_precio + $maq['precio_ton'];
 
-                        $costo_total = $costo_total + $maq['costos']['costo_h'];
+                        $costo_total = $costo_total + $maq['costos']['costo_ton'];
 
                         $horas = $horas + $maq['costos']['horas'];
 
@@ -1439,7 +1483,7 @@ class AnalisisCostosController extends AppController
     }
 
 
-    private function calculateCostosFijosAndVariables($data_by_centro_costos = null, $array_informe = null, $array_remitos, $options)
+    private function calculateCostosFijosAndVariables($data_by_centro_costos, $array_informe, $array_remitos, $options)
     {
         //Preparo los datos generales
         $costo_total = null;
@@ -1534,7 +1578,7 @@ class AnalisisCostosController extends AppController
         $result = $this->createdExcel($data, $array_informe, $data_year_back, $data_six_month_back);
 
 
-
+        //GUARDO EL INFORME EN LA TABLA
         if($result != false){
 
             $array_informe['path_file'] = $result['path'];
@@ -2324,10 +2368,21 @@ class AnalisisCostosController extends AppController
     }
 
 
-    private function calculateCostoTotal($data = [])
+    private function calculateCostoTotal($data_by_centro_costos = [])
     {
 
+        $costo_result = null;
 
+        //Recorro cada uno de los centros y multiplico COSTO/t * Toneladas + COSTO/t n * TOneladas
+
+        foreach ($data_by_centro_costos['centros'] as $centro)
+        {
+            $costo_result = $costo_result + ($centro['costo_total'] * $centro['toneladas_total']);
+
+        }
+
+
+        return $costo_result;
     }
 
     private function calculateCostosByCategory($costo_total = null, $array_data = [], $option = null)
@@ -2356,13 +2411,33 @@ class AnalisisCostosController extends AppController
     }
 
 
-    private function calculateMaiEconomico($fact_pond_by_cat = null)
+
+
+    private function calculateMAIEconomico($facturacion_by_item = null)
     {
-        $result = null;
+
+        //Segun la planilla necesito usar HME
+
+        $precio_medio_ponderado = null;
+        $toneladas_total = null;
+        $sum_total = null;
+
+        //Sumo la facturacion en Produccion y facturacion en transporte y divido por costo total
+        foreach ($facturacion_by_item as $item)
+        {
+            //(tn1 * serv + tonn * servn) / (tn1 + tn2 + tnn)
+            $sum_total = $sum_total + $item['facturacion'];
+            $toneladas_total = $toneladas_total + $item['toneladas'];
+
+        }
+
+        $psmp = $toneladas_total == 0 ? null : ($sum_total / $toneladas_total);
+
+        //le resto el costo total
 
 
 
-        return $result;
+        return null;
     }
 
     //Recibe el arreglo con los datos de gastos

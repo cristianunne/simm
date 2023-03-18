@@ -153,7 +153,6 @@
                                             <th scope="col"><?= $this->Paginator->sort('ID') ?></th>
                                             <th scope="col"><?= $this->Paginator->sort('Máquina') ?></th>
                                             <th scope="col"><?= $this->Paginator->sort('Operario') ?></th>
-                                            <th scope="col"><?= $this->Paginator->sort('AlquilerTon') ?></th>
                                             <th scope="col" class="actions"><?= __('Acciones') ?></th>
                                         </tr>
                                         </thead>
@@ -165,7 +164,6 @@
                                                 <td class="dt-center"><?= h($i) ?></td>
                                                 <td class="dt-center"><?= h($maq->maquina->marca . ': ' . $maq->maquina->name) ?></td>
                                                 <td class="dt-center"><?= h($maq->operario->firstname . ' ' . $maq->operario->lastname) ?></td>
-                                                <td class="dt-center"><?= h($maq->alquiler_ton) ?></td>
                                                 <td class="actions" style="text-align: center">
                                                     <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
 
@@ -182,6 +180,29 @@
                                             <?php $i = $i + 1; ?>
                                         <?php endforeach; ?>
 
+
+
+                                        <?php foreach ($remitos_maq_data_alquilada as $maq): ?>
+
+                                            <tr>
+                                                <td class="dt-center"><?= h($i) ?></td>
+                                                <td class="dt-center"><?= h($maq->maquina->marca . ': ' . $maq->maquina->name) ?></td>
+                                                <td class="dt-center"></td>
+                                                <td class="actions" style="text-align: center">
+                                                    <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+
+                                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                                            ['action' => 'removeRemitoMaquina', $maq->idremitos_maquinas, $maq->remitos_idremitos],
+                                                            ['confirm' => __('Eliminar {0}?', $maq->idremitos_maquinas),
+                                                                'class' => 'btn btn-danger','escape' => false,
+                                                                'id' => $maq->idremitos_maquinas]) ?>
+
+                                                    <?php endif;?>
+                                                </td>
+
+                                            </tr>
+                                            <?php $i = $i + 1; ?>
+                                        <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -231,8 +252,6 @@
                             <tr>
                                 <th scope="col"><?= $this->Paginator->sort('Maquina') ?></th>
                                 <th scope="col"><?= $this->Paginator->sort('Operario') ?></th>
-                                <th scope="col"><?= $this->Paginator->sort('Alquiler Ton') ?></th>
-
                                 <th scope="col" class="actions"><?= __('Acciones') ?></th>
                             </tr>
                             </thead>
@@ -242,14 +261,10 @@
                             <?php foreach ($oper_maq_data as $maq): ?>
 
                                 <!-- Hago la comprobacion de los datos teoricos cargados-->
-
                                 <?php if (!empty($maq->maquina->costos_maquinas)): ?>
                                         <tr>
                                             <td class="dt-center"><?= h($maq->maquina->marca . ': ' . $maq->maquina->name) ?></td>
                                             <td class="dt-center"><?= h($maq->operario->firstname . ' ' . $maq->operario->lastname) ?></td>
-                                            <td class="dt-center"><input type="number" value="0"
-                                                                         id="<?= h('input_' . $maq->idoperarios_maquinas) ?>"></input></td>
-
                                             <td class="actions" style="text-align: center">
                                                 <?= $this->Form->button($this->Html->tag('span', '', ['class' => 'fas fa-check', 'aria-hidden' => 'true']),
                                                     ['type' => 'button', 'class' => 'btn btn-success', 'escape' => false,
@@ -262,6 +277,22 @@
 
                                         </tr>
                                 <?php endif;?>
+                            <?php endforeach; ?>
+
+                            <?php foreach ($maquinas_alquiladas as $maq): ?>
+
+                                <tr>
+                                    <td class="dt-center"><?= h($maq->marca . ': ' . $maq->name) ?></td>
+                                    <td class="dt-center">Alquilada</td>
+                                    <td class="actions" style="text-align: center">
+                                        <?= $this->Form->button($this->Html->tag('span', '', ['class' => 'fas fa-check', 'aria-hidden' => 'true']),
+                                            ['type' => 'button', 'class' => 'btn btn-success', 'escape' => false,
+                                                'maquina' => $maq->marca . ': ' . $maq->name,
+                                                'id_maquina' => $maq->idmaquinas,
+                                                'onclick' => 'addMaquinaAlquiladaToRemito(this)']) ?>
+                                    </td>
+
+                                </tr>
 
                             <?php endforeach; ?>
 

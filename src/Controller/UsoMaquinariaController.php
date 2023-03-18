@@ -113,6 +113,8 @@ class UsoMaquinariaController extends AppController
 
         $this->set(compact('maquinas_data'));
 
+
+
         $tablaLotes = $this->loadModel('Lotes');
 
         $lotes =  $tablaLotes->find('all', [

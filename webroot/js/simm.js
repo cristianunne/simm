@@ -1251,7 +1251,6 @@ function addMaquinaToRemito(element)
 
     let remito_id = $("#remito_number").attr('attr');
 
-    let alq_ton = $("#input_" + id_maq_op).val();
 
 
     let url = '../../RemitosMaquinas/addRemitoMaquina';
@@ -1260,7 +1259,7 @@ function addMaquinaToRemito(element)
         type: "POST",
         async: true,
         url: url,
-        data: {'remitos_idremitos' : remito_id, 'alquiler_ton': alq_ton, 'operarios_idoperarios': id_operario, 'maquinas_idmaquinas': id_maquina},
+        data: {'remitos_idremitos' : remito_id, 'operarios_idoperarios': id_operario, 'maquinas_idmaquinas': id_maquina},
 
         beforeSend: function (xhr) { // Add this line
             xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -1270,7 +1269,7 @@ function addMaquinaToRemito(element)
             console.log(data);
             //Si esta todo okey hagamos el add a la tabla
 
-            loadMaquinaSelectToTable(element);
+            //loadMaquinaSelectToTable(element);
 
             location.reload(true);
 
@@ -1281,9 +1280,45 @@ function addMaquinaToRemito(element)
 
         }
     });
+}
+
+function addMaquinaAlquiladaToRemito(element)
+{
+    //Accedo a los atributos
+
+    let option = $(element);
+
+    //Debo obtener los IDS
+
+    let id_maquina = option.attr('id_maquina').toString();
+    let remito_id = $("#remito_number").attr('attr');
+
+    let url = '../../RemitosMaquinas/addRemitoMaquinaAlquilada';
+
+    $.ajax({
+        type: "POST",
+        async: true,
+        url: url,
+        data: {'remitos_idremitos' : remito_id, 'maquinas_idmaquinas': id_maquina},
+
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        },
+        success: function(data, textStatus){
 
 
+            console.log(data);
+            //loadMaquinaSelectToTable(element);
 
+            location.reload(true);
+
+        },
+        error: function (data) {
+
+            console.log(data);
+
+        }
+    });
 
 }
 
@@ -2459,7 +2494,7 @@ function groupsCostosCalc(button){
 
 
     if(groups_control.val() === '' || fecha_inicio_control.val() === '' || fecha_final_control.val() === '' ||
-        lotes_idlotes_control.val() === '' || parcelas_idparcelas_control.val() === '' || parcelas_idparcelas_control.val() == undefined
+        lotes_idlotes_control.val() === '' || parcelas_idparcelas_control.val() === '' || parcelas_idparcelas_control.val() === undefined
         || propietarios_idpropietarios_control === '' ||
         destinos_iddestinos_control === ''){
 
@@ -3078,18 +3113,191 @@ function downloadInforme(button)
 }
 
 
-function prueba()
+/*
+    FUncion que checkea si la maquina tiene los datos para ser procesado
+ */
+function checkMaquinaIsOk()
 {
-    var lista_left = $("#div_treeview_left");
+    //Primero verifico que me haya pasado los datos
+    let maquina_control = $("#maquina");
 
-    let text = '<li class="sui-treeview-item sui-unselectable" role="treeitem" aria-describedby="shielddx">' +
-        '<div class="sui-treeview-item-content"><span class="sui-treeview-item-toggle" style="visibility: hidden;">' +
-        '<span class="sui-treeview-item-toggle-collapsed"></span></span><span class="sui-treeview-item-text" id="shielddx">otrAAA</span></div>' +
-        '<ul class="sui-treeview-list sui-treeview-item-list" role="group" style="display: none;"></ul></li>';
+    //et groups_control = $("#worksgroups_idworksgroups");
+    let fecha_inicio_control = $("#fecha_inicio");
+    let fecha_final_control = $("#fecha_final");
+    let lotes_idlotes_control = $("#lotes_idlotes");
+    let parcelas_idparcelas_control = $("#parcela");
+    let propietarios_idpropietarios_control = $("#propietarios_idpropietarios");
+    let destinos_iddestinos_control = $("#destinos_iddestinos");
 
-    lista_left.append(text);
+    //OBtengo los valores
+    //Creo las variables
+    let maquina = maquina_control.val();
+    let fecha_inicio = fecha_inicio_control.val();
+    let fecha_final = fecha_final_control.val();
+    let lotes = lotes_idlotes_control.val();
+    let parcelas = parcelas_idparcelas_control.val();
+    let propietarios = propietarios_idpropietarios_control.val();
+    let destinos = destinos_iddestinos_control.val();
+
+
+    let variables = {'maquina' : maquina, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
+        'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas};
+
+
+    var a = $.confirm({
+        theme: 'supervan',
+        lazyOpen: true,
+        closeIcon: false,
+        type: 'blue',
+        typeAnimated: true,
+        icon: 'fa fa-spinner fa-spin',
+        title: 'Procesando!',
+        content: 'Estamos verificando los datos de la Máquina, por favor espere!',
+        buttons:false
+
+    });
+
+
+    //Verifico que todos los campos esten completos
+    if(!checkAllInpustOk(maquina, fecha_inicio, fecha_final, lotes, parcelas, propietarios, destinos)){
+
+        $.confirm({
+            icon: 'fas fa-exclamation-circle',
+            title: '¡Advertencia!',
+            content: 'Debe completar todos los campos para proceder!',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                close:
+                    {
+                        text: 'Aceptar',
+                        btnClass: 'btn-red',
+                        actions: function () {
+                        }}
+            }
+        });
+
+
+    } else {
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: 'checkMaquinaIsOkeyToCostos',
+            data: variables,
+
+            beforeSend: function (xhr) { // Add this line
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                //Debo mostrar un loading
+
+                a.open();
+
+            },
+            success: function(data, textStatus){
+
+                //controlo que el resultado no sea false
+                //COnsulto si el informe es ok, y en virtud de ello consulto
+                console.log(data);
+
+                if(data.result){
+                    let l = setTimeout(function (){
+                        let res = a.close();
+
+                        if(res) {
+                            let is_not_ok = $.confirm({
+                                icon: 'fas fa-exclamation-circle',
+                                title: '¡Análisis completo!',
+                                content: 'La Máquina puede ser analizada.',
+                                type: 'green',
+                                typeAnimated: true,
+                                buttons: {
+                                    close:
+                                        {
+                                            text: 'Aceptar',
+                                            btnClass: 'btn-green',
+                                            action: function() {
+
+                                                $("#div_accept_btn").css("display", "block");
+                                                $("#div_btn_check").css("display", "none");
+                                            }
+                                        }
+
+                                }
+                            });
+                        }
+
+                    }, 7000);
+                } else {
+
+                    let l = setTimeout(function (){
+                        let res = a.close();
+                    }, 7000);
+                }
+
+
+            },
+            error: function (data, textStatus) {
+
+                let l = setTimeout(function (){
+                    let res = a.close();
+
+                    if(res) {
+                        let is_not_ok = $.confirm({
+                            icon: 'fas fa-exclamation-circle',
+                            title: '¡Error!',
+                            content: 'La Máquina no puede ser analizada.',
+                            type: 'red',
+                            typeAnimated: true,
+                            buttons: {
+                                close:
+                                    {
+                                        text: 'Aceptar',
+                                        btnClass: 'btn-red',
+                                        function() {
+                                        }
+                                    }
+
+                            }
+                        });
+                    }
+
+                }, 7000);
+            },
+            complete: function (data) {
+
+            }
+
+
+        });
+    }
+
+
 
 }
+
+
+function checkAllInpustOk(maquina, fecha_inicio, fecha_final, lotes, parcelas, propietarios, destinos)
+{
+
+    if(maquina === '' || fecha_inicio === '' || fecha_final === '' ||
+        lotes === '' || parcelas === '' || propietarios === '' || destinos === '' ||
+        maquina == null || fecha_inicio == null || fecha_final == null ||
+        lotes == null || parcelas == null || propietarios == null || destinos == null ||
+        maquina === 'null' || fecha_inicio === 'null' || fecha_final === 'null' ||
+        lotes === 'null' || parcelas === 'null' || propietarios === 'null' || destinos === 'null' ||
+        maquina === 'undefined' || fecha_inicio === 'undefined' || fecha_final === 'undefined' ||
+        lotes === 'undefined' || parcelas === 'undefined' || propietarios === 'undefined' || destinos === 'undefined'){
+
+        return false;
+    }
+    return true;
+}
+
+function changeStyleBtns() {
+    //Habilito el boton POST
+    $("#div_accept_btn").css("display", "block");
+    $("#div_btn_check").css("display", "none");
+}
+
 
 
 

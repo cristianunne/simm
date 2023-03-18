@@ -18,12 +18,20 @@
                 <h3 class="card-title">
                     <?php echo $this->Html->image('informes_white.png', ["alt" => 'User Image' , "class" => 'img-circle img-header',
                         'pathPrefix' => '/webroot/img/icons/']) ?>
-                    Informes
+                    Informes por Destinos
                 </h3>
+
             </div>
 
 
             <div class="card-body table-responsive">
+
+                <?php if(isset($id_informe)):  ?>
+                    <?= $this->Html->link($this->Html->tag('span', ' Descargar último Informe', ['class' => 'glyphicon far fa-file-excel', 'aria-hidden' => 'true']),
+                        ['controller' => 'InformesResumen', 'action' => 'downloadAsExcel', $id_informe],
+                        ['class' => 'btn btn-success', 'escape' => false]) ?>
+                <?php endif;?>
+
 
 
 
@@ -32,37 +40,33 @@
                     <tr>
                         <th scope="col"><?= $this->Paginator->sort('ID') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Informe') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Grupo') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Inicio') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Fin') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Lote') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Parcela') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Propietario') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Categoria') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Destino') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Producto') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Descarga') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
 
                     </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ($informes as $inf): ?>
+                    <?php foreach ($informes_resumen as $inf): ?>
 
                         <tr>
-                            <td class="dt-center"><?= h($inf->idinformes) ?></td>
+                            <td class="dt-center"><?= h($inf->idinformes_resumen) ?></td>
                             <td class="dt-center"><?= h($inf->created) ?></td>
-                            <td class="dt-center"><?= h($inf->worksgroups) ?></td>
                             <td class="dt-center"><?= h($inf->fecha_inicio) ?></td>
                             <td class="dt-center"><?= h($inf->fecha_fin) ?></td>
-                            <td class="dt-center"><?= h($inf->lote) ?></td>
-                            <td class="dt-center"><?= h($inf->parcela) ?></td>
-                            <td class="dt-center"><?= h($inf->propietario) ?></td>
-                            <td class="dt-center"><?= h($inf->destino) ?></td>
+                            <td class="dt-center"><?= h($inf->categoria) ?></td>
+                            <td class="dt-center"><?= h($inf->clasificador) ?></td>
+                            <td class="dt-center"><?= h($inf->producto) ?></td>
 
-                            <?php if(!empty($inf->path_file)):  ?>
+                            <?php if(!empty($inf->path)):  ?>
 
                                 <td class="dt-center">
                                     <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'glyphicon far fa-file-excel', 'aria-hidden' => 'true']),
-                                        ['controller' => 'Informes', 'action' => 'downloadAsExcel', $inf->idinformes],
+                                        ['controller' => 'InformesResumen', 'action' => 'downloadAsExcel', $inf->idinformes_resumen],
                                         ['class' => 'btn btn-success', 'escape' => false]) ?>
                                 </td>
                             <?php else:?>
@@ -74,8 +78,8 @@
 
                                 <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                        ['action' => 'delete', $inf->idinformes],
-                                        ['confirm' => __('Eliminar {0}?', $inf->idinformes), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                        ['action' => 'delete', $inf->idinformes_resumen],
+                                        ['confirm' => __('Eliminar {0}?', $inf->idinformes_resumen), 'class' => 'btn btn-danger','escape' => false]) ?>
 
                                 <?php endif;?>
 
@@ -92,7 +96,7 @@
             <div class="form-group" style="margin-top: 20px; margin-left: 20px;">
 
                 <div class="pull-left">
-                    <?= $this->Html->link("Volver", ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'btn btn-danger btn-flat']) ?>
+                    <?= $this->Html->link("Volver", ['controller' => 'InformesResumen', 'action' => 'index'], ['class' => 'btn btn-danger btn-flat']) ?>
                 </div>
 
             </div>

@@ -1,0 +1,41 @@
+  <ul style="line-height: 45px;">
+                                    <li><strong>Costo Total: </strong><?= h(number_format($data_result[0]['costos']['costo_h'], 2, ",",".") . " $/h") ?></li>
+                                    <ul>
+                                        <li><strong>Costo de la Máquina: </strong><?= h(number_format($data_result[1]['costos_groups']['costo_maquina'], 2, ",",".") . " $/h") ?></li>
+
+                                        <ul>
+                                            <li style="font-size: 15px;"><strong>Costos Fijos: </strong><?= h(number_format($data_result[1]['costos_groups']['costos_fijos'], 2, ",",".") . " $/h") ?></li>
+
+                                            <ul>
+                                                <li>Ínteres: <?= h(number_format($data_result[0]['result_metod']['interes'], 2, ",",".") . " $/h") ?></li>
+                                                <li>Seguro: <?= h(number_format($data_result[0]['result_metod']['seguro'], 2, ",",".") . " $/h") ?></li>
+                                            </ul>
+                                        </ul>
+                                        <ul>
+                                            <li style="font-size: 15px;"><strong>Costos Semifijos: </strong><?= h(number_format($data_result[1]['costos_groups']['costos_semifijos'], 2, ",",".") . " $/h") ?></li>
+                                            <ul>
+                                                <li>Depraciación de la máquina: <?= h(number_format($data_result[0]['result_metod']['dep_maq'], 2, ",",".") . " $/h") ?></li>
+                                                <li>Depraciación de los neumáticos: <?= h(number_format($data_result[0]['result_metod']['dep_neum'], 2, ",",".") . " $/h") ?></li>
+                                                <li>Arreglos en la máquina: <?= h(number_format($data_result[0]['result_metod']['arreglos_maq'], 2, ",",".") . " $/h") ?></li>
+
+                                            </ul>
+                                        </ul>
+                                        <ul>
+                                            <li style="font-size: 15px;"><strong>Costos Variables: </strong><?= h(number_format($data_result[1]['costos_groups']['costos_variables'], 2, ",",".") . " $/h") ?></li>
+                                            <ul>
+                                                <li>Consumo de Combustible: <?= h(number_format($data_result[0]['result_metod']['cons_comb'], 2, ",",".") . " $/h") ?></li>
+                                                <li>Consumo de Lubricantes: <?= h(number_format($data_result[0]['result_metod']['cons_lub'], 2, ",",".") . " $/h") ?></li>
+                                            </ul>
+                                        </ul>
+
+                                        <li><strong>Costo horario de personal: </strong></li>
+
+                                        <ul>
+                                            <li style="font-size: 15px;"><strong>Operador: </strong><?= h(number_format($data_result[0]['result_metod']['operador'], 2, ",",".") . " $/h") ?></li>
+                                            <li style="font-size: 15px;"><strong>Mantenimiento: </strong><?= h(number_format($data_result[0]['result_metod']['mantenimiento'], 2, ",",".") . " $/h") ?></li>
+
+                                        </ul>
+                                        <li><strong>Costo horario de administración: </strong><?= h(number_format($data_result[0]['result_metod']['administracion'], 2, ",",".") . " $/h") ?></li>
+
+                                    </ul>
+                                </ul>

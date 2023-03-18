@@ -49,6 +49,12 @@ class PropietariosTable extends Table
             'bindingKey' => 'empresas_idempresas', //actual
             'joinType' => 'INNER'
         ]);
+
+        $this->hasMany('Remitos', [
+            'foreignKey' => 'propietarios_idpropietarios',
+            'bindingKey' => 'idpropietarios', //actual
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

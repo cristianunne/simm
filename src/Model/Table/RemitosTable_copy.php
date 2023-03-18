@@ -207,7 +207,7 @@ class RemitosTable_copy extends Table
         $conditions['fecha >='] = $date_start;
         $conditions['fecha <='] = $date_end;
 
-        debug($conditions);
+        //debug($conditions);
 
         return $query->where($conditions)
             ->innerJoinWith('Parcelas')

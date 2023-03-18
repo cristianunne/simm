@@ -5,6 +5,7 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use PHP_CodeSniffer\Standards\PSR12\Sniffs\Files\ImportStatementSniff;
 
 /**
  * Remitos Model
@@ -87,6 +88,14 @@ class RemitosTable extends Table
             'bindingKey' => 'idremitos', //actual
             'joinType' => 'INNER'
         ]);
+
+        /*$this->belongsToMany('Maquinas', [
+            'foreignKey' => 'remitos_idremitos',
+            'bindingKey' => 'idremitos', //actual
+            'targetForeignKey' => 'maquinas_idmaquinas',
+            'joinTable' => 'RemitosMaquinas',
+            'joinType' => 'INNER'
+        ]);*/
     }
 
     /**
@@ -178,17 +187,238 @@ class RemitosTable extends Table
         return $rules;
     }
 
-    public function findRemitosByConditions(Query $query, array $options)
+    public function findRemitosByConditions(Query $query, $options)
     {
         //Cuando en las condiciones viene el 0, significa que tiene que traer todos
         $conditions = [];
 
-
-        $options = $options[0];
-
-        if($options['worksgroup'] != 0){
-            $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0 ){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
         }
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
+        }
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+
+        if(isset($options['productos_idproductos'])){
+            if($options['productos_idproductos'] != 0 && $options['productos_idproductos'] != null){
+                $conditions['productos_idproductos'] = $options['productos_idproductos'];
+            }
+        }
+
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+        $conditions['fecha >='] = $date_start;
+        $conditions['fecha <='] = $date_end;
+
+        $result = $query->where($conditions);
+
+        $array_result = [];
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->idremitos;
+        }
+
+        return $array_result;
+    }
+
+    public function findRemitosByConditionsQuery(Query $query, $options)
+    {
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0 ){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
+        }
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
+        }
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+        $conditions['fecha >='] = $date_start;
+        $conditions['fecha <='] = $date_end;
+
+        $result = $query->where($conditions);
+
+        return $result;
+    }
+
+
+    public function findDestinosByRemitos(Query $query, $options)
+    {
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0 ){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
+        }
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
+        }
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+        if(isset($options['productos_idproductos'])){
+            if($options['productos_idproductos'] != 0 && $options['productos_idproductos'] != null){
+                $conditions['productos_idproductos'] = $options['productos_idproductos'];
+            }
+        }
+
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+        $conditions['fecha >='] = $date_start;
+        $conditions['fecha <='] = $date_end;
+
+        $result = $query->select(['destinos_iddestinos'])
+            ->distinct(['destinos_iddestinos'])
+            ->where($conditions);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->destinos_iddestinos;
+        }
+
+        return $array_result;
+    }
+
+    public function findPropietariosByRemitos(Query $query, $remitos)
+    {
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+
+
+
+        $result = $query->select(['propietarios_idpropietarios'])
+            ->distinct(['propietarios_idpropietarios'])
+            ->where(['idremitos IN' => $remitos]);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->propietarios_idpropietarios;
+        }
+
+        return $array_result;
+    }
+
+    public function findGetProductosDistinctByRemitos(Query $query, $array_remitos)
+    {
+        $result = $query->select(['productos_idproductos'])
+            ->distinct(['productos_idproductos'])
+            ->where(['idremitos IN ' => $array_remitos]);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+            $array_result[$rem->productos_idproductos] = $rem->productos_idproductos;
+        }
+
+        return $array_result;
+    }
+
+    public function findGetParcelasDistinctByRemitos(Query $query, $array_remitos)
+    {
+        $result = $query->select(['parcelas_idparcelas'])
+            ->distinct(['parcelas_idparcelas'])
+            ->where(['idremitos IN ' => $array_remitos]);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+            $array_result[] = $rem->parcelas_idparcelas;
+        }
+
+        return $array_result;
+    }
+
+    public function findRemitosByConditionsAllData(Query $query, $options)
+    {
+
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
+        }
+
 
         if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
             $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
@@ -218,14 +448,10 @@ class RemitosTable extends Table
 
         $result = $query->where($conditions);
 
-        $array_result = [];
-        foreach ($result as $rem){
 
-            $array_result[] = $rem->idremitos;
-        }
-
-        return $array_result;
+        return $result;
     }
+
 
     /** Utilizo el metodo para devolver un arreglo de los remitos ***/
     public function findRemitosByDate(Query $query, $options = [])
@@ -233,7 +459,6 @@ class RemitosTable extends Table
 
         $array_result = [];
 
-        $options = $options[0];
         $date_start = $options['fecha_inicio'];
         $date_end = $options['fecha_fin'];
 

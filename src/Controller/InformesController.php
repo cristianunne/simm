@@ -5,6 +5,7 @@ use App\Controller\AppController;
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Filesystem\File;
+use Cake\Http\Exception\NotFoundException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Style;
@@ -322,6 +323,8 @@ class InformesController extends AppController
 
     public function downloadAsExcel($id = null)
     {
+        $this->autoRender = false;
+
         //TRaigo el informe
         try {
 
@@ -335,14 +338,19 @@ class InformesController extends AppController
             return $response;
 
         } catch (InvalidPrimaryKeyException $e){
-            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
 
         } catch (RecordNotFoundException $e){
-            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
+        }
+        catch (NotFoundException $e){
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
         }
         catch (Exception $e){
-            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
         }
+
+        return $this->redirect(['action' => 'index']);
 
     }
 

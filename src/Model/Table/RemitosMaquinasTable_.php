@@ -52,6 +52,9 @@ class RemitosMaquinasTable extends Table
             'joinType' => 'INNER'
         ]);
 
+
+
+
     }
 
     /**
@@ -72,8 +75,13 @@ class RemitosMaquinasTable extends Table
             ->notEmptyString('remitos_idremitos');
 
         $validator
+            ->numeric('alquiler_ton')
+            ->allowEmptyString('alquiler_ton');
+
+        $validator
             ->integer('operarios_idoperarios')
-            ->allowEmptyString('operarios_idoperarios');
+            ->requirePresence('operarios_idoperarios', 'create')
+            ->notEmptyString('operarios_idoperarios');
 
         $validator
             ->integer('maquinas_idmaquinas')
@@ -82,6 +90,8 @@ class RemitosMaquinasTable extends Table
 
         return $validator;
     }
+
+
 
     public function findGetMaquinasByRemitos(Query $query, $options = [])
     {
@@ -101,7 +111,7 @@ class RemitosMaquinasTable extends Table
             return $array_result;
         }
 
-        return false;
+      return false;
 
     }
 

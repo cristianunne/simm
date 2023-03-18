@@ -164,12 +164,12 @@ class MaquinasTable extends Table
     }
 
     /**
-     * @param Query $
+     * @param Query
      * @param $option
      * @return array
      * Return maquinas by date especified in remitos
      */
-    public function findGetMaquinasByDateRemitos(Query query, $option = [])
+    public function findGetMaquinasByDateRemitos(Query $query, $option = [])
     {
 
         $array_maquinas = [];
@@ -179,6 +179,143 @@ class MaquinasTable extends Table
 
 
         return $array_maquinas;
+    }
+
+
+    public function findGetMaquinasEvaluations(Query $query, $maquinas_array = [])
+    {
+
+        $result = $query
+            ->distinct(['idmaquinas'])
+            ->innerJoinWith('CostosMaquinas')
+            ->innerJoinWith('OperariosMaquinas')
+            ->innerJoinWith('UsoMaquinaria')
+        ->where(['Maquinas.idmaquinas IN' => $maquinas_array, 'CostosMaquinas.active' => true, 'OperariosMaquinas.active' => true]);
+
+        //Devuelvo un array con las maquinas tipo list
+
+        $array_result = [];
+
+        if(count($result->toArray()) > 0){
+
+            foreach ($result as $res)
+            {
+                $array_result[$res->idmaquinas] = $res->marca . ':' . $res->name;
+
+            }
+        }
+
+        return $array_result;
+    }
+
+
+    public function findGetMaquinasByConditions(Query $query, $options = [])
+    {
+
+        $conditions['Maquinas.idmaquinas'] = $options['maquina'];
+
+        if($options['lotes_idlotes'] != 0){
+            $conditions['Remitos.Parcelas.lotes_idlotes'] = $options['lotes_idlotes'];
+        }
+
+        if($options['parcelas_idparcelas'] != 0){
+            $conditions['Remitos.parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+        }
+
+        if($options['propietarios_idpropietarios'] != 0){
+            $conditions['Remitos.propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+        }
+
+        if($options['destinos_iddestinos'] != 0){
+            $conditions['Remitos.destinos_iddestinos'] = $options['destinos_iddestinos'];
+        }
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+
+        $conditions['Remitos.fecha >='] = $date_start;
+        $conditions['Remitos.fecha <='] = $date_end;
+
+       // $conditions['CostosMaquinas.active'] = true;
+
+        //$conditions['UsoMaquinaria.fecha >='] = $date_start;
+        //$conditions['UsoMaquinaria.fecha <='] = $date_end;
+        debug($conditions);
+
+
+        $result = $query
+            ->distinct(['idmaquinas'])
+            ->contain(['Remitos'])
+            ->innerJoinWith('Remitos')
+            ->where($conditions);
+
+        return $result;
+
+
+    }
+
+    public function findGetMaquinaEvaluationsOnly(Query $query, $options = [])
+    {
+        //Recibo todos los parametros y evaluo
+
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+
+
+        /*if($options['worksgroup'] != 0){
+            $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+        }*/
+
+
+        $conditions['Maquinas.idmaquinas'] = $options['maquina'];
+
+        if($options['lotes_idlotes'] != 0){
+            $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+        }
+
+        if($options['parcelas_idparcelas'] != 0){
+            $conditions['Remitos.parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+        }
+
+        if($options['propietarios_idpropietarios'] != 0){
+            $conditions['Remitos.propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+        }
+
+        if($options['destinos_iddestinos'] != 0){
+            $conditions['Remitos.destinos_iddestinos'] = $options['destinos_iddestinos'];
+        }
+
+
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+
+        $conditions['Remitos.fecha >='] = $date_start;
+        $conditions['Remitos.fecha <='] = $date_end;
+
+        $conditions['CostosMaquinas.active'] = true;
+
+        $conditions['UsoMaquinaria.fecha >='] = $date_start;
+        $conditions['UsoMaquinaria.fecha <='] = $date_end;
+
+
+
+        //Primero compruebo que tenga remitos
+        $result = $query->distinct(['idmaquinas'])
+            ->innerJoinWith('Remitos')
+            ->innerJoinWith('CostosMaquinas')
+            ->innerJoinWith('UsoMaquinaria')
+            ->where($conditions);
+
+
+        if(count($result->toArray()) > 0){
+            return true;
+        }
+
+        return false;
     }
 
 

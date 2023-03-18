@@ -41,7 +41,6 @@
 
 
 
-
                     <div class="col-md-3" style="border: solid 1px #c1c1c1; margin-left: 5px;">
                         <p class="title-box-ac">Período</p>
                         <hr>
@@ -464,6 +463,94 @@
 <?= $this->Html->css('tree_view.css') ?>
 
 <?= $this->Html->script('jquery-confirm.min.js') ?>
+
+<?= $this->Html->script('../plugins/datatables/jquery.dataTables.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-responsive/js/dataTables.responsive.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-responsive/js/responsive.bootstrap4.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-buttons/js/dataTables.buttons.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-buttons/js/buttons.bootstrap4.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-buttons/js/buttons.html5.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-buttons/js/buttons.print.min.js') ?>
+<?= $this->Html->script('../plugins/datatables-buttons/js/buttons.colVis.min.js') ?>
+
+<script>
+    $(function () {
+        $('#tabladata').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false
+        });
+
+        $('#tabladata_maq_modal').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false
+        });
+
+        $('#tabladata_3').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+            "pageLength": 10
+        });
+
+        $('#tabladata_prop_1').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false
+        });
+
+        $('#tabladata_prop_2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+            "pageLength": 10
+        });
+
+        $('#tabladata_destinos').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+            "pageLength": 10
+        });
+
+        $('#tabladata_productos').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+            "pageLength": 10
+        });
+    })
+</script>
 
 
 

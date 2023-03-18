@@ -52,6 +52,12 @@ class DestinosTable extends Table
             'bindingKey' => 'users_idusers', //actual
             'joinType' => 'INNER'
         ]);
+
+        $this->hasMany('Remitos', [
+            'foreignKey' => 'destinos_iddestinos',
+            'bindingKey' => 'iddestinos', //actual
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

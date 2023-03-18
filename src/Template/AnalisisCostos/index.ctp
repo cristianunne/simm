@@ -65,7 +65,7 @@
                     <div class="btn-group flex-vertical" role="group" aria-label="Third group">
                         <div>
                             <?= $this->Html->link('',
-                                ['controller' => 'Informes', 'action' => 'index'], ['class' => 'btn-simm btn-remito btn btn-default',
+                                ['controller' => 'InformesMaquinas', 'action' => 'index'], ['class' => 'btn-simm btn-remito btn btn-default',
                                     'escape' => false]) ?>
                         </div>
                         <div class="div_content">
@@ -74,6 +74,22 @@
                     </div>
 
                 </div>
+
+
+                <div class="gap-3 d-md-flex justify-content-md-center mb-3 pt-1">
+                    <div class="btn-group flex-vertical " role="group" aria-label="Third group">
+                        <div>
+                            <?= $this->Html->link('',
+                                ['controller' => 'InformesResumen', 'action' => 'index'],
+                                ['class' => 'btn-simm btn-costos btn btn-default', 'escape' => false]) ?>
+                        </div>
+                        <div class="div_content">
+                            <p class="center text-color-navy">Informes por Destinos y Propietarios</p>
+                        </div>
+                    </div>
+
+                </div>
+
 
                 <div class="gap-3 d-md-flex justify-content-md-center mb-3 pt-1">
                     <div class="btn-group flex-vertical " role="group" aria-label="Third group">
