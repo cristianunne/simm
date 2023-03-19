@@ -97,6 +97,8 @@ class InformesResumenController extends AppController
 
         if ($this->request->is('post')) {
 
+
+
             $fecha_inicio = $this->request->getData()['fecha_inicio'];
             $fecha_fin = $this->request->getData()['fecha_final'];
 
@@ -158,12 +160,11 @@ class InformesResumenController extends AppController
                         $entity_informe_resumen = $this->InformesResumen->patchEntity($entity_informe, $array_informe);
 
                         //DEvuelvo un arreglo con la operacion y el id
-
                         if ($this->InformesResumen->save($entity_informe_resumen)) {
 
                             //Mando la descarga
 
-                            //return $this->redirect(['action' => 'destinosReportIndex', $entity_informe_resumen->idinformes_resumen]);
+                            return $this->redirect(['action' => 'destinosReportIndex', $entity_informe_resumen->idinformes_resumen]);
                         }
 
                     } else {
@@ -202,9 +203,10 @@ class InformesResumenController extends AppController
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
 
         $informes_resumen = $this->InformesResumen->find('all', [])
-        ->where(['categoria LIKE' => 'Destinos']);
+        ->where(['categoria LIKE' => 'Destinos', 'empresas_idempresas' => $id_empresa]);
         $this->set(compact('informes_resumen'));
         $id_informe = $id;
+
         if($id_informe != null){
 
             $this->set(compact('id_informe'));
@@ -431,9 +433,12 @@ class InformesResumenController extends AppController
 
                             $myWorkSheet_res->setCellValue('B' . $index, date("d-m-Y", strtotime($rem->fecha)));
                             $myWorkSheet_res->setCellValue('C' . $index, $rem->lote->name);
-                            $myWorkSheet_res->setCellValue('D' . $index, $rem->parcela->name);
+
+                            $name_parcela = isset($rem->parcela->name) ? $rem->parcela->name : null;
+
+                            $myWorkSheet_res->setCellValue('D' . $index, $name_parcela);
                             $myWorkSheet_res->setCellValue('E' . $index, $this->getNamePropietarioById($rem->propietario_idpropietarios));
-                            $myWorkSheet_res->setCellValue('F' . $index, 'Fletero');
+                            $myWorkSheet_res->setCellValue('F' . $index, '');
                             $myWorkSheet_res->setCellValue('G' . $index, $rem->producto->name);
                             $myWorkSheet_res->setCellValue('H' . $index, $rem->ton);
                             $myWorkSheet_res->setCellValue('I' . $index, $rem->precio_ton);
@@ -504,8 +509,6 @@ class InformesResumenController extends AppController
                 $index++;
                 $index++;
             } //Lavel del foreach de DEstinos
-
-
 
 
             return $myWorkSheet_res;
@@ -767,15 +770,17 @@ class InformesResumenController extends AppController
 
             $remitos_model = $this->loadModel('Remitos');
             $remitos = $remitos_model->find('RemitosByConditions', $array_options);
-            //$propietarios_distinct = $remitos_model->find('PropietariosByRemitos', $remitos);
+            $propietarios_distinct = $remitos_model->find('PropietariosByRemitos', $remitos);
 
             //LA PARCELA ES EL ELEMENTO ORGANIZADOR
 
-            //$parcelas_distinct = $remitos_model->find('GetParcelasDistinctByRemitos', $remitos);
-            debug(v);
+            $parcelas_distinct = $remitos_model->find('GetParcelasDistinctByRemitos', $remitos);
+
+            //USo los remitos y traigo agrupado las toneladas por producto findGetTotalToneladasByProductos
+            $ton_by_producto = $remitos_model->find('GetTotalToneladasByProductos', $remitos);
 
             //SI destinos distinc esta vacio, no se puede procesar porque no hay remitos
-            /*if(count($propietarios_distinct) == 0){
+            if(count($propietarios_distinct) == 0){
 
                 //INformo que no hay nada
                 $this->Flash->error(__('No existen Remitos con la información solicitada!'));
@@ -790,24 +795,87 @@ class InformesResumenController extends AppController
 
                 //controlo que no venga vacio el array tmb
                 if(count($propietarios_with_remitos->toArray()) > 0){
-                    //$result_report = $this->processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options);
+                    $result_report = $this->processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options, $ton_by_producto);
+
+
+                    if($result_report != false){
+                        $array_informe['fecha_inicio'] = $fecha_inicio;
+                        $array_informe['fecha_fin'] = $fecha_fin;
+                        $array_informe['categoria'] = 'Propietarios';
+                        $array_informe['users_idusers'] = $user_id;
+                        $array_informe['empresas_idempresas'] = $id_empresa;
+
+                        $array_informe['name'] = $result_report['name'];
+                        $array_informe['path'] = $result_report['path'];
+
+                        //el clasificador en la variable elegida en destino o propietarios
+                        $array_informe['clasificador'] = $this->getNamePropietarioById($propietario);
+
+                        //el producto puede ser filtrado en destinos, pero para propietario es todos
+
+
+                        $entity_informe = $this->InformesResumen->newEntity();
+                        //Creo la entidad y cargo a la base de datos
+                        $entity_informe_resumen = $this->InformesResumen->patchEntity($entity_informe, $array_informe);
+
+                        //DEvuelvo un arreglo con la operacion y el id
+
+                        if ($this->InformesResumen->save($entity_informe_resumen)) {
+
+                            //Mando la descarga
+                            return $this->redirect(['action' => 'propietariosReportIndex', $entity_informe_resumen->idinformes_resumen]);
+                        }
+
+                    } else {
+                        //Reportfile es false, entonces no se pudo crear el excel
+                        //vuelvo a destinos report
+                        $this->Flash->error(__('No se puede crear el archivo de informe, intente nuevamente!'));
+                        return $this->redirect(['action' => 'propietariosReportIndex']);
+
+                    }
                 }
 
-            }*/
+            }
 
             }
 
     }
 
-    private function processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options)
+    public function propietariosReportIndex($id = null)
+    {
+        $seccion = 'Informes';
+        $sub_seccion = 'Informes';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
+        //Consulto si la empresa no esta vacia
+        //Traigo los datos de la sesion
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        $informes_resumen = $this->InformesResumen->find('all', [])
+            ->where(['categoria LIKE' => 'Propietarios', 'empresas_idempresas' => $id_empresa]);
+        $this->set(compact('informes_resumen'));
+        $id_informe = $id;
+
+        if($id_informe != null){
+
+            $this->set(compact('id_informe'));
+        }
+    }
+
+    private function processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options, $ton_by_producto)
     {
 
-        $result = $this->createdExcelResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options);
 
+
+        $result = $this->createdExcelResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options, $ton_by_producto);
+        //debug($propietarios_with_remitos->toArray());
         return $result;
     }
 
-    private function createdExcelResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options)
+    private function createdExcelResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options, $ton_by_producto)
     {
 
         $this->viewBuilder()->setLayout(null);
@@ -815,8 +883,10 @@ class InformesResumenController extends AppController
 
         $spreadsheet = new Spreadsheet();
 
-        $myWorkSheet_maq =  $this->createdSheetResumen($spreadsheet, $propietarios_with_remitos, $parcelas_distinct, $array_options);
 
+        $myWorkSheet_maq =  $this->createdSheetResumenPropietarios($spreadsheet, $propietarios_with_remitos, $parcelas_distinct, $array_options);
+
+        $worksheet_madera = $this->createdSheetResumenPropietariosMaderas($spreadsheet, $ton_by_producto, $array_options);
 
         //utilizo el now, es mejor
         $nombre = "informe_resumen_" .hash('sha256' , (date("Y-m-d H:i:s")));
@@ -838,5 +908,407 @@ class InformesResumenController extends AppController
         }
     }
 
+    private function createdSheetResumenPropietarios($spreadsheet, $propietarios_with_remitos, $parcelas_distinct, $array_options)
+    {
+        $this->viewBuilder()->setLayout(null);
+        $this->autoRender = false;
 
+
+        $font_bold = [
+            'font' => [
+                'bold' => true
+            ]
+        ];
+
+        $styleArray = [
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ,
+                    'color' => ['argb' => '00000000'],
+                ],
+            ],
+        ];
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        try {
+            //TRigo el logo de la empresa
+            $empresa_model = $this->loadModel('Empresas');
+            $empresas_data = $empresa_model->get($id_empresa);
+
+            //configuro el path y el file
+            $path = null;
+
+            if ($empresas_data->logo == null or empty($empresas_data->logo)) {
+                //logo default
+                $path = LOGOS . 'edificio.png';
+            } else {
+                $path = LOGOS . $empresas_data->logo;
+            }
+
+
+            $myWorkSheet_res = new Worksheet($spreadsheet, 'Resumen');
+
+            $spreadsheet->addSheet($myWorkSheet_res, 0);
+            $spreadsheet->getDefaultStyle()->getFont()->setName('Times New Roman');
+
+            //Combino la primer celda para porner el titulo y configuro una altura aceptable
+            $myWorkSheet_res->mergeCells('B1:I1');
+            $myWorkSheet_res->getRowDimension('1')->setRowHeight(75);
+
+            //EL titulo tiene que decir Informe de Costo - NOmbre de empresa
+            $empresa_name = $empresas_data->name;
+            $titulo = 'Informe por Propietarios - ' . $empresa_name;
+
+            $myWorkSheet_res->setCellValue('B1', $titulo);
+
+            $myWorkSheet_res->getStyle('B1')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getStyle('B1')->getFont()->setBold(true)->setName('Arial')
+                ->setSize(14);
+
+            //DIBUJO EL LOGO
+
+            $drawing = new Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath($path);
+            $drawing->setHeight(75);
+            $drawing->setWidth(75);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(45);
+            $drawing->setOffsetY(15);
+            $drawing->setWorksheet($myWorkSheet_res);
+
+
+            //Represento la primer tabla
+            $myWorkSheet_res->mergeCells('A2:I2');
+            $myWorkSheet_res->getRowDimension('2')->setRowHeight(45);
+
+            $myWorkSheet_res->mergeCells('A3:I3');
+            $myWorkSheet_res->setCellValue('A3', 'Datos considerados en el análisis');
+
+            $myWorkSheet_res->getStyle('A3')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getRowDimension('3')->setRowHeight(25);
+
+            //DEtalles del filtro
+
+            //Creo el titulo
+            $title = 'Periodo: ' . $array_options['fecha_inicio'] . ' a ' . $array_options['fecha_fin'];
+
+            $dest_title = 'Propietarios: ' . $this->getNamePropietarioById($array_options['propietarios_idpropietarios']);
+
+            $prod_title = 'Productos: ' . 'Todos';
+
+            $title = $title . '; ' . $dest_title . '; ' . $prod_title;
+
+            $myWorkSheet_res->mergeCells('A4:I4');
+            $myWorkSheet_res->setCellValue('A4', $title);
+
+            $myWorkSheet_res->getStyle('A4')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A4')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A4')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getRowDimension('4')->setRowHeight(25);
+
+            //EL indice empieza en 5
+            $index = 5;
+
+            //Creo la cabecera
+
+            $myWorkSheet_res->setCellValue('A'.$index, 'Producto');
+            $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A'.$index)->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('A'.$index)->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->setCellValue('B'.$index, 'Toneladas');
+            $myWorkSheet_res->getStyle('B'.$index)->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B'.$index)->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('B'.$index)->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getRowDimension($index)->setRowHeight(25);
+
+
+            foreach ($propietarios_with_remitos as $prop)
+            {
+                //COmo estoy en un nuevo destino creo su cabecera
+
+
+                //sumo el index porque tengo que bajar una celda
+                $index++;
+
+                //Creo la cabecera de los datos
+
+                $myWorkSheet_res->setCellValue('A'.$index, 'N° Remito:');
+                $myWorkSheet_res->setCellValue('B'.$index, 'Fecha');
+                $myWorkSheet_res->setCellValue('C'.$index, 'Lote');
+                $myWorkSheet_res->setCellValue('D'.$index, 'Parcela');
+                $myWorkSheet_res->setCellValue('E'.$index, 'Destino');
+                $myWorkSheet_res->setCellValue('F'.$index, 'Producto');
+                $myWorkSheet_res->setCellValue('G'.$index, 'Toneladas');
+                $myWorkSheet_res->setCellValue('H'.$index, 'Precio/t');
+                $myWorkSheet_res->setCellValue('I'.$index, 'Precio Total');
+
+                $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('B'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('C'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('D'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('E'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('F'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('G'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('H'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('I'.$index)->applyFromArray($font_bold);
+
+                $myWorkSheet_res->getRowDimension($index)->setRowHeight(17);
+
+                $cell_coord = 'A'.$index.':I'.$index;
+
+                foreach (range($cell_coord, $myWorkSheet_res->getHighestColumn()) as $col) {
+                    $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
+                }
+                $index++;
+
+                //Proceso los datos
+
+                $total_propietario_ton = null;
+
+                $total_propietario_precio = null;
+
+
+                //recorro los remitos
+                foreach ($parcelas_distinct as $parc){
+                    $index_producto = 0;
+                    $precio_total = null;
+                    $total_ton_producto = null;
+
+                    $flags_subtotal = false;
+                    //COmparo los productos
+                    foreach ($prop->remitos as $rem){
+
+                        //Verifico que las parcelas sean iguales
+                        if($rem->parcelas_idparcelas == $parc) {
+                            $flags_subtotal = true;
+                            $myWorkSheet_res->setCellValue('A' . $index, $rem->remito_number);
+
+                            $myWorkSheet_res->setCellValue('B' . $index, date("d-m-Y", strtotime($rem->fecha)));
+                            $myWorkSheet_res->setCellValue('C' . $index, $rem->lote->name);
+
+                            $name_parcela = isset($rem->parcela->name) ? $rem->parcela->name : null;
+
+                            $myWorkSheet_res->setCellValue('D' . $index, $name_parcela);
+                            $myWorkSheet_res->setCellValue('E' . $index, $this->getNameDestinoById($rem->destinos_iddestinos));
+                            $myWorkSheet_res->setCellValue('F' . $index, $this->getNameProductoById($rem->productos_idproductos));
+                            $myWorkSheet_res->setCellValue('G' . $index, $rem->ton);
+                            $myWorkSheet_res->setCellValue('H' . $index, $rem->precio_ton);
+                            $myWorkSheet_res->setCellValue('I' . $index, $rem->ton * $rem->precio_ton);
+
+
+                            $myWorkSheet_res->getStyle('D'.$index)->getAlignment()->setHorizontal('center');
+                            $myWorkSheet_res->getStyle('D'.$index)->getAlignment()->setVertical('center');
+
+                            $myWorkSheet_res->getStyle('A' . $index)->applyFromArray($font_bold);
+                            $myWorkSheet_res->getStyle('A' . $index)->getAlignment()->setHorizontal('center');
+                            $myWorkSheet_res->getStyle('A' . $index)->getAlignment()->setVertical('center');
+
+
+                            $precio_total = $precio_total + ($rem->precio_ton * $rem->ton);
+                            $total_ton_producto = $total_ton_producto + $rem->ton;
+                            $index_producto++;
+                            $index++;
+                        }
+                    }
+                    //Cargo los resultados parciales del producto
+
+                    if($flags_subtotal){
+
+                        $myWorkSheet_res->setCellValue('A'.$index, 'Subtotal:');
+                        $myWorkSheet_res->setCellValue('B'.$index, 'Parcela: '. $this->getNameParcelaById($parc));
+                        $myWorkSheet_res->getStyle('B' . $index)->applyFromArray($font_bold);
+
+                        $myWorkSheet_res->setCellValue('G'.$index, $total_ton_producto);
+                        $myWorkSheet_res->setCellValue('I'.$index, $precio_total);
+
+                        $myWorkSheet_res->getStyle('I' . $index)->applyFromArray($font_bold);
+                        $myWorkSheet_res->getStyle('G' . $index)->applyFromArray($font_bold);
+
+                        $total_propietario_ton = $total_propietario_ton + $total_ton_producto;
+                        $total_propietario_precio = $total_propietario_precio + $precio_total;
+
+
+                        $index++;
+                    }
+
+                }
+                $index++;
+
+                //Cargo el total Final del Propietario
+                $myWorkSheet_res->setCellValue('A'.$index, 'Totales: ');
+                $myWorkSheet_res->setCellValue('B'.$index, $this->getNamePropietarioById($prop->idpropietarios));
+
+                $myWorkSheet_res->setCellValue('G'.$index, $total_propietario_ton);
+                $myWorkSheet_res->setCellValue('I'.$index, $total_propietario_precio);
+
+                $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('B'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('G'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('H'.$index)->applyFromArray($font_bold);
+                $index++;
+
+
+                $index++;
+            } //Lavel del foreach de DEstinos
+
+
+            return $myWorkSheet_res;
+
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+        }
+
+
+        return false;
+    }
+
+
+    private function createdSheetResumenPropietariosMaderas($spreadsheet, $ton_by_prod, $array_options)
+    {
+        $this->viewBuilder()->setLayout(null);
+        $this->autoRender = false;
+
+
+        $font_bold = [
+            'font' => [
+                'bold' => true
+            ]
+        ];
+
+        $styleArray = [
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ,
+                    'color' => ['argb' => '00000000'],
+                ],
+            ],
+        ];
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        try {
+            //TRigo el logo de la empresa
+            $empresa_model = $this->loadModel('Empresas');
+            $empresas_data = $empresa_model->get($id_empresa);
+
+            //configuro el path y el file
+            $path = null;
+
+            if ($empresas_data->logo == null or empty($empresas_data->logo)) {
+                //logo default
+                $path = LOGOS . 'edificio.png';
+            } else {
+                $path = LOGOS . $empresas_data->logo;
+            }
+
+
+            $myWorkSheet_res = new Worksheet($spreadsheet, 'Madera Extraida');
+
+            $spreadsheet->addSheet($myWorkSheet_res, 1);
+            $spreadsheet->getDefaultStyle()->getFont()->setName('Times New Roman');
+
+            //Combino la primer celda para porner el titulo y configuro una altura aceptable
+            $myWorkSheet_res->mergeCells('B1:I1');
+            $myWorkSheet_res->getRowDimension('1')->setRowHeight(75);
+
+            //EL titulo tiene que decir Informe de Costo - NOmbre de empresa
+            $empresa_name = $empresas_data->name;
+            $titulo = 'Informe por Propietarios - ' . $empresa_name;
+
+            $myWorkSheet_res->setCellValue('B1', $titulo);
+
+            $myWorkSheet_res->getStyle('B1')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getStyle('B1')->getFont()->setBold(true)->setName('Arial')
+                ->setSize(14);
+
+            //DIBUJO EL LOGO
+
+            $drawing = new Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath($path);
+            $drawing->setHeight(75);
+            $drawing->setWidth(75);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(45);
+            $drawing->setOffsetY(15);
+            $drawing->setWorksheet($myWorkSheet_res);
+
+
+            //Represento la primer tabla
+            $myWorkSheet_res->mergeCells('A2:B2');
+            $myWorkSheet_res->getRowDimension('2')->setRowHeight(45);
+
+            $myWorkSheet_res->mergeCells('A3:B3');
+            $myWorkSheet_res->setCellValue('A3', 'Resumen de Madera Extraída');
+
+            $myWorkSheet_res->getStyle('A3')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getRowDimension('3')->setRowHeight(25);
+
+
+            $myWorkSheet_res->setCellValue('A4', 'Producto:');
+            $myWorkSheet_res->setCellValue('B4', 'Toneladas');
+
+            $myWorkSheet_res->getStyle('A4')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B4')->applyFromArray($font_bold);
+
+            $index = 5;
+
+            $madera_total = null;
+
+            //Recorro los productos
+            foreach ($ton_by_prod as $ton){
+
+                $myWorkSheet_res->setCellValue('A'.$index, $this->getNameProductoById($ton->productos_idproductos));
+                $myWorkSheet_res->setCellValue('B'.$index, $ton->sum);
+
+                $madera_total = $madera_total + $ton->sum;
+
+                $cell_coord = 'A'.$index.':B'.$index;
+
+                foreach (range($cell_coord, $myWorkSheet_res->getHighestColumn()) as $col) {
+                    $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                $index++;
+            }
+
+            $myWorkSheet_res->setCellValue('A'.$index, 'Madera extraida Total:');
+            $myWorkSheet_res->setCellValue('B'.$index, $madera_total);
+
+            $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B'.$index)->applyFromArray($font_bold);
+
+            return $myWorkSheet_res;
+
+            //DEtalles del filtro
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+        }
+        return false;
+    }
 }

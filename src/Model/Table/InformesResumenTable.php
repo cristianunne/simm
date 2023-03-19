@@ -96,7 +96,6 @@ class InformesResumenTable extends Table
         $validator
             ->scalar('producto')
             ->maxLength('producto', 100)
-            ->requirePresence('producto', 'create')
             ->notEmptyString('producto');
 
         return $validator;

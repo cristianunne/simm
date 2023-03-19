@@ -507,4 +507,17 @@ class RemitosTable extends Table
 
     }
 
+    public function findGetTotalToneladasByProductos(Query $query, $remitos = null)
+    {
+
+        $result = $query
+            ->select(['productos_idproductos', 'sum' => $query->func()->sum('ton')])
+            ->where([
+                'Remitos.idremitos IN' => $remitos
+            ])->group('productos_idproductos');
+
+        return $result;
+
+    }
+
 }
