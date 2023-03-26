@@ -35,11 +35,13 @@
                         <th scope="col"><?= $this->Paginator->sort('Apellido') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Nombre') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('DNI') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Fecha') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Maquina') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Salario') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('¿Activo?') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Fecha de Alta') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Fecha de Carga') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                        <th scope="col" class="actions"><?= __('Histórico') ?></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -49,6 +51,14 @@
                             <td class="dt-center"><?= h($oper->operario->lastname) ?></td>
                             <td class="dt-center"><?= h($oper->operario->firstname) ?></td>
                             <td class="dt-center"><?= h($oper->operario->dni) ?></td>
+                            <?php if(isset($oper->fecha)):  ?>
+                                <td class="dt-center"><?= h($oper->fecha->format('d-m-Y')) ?></td>
+                            <?php else: ?>
+                                <td class="dt-center"></td>
+                            <?php endif;?>
+
+
+
                             <td class="dt-center"><?= h($oper->maquina->marca . ': ' . $oper->maquina->name) ?></td>
                             <td class="dt-center"><?= h($oper->sueldo) ?></td>
 
@@ -57,6 +67,12 @@
                                 <td class="dt-center"><?= h('Si') ?></td>
                             <?php else: ?>
                                 <td class="dt-center"><?= h('No') ?></td>
+                            <?php endif;?>
+
+                            <?php if(isset($oper->created)):  ?>
+                                <td class="dt-center"><?= h($oper->created->format('d-m-Y')) ?></td>
+                            <?php else: ?>
+                                <td class="dt-center"></td>
                             <?php endif;?>
 
                             <td class="dt-center"><?= h($oper->created->format('d-m-Y')) ?></td>

@@ -10,9 +10,14 @@ use Cake\ORM\Entity;
  * @property float|null $sueldo
  * @property int $operarios_idoperarios
  * @property int $maquinas_idmaquinas
- * @property \Cake\I18n\FrozenDate $created
+ * @property \Cake\I18n\FrozenTime $created
  * @property \Cake\I18n\FrozenDate|null $finished
  * @property bool $active
+ * @property \Cake\I18n\FrozenTime|null $modified
+ * @property \Cake\I18n\FrozenDate|null $fecha
+ *
+ * @property \App\Model\Entity\Maquina $maquina
+ * @property \App\Model\Entity\Operario $operario
  */
 class OperariosMaquina extends Entity
 {
@@ -32,5 +37,9 @@ class OperariosMaquina extends Entity
         'created' => true,
         'finished' => true,
         'active' => true,
+        'modified' => true,
+        'fecha' => true,
+        'maquina' => true,
+        'operario' => true,
     ];
 }

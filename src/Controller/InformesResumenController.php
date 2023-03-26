@@ -75,7 +75,7 @@ class InformesResumenController extends AppController
             'keyField' => 'iddestinos',
             'valueField' => 'name'
         ])
-            ->where(['active' => true])->toArray();
+            ->where(['active' => true, 'empresas_idempresas' => $id_empresa])->toArray();
 
         $destinos[0] = 'Todos';
         $this->set(compact('destinos'));
@@ -88,7 +88,7 @@ class InformesResumenController extends AppController
             'valueField' => 'name'
         ])
             ->order(['name' => 'ASC'])
-            ->where(['active' => true])->toArray();
+            ->where(['active' => true, 'empresas_idempresas' => $id_empresa])->toArray();
 
         $productos[0] = 'Todos';
 
@@ -110,14 +110,25 @@ class InformesResumenController extends AppController
                 'fecha_inicio' => $fecha_inicio,
                 'fecha_fin' => $fecha_fin,
                 'destinos_iddestinos' => $destino,
-                'productos_idproductos' => $producto
+                'productos_idproductos' => $producto,
+                'empresas_idempresas' => $id_empresa
             ];
 
             //Llamo a la tabla remitos
             $remitos_model = $this->loadModel('Remitos');
             $remitos = $remitos_model->find('RemitosByConditions', $array_options);
-            $destinos_distinct = $remitos_model->find('DestinosByRemitos', $array_options);
+
+
+            //ESTE METODO ES EL QUE GENERA EL ERROR
+            $destinos_distinct = $remitos_model->find('DestinosByRemitos', $remitos);
             $productos_array = $remitos_model->find('GetProductosDistinctByRemitos', $remitos);
+
+
+            //USo los remitos y traigo agrupado las toneladas por producto findGetTotalToneladasByProductos
+            $ton_by_producto = $remitos_model->find('GetTotalToneladasByProductos', $remitos);
+
+            //debug($ton_by_producto->toArray());
+            //debug($remitos);
 
             //SI destinos distinc esta vacio, no se puede procesar porque no hay remitos
             if(count($destinos_distinct) == 0){
@@ -134,10 +145,13 @@ class InformesResumenController extends AppController
                 ])->where(['iddestinos IN' => $destinos_distinct]);
 
 
+                //debug($destinos_with_remitos->toArray());
+
 
                 //controlo que no venga vacio el array tmb
                 if(count($destinos_with_remitos->toArray()) > 0){
-                    $result_report = $this->processInformeResumenDestino($destinos_with_remitos, $productos_array, $array_options);
+                    $result_report = $this->processInformeResumenDestino($destinos_with_remitos, $productos_array,
+                       $array_options, $ton_by_producto);
 
                     if($result_report != false){
                         $array_informe['fecha_inicio'] = $fecha_inicio;
@@ -214,15 +228,45 @@ class InformesResumenController extends AppController
 
     }
 
-    private function processInformeResumenDestino($destinos_with_remitos, $productos, $array_options)
+    /**
+     * @return string from names of peoples or bussiness
+     */
+    private function getFleteroById($id_remito = null)
     {
-        $result = $this->createdExcel($destinos_with_remitos, $productos, $array_options);
+        //From Maquinas's Remitos List extract Transporte One
+        //Can be null
+        if ($id_remito == null){
+            return null;
+        }
+
+        $remitos[] = $id_remito;
+
+        $maquinas_remitos_model = $this->loadModel('RemitosMaquinas');
+        $maquinas_rem = $maquinas_remitos_model->find('GetMaquinasByRemitos', $remitos);
+
+        $maquinas_model = $this->loadModel('Maquinas');
+        $maquinas = $maquinas_model->find('GetNameFleteroById', $maquinas_rem);
+
+        if($maquinas != false){
+            //DEvolvio una maquina, devuelvo su nombre
+
+            return $maquinas['name'];
+
+        }
+
+        return  null;
+
+    }
+
+    private function processInformeResumenDestino($destinos_with_remitos, $productos, $array_options, $ton_by_producto)
+    {
+        $result = $this->createdExcel($destinos_with_remitos, $productos, $array_options, $ton_by_producto);
 
         return $result;
 
     }
 
-    private function createdExcel($destinos_with_remitos, $productos, $array_options)
+    private function createdExcel($destinos_with_remitos, $productos, $array_options, $ton_by_producto)
     {
         $this->viewBuilder()->setLayout(null);
         $this->autoRender = false;
@@ -231,7 +275,11 @@ class InformesResumenController extends AppController
 
         $myWorkSheet_maq =  $this->createdSheetResumen($spreadsheet, $destinos_with_remitos, $productos, $array_options);
 
+        $title = 'Destinos';
 
+        $worksheet_madera = $this->createdSheetResumenMaderas($spreadsheet, $ton_by_producto, $array_options, $title);
+
+        $spreadsheet->removeSheetByIndex(2);
         //utilizo el now, es mejor
         $nombre = "informe_resumen_" .hash('sha256' , (date("Y-m-d H:i:s")));
 
@@ -317,16 +365,25 @@ class InformesResumenController extends AppController
 
             //DIBUJO EL LOGO
 
-            $drawing = new Drawing();
-            $drawing->setName('Logo');
-            $drawing->setDescription('Logo');
-            $drawing->setPath($path);
-            $drawing->setHeight(75);
-            $drawing->setWidth(75);
-            $drawing->setCoordinates('A1');
-            $drawing->setOffsetX(45);
-            $drawing->setOffsetY(15);
-            $drawing->setWorksheet($myWorkSheet_res);
+
+
+            try{
+                $drawing = new Drawing();
+                $drawing->setName('Logo');
+                $drawing->setDescription('Logo');
+                $drawing->setPath($path);
+                $drawing->setHeight(75);
+                $drawing->setWidth(75);
+                $drawing->setCoordinates('A1');
+                $drawing->setOffsetX(45);
+                $drawing->setOffsetY(15);
+                $drawing->setWorksheet($myWorkSheet_res);
+
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $exception){
+
+            }
+
+
 
 
             //Represento la primer tabla
@@ -438,7 +495,8 @@ class InformesResumenController extends AppController
 
                             $myWorkSheet_res->setCellValue('D' . $index, $name_parcela);
                             $myWorkSheet_res->setCellValue('E' . $index, $this->getNamePropietarioById($rem->propietario_idpropietarios));
-                            $myWorkSheet_res->setCellValue('F' . $index, '');
+
+                            $myWorkSheet_res->setCellValue('F' . $index, $this->getFleteroById($rem->idremitos));
                             $myWorkSheet_res->setCellValue('G' . $index, $rem->producto->name);
                             $myWorkSheet_res->setCellValue('H' . $index, $rem->ton);
                             $myWorkSheet_res->setCellValue('I' . $index, $rem->precio_ton);
@@ -765,7 +823,8 @@ class InformesResumenController extends AppController
             $array_options = [
                 'fecha_inicio' => $fecha_inicio,
                 'fecha_fin' => $fecha_fin,
-                'propietarios_idpropietarios' => $propietario
+                'propietarios_idpropietarios' => $propietario,
+                'empresas_idempresas' => $id_empresa
             ];
 
             $remitos_model = $this->loadModel('Remitos');
@@ -795,7 +854,8 @@ class InformesResumenController extends AppController
 
                 //controlo que no venga vacio el array tmb
                 if(count($propietarios_with_remitos->toArray()) > 0){
-                    $result_report = $this->processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct, $array_options, $ton_by_producto);
+                    $result_report = $this->processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct,
+                        $array_options, $ton_by_producto);
 
 
                     if($result_report != false){
@@ -885,8 +945,11 @@ class InformesResumenController extends AppController
 
 
         $myWorkSheet_maq =  $this->createdSheetResumenPropietarios($spreadsheet, $propietarios_with_remitos, $parcelas_distinct, $array_options);
+        $title = 'Propietarios';
+        $worksheet_madera = $this->createdSheetResumenMaderas($spreadsheet, $ton_by_producto, $array_options, $title);
 
-        $worksheet_madera = $this->createdSheetResumenPropietariosMaderas($spreadsheet, $ton_by_producto, $array_options);
+
+        $spreadsheet->removeSheetByIndex(2);
 
         //utilizo el now, es mejor
         $nombre = "informe_resumen_" .hash('sha256' , (date("Y-m-d H:i:s")));
@@ -1017,25 +1080,23 @@ class InformesResumenController extends AppController
             $myWorkSheet_res->getRowDimension('4')->setRowHeight(25);
 
             //EL indice empieza en 5
-            $index = 5;
+            $index = 6;
 
             //Creo la cabecera
-
-            $myWorkSheet_res->setCellValue('A'.$index, 'Producto');
-            $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
-            $myWorkSheet_res->getStyle('A'.$index)->getAlignment()->setHorizontal('left');
-            $myWorkSheet_res->getStyle('A'.$index)->getAlignment()->setVertical('center');
-
-            $myWorkSheet_res->setCellValue('B'.$index, 'Toneladas');
-            $myWorkSheet_res->getStyle('B'.$index)->applyFromArray($font_bold);
-            $myWorkSheet_res->getStyle('B'.$index)->getAlignment()->setHorizontal('left');
-            $myWorkSheet_res->getStyle('B'.$index)->getAlignment()->setVertical('center');
-            $myWorkSheet_res->getRowDimension($index)->setRowHeight(25);
 
 
             foreach ($propietarios_with_remitos as $prop)
             {
                 //COmo estoy en un nuevo destino creo su cabecera
+
+                //COmo estoy en un nuevo destino creo su cabecera
+                $cell_coord = 'A'.$index.':I'.$index;
+                $myWorkSheet_res->mergeCells($cell_coord);
+                $myWorkSheet_res->setCellValue('A'.$index, $this->getNamePropietarioById($prop->idpropietarios));
+                $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
+                $myWorkSheet_res->getStyle('A'.$index)->getAlignment()->setHorizontal('left');
+                $myWorkSheet_res->getStyle('A'.$index)->getAlignment()->setVertical('center');
+                $myWorkSheet_res->getRowDimension($index)->setRowHeight(25);
 
 
                 //sumo el index porque tengo que bajar una celda
@@ -1177,7 +1238,7 @@ class InformesResumenController extends AppController
     }
 
 
-    private function createdSheetResumenPropietariosMaderas($spreadsheet, $ton_by_prod, $array_options)
+    private function createdSheetResumenMaderas($spreadsheet, $ton_by_prod, $array_options, $title)
     {
         $this->viewBuilder()->setLayout(null);
         $this->autoRender = false;
@@ -1230,7 +1291,7 @@ class InformesResumenController extends AppController
 
             //EL titulo tiene que decir Informe de Costo - NOmbre de empresa
             $empresa_name = $empresas_data->name;
-            $titulo = 'Informe por Propietarios - ' . $empresa_name;
+            $titulo = 'Informe por ' . $title . ' - ' . $empresa_name;
 
             $myWorkSheet_res->setCellValue('B1', $titulo);
 
@@ -1241,17 +1302,22 @@ class InformesResumenController extends AppController
                 ->setSize(14);
 
             //DIBUJO EL LOGO
+            try{
+                $drawing = new Drawing();
+                $drawing->setName('Logo');
+                $drawing->setDescription('Logo');
+                $drawing->setPath($path);
+                $drawing->setHeight(75);
+                $drawing->setWidth(75);
+                $drawing->setCoordinates('A1');
+                $drawing->setOffsetX(45);
+                $drawing->setOffsetY(15);
+                $drawing->setWorksheet($myWorkSheet_res);
 
-            $drawing = new Drawing();
-            $drawing->setName('Logo');
-            $drawing->setDescription('Logo');
-            $drawing->setPath($path);
-            $drawing->setHeight(75);
-            $drawing->setWidth(75);
-            $drawing->setCoordinates('A1');
-            $drawing->setOffsetX(45);
-            $drawing->setOffsetY(15);
-            $drawing->setWorksheet($myWorkSheet_res);
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $exception){
+
+            }
+
 
 
             //Represento la primer tabla

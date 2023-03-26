@@ -241,7 +241,6 @@ class MaquinasTable extends Table
 
         //$conditions['UsoMaquinaria.fecha >='] = $date_start;
         //$conditions['UsoMaquinaria.fecha <='] = $date_end;
-        debug($conditions);
 
 
         $result = $query
@@ -316,6 +315,48 @@ class MaquinasTable extends Table
         }
 
         return false;
+    }
+
+
+
+
+    public function findGetNameFleteroById(Query $query, $options = null)
+    {
+
+        //Debo controllar que options no sea null
+        if($options != null){
+            $result = $query
+                ->contain(['CostosMaquinas' => function ($q){
+                    $q
+                        ->select(['maquinas_idmaquinas' , 'centros_costos_idcentros_costos'])
+                        ->where(['active' => true])
+                        ->contain('CentrosCostos');
+
+                    return $q;
+                }])
+                ->where(['idmaquinas IN' => $options]);
+
+
+            foreach ($result as $maq){
+
+                foreach ($maq->costos_maquinas as $costos)
+                {
+                    foreach ($costos->centros_costos as $centro){
+
+
+                        if($centro->categoria == 'Transporte'){
+                            return $maq;
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+
+        return false;
+
     }
 
 

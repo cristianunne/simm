@@ -128,4 +128,61 @@ class ArreglosMecanicosTable extends Table
 
         return $validator;
     }
+
+
+    public function findGetArreglosByConditions(Query $query, $options = null)
+    {
+
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0 ){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
+        }
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
+        }
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+
+        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
+
+
+        $conditions['MONTH(fecha) ='] = $options['mes'];
+        $conditions['YEAR(fecha) ='] = $options['year'];
+
+        $conditions['maquinas_idmaquinas'] = $options['maquina'];
+
+
+
+        $result = $query
+            ->where($conditions);
+
+
+        return $result;
+    }
+
 }

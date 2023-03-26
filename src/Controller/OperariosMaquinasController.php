@@ -51,7 +51,7 @@ class OperariosMaquinasController extends AppController
             ])->where(['OperariosMaquinas.active' => true, 'Operarios.empresas_idempresas' => $id_empresa]);
             $this->set(compact('operarios_maquinas'));
 
-            //debug($operarios->toArray());
+            //debug($operarios_maquinas->toArray());
         }
 
     }
@@ -104,11 +104,10 @@ class OperariosMaquinasController extends AppController
 
 
             if ($this->request->is(['patch', 'post', 'put'])) {
-                $data = $this->request->getData();
+
                 $operarios_maq = $this->OperariosMaquinas->patchEntity($operarios_maq, $this->request->getData());
 
                 $operarios_maq->operarios_idoperarios = $id;
-                //debug($operarios_maq);
 
                 if($this->OperariosMaquinas->save($operarios_maq)){
                     $this->Flash->success(__('El Salario se ha almacenado correctamente'));
@@ -177,21 +176,29 @@ class OperariosMaquinasController extends AppController
                     //si hay cambios creo un nuevo registro y seteo a false el anterior
 
                     //al actual lo seteo como inactivo
-                    $operarios_maq->active = 0;
+                    $operarios_maq_new = $this->OperariosMaquinas->newEntity();
+
+                    //Solo cambiara el active si la fecha es mas actual que el que esta activo
+                    if(strtotime($data['fecha']) > strtotime($operarios_maq->fecha)){
+                        $operarios_maq->active = 0;
+                    } else {
+                        $operarios_maq_new->active = 0;
+                    }
+
+
                     $operarios_maq->finished = date("Y-m-d");
 
 
                     if($this->OperariosMaquinas->save($operarios_maq)){
 
                         //setee a false el estado, entonces creo uno nuevo
-                        $operarios_maq_new = $this->OperariosMaquinas->newEntity();
+
 
                         $operarios_maq_new = $this->OperariosMaquinas->patchEntity($operarios_maq_new, $data);
                         $operarios_maq_new->operarios_idoperarios = $operarios_idop;
                         $operarios_maq_new->maquinas_idmaquinas = $id_maq;
 
-                        //AGrego lo datos falantes
-                        $operarios_maq_new->created = date("Y-m-d");
+
 
                         if($this->OperariosMaquinas->save($operarios_maq_new)){
                             $this->Flash->success(__('El Salario se ha actualizado correctamente'));
@@ -224,6 +231,12 @@ class OperariosMaquinasController extends AppController
         catch (Exception $e){
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
         }
+    }
+
+
+    private function getActiveSalary()
+    {
+
     }
 
 

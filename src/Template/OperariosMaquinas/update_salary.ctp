@@ -28,7 +28,12 @@
                             <?= $this->Form->text('nombre', ['class' => 'form-control', 'value' => ($operarios_maq->operario->lastname . ' ' .
                                 $operarios_maq->operario->firstname), 'readOnly' => true]) ?>
                         </div>
-
+                        <div class="form-group" id="sandbox-container">
+                            <?=  $this->Form->label('fecha', 'Fecha: ') ?>
+                            <div class="input-append date">
+                                <input id="fecha" name="fecha" type="date" class="span2" required>
+                            </div>
+                        </div>
 
                         <div class="form-group" id="group-firstname">
                             <?=  $this->Form->label('Nombre/s: ') ?>

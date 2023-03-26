@@ -113,4 +113,35 @@ class UsoMaquinariaTable extends Table
 
         return $validator;
     }
+
+
+    public function findGetUsoMaquinariaByConditions(Query $query, $options = [])
+    {
+
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+
+
+
+        $conditions['MONTH(fecha) ='] = $options['mes'];
+        $conditions['YEAR(fecha) ='] = $options['year'];
+
+        $conditions['maquinas_idmaquinas'] = $options['maquina'];
+
+        $result = $query
+            ->contain(['UsoCombLub'])
+            ->where($conditions);
+
+
+        return $result;
+    }
+
+
 }

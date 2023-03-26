@@ -94,6 +94,7 @@ class RemitosMaquinasTable extends Table
 
 
             $res = $query->where($conditions);
+
             foreach ($query as $q){
                 $array_result[$q->maquinas_idmaquinas] = $q->maquinas_idmaquinas;
             }

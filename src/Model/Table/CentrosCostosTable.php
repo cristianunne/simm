@@ -4,6 +4,7 @@ namespace App\Model\Table;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
+use Cake\Test\Fixture\ThingsFixture;
 use Cake\Validation\Validator;
 
 /**
@@ -100,5 +101,17 @@ class CentrosCostosTable extends Table
             ->notEmptyString('categoria');
 
         return $validator;
+    }
+
+
+    public function findGetFletero(Query $query, $options = null)
+    {
+
+        $id_remito = $options['id_remito'];
+
+
+
+
+
     }
 }

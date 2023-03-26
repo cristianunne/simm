@@ -229,6 +229,12 @@ class RemitosTable extends Table
                 $conditions['productos_idproductos'] = $options['productos_idproductos'];
             }
         }
+        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
+
+
+        if($conditions['empresas_idempresas'] == null){
+            return false;
+        }
 
 
         $date_start = $options['fecha_inicio'];
@@ -285,20 +291,27 @@ class RemitosTable extends Table
             }
         }
 
+        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
 
-        $date_start = $options['fecha_inicio'];
-        $date_end = $options['fecha_fin'];
 
-        $conditions['fecha >='] = $date_start;
-        $conditions['fecha <='] = $date_end;
+        $conditions['MONTH(fecha) ='] = $options['mes'];
+        $conditions['YEAR(fecha) ='] = $options['year'];
 
-        $result = $query->where($conditions);
+        $result = $query
+            ->where($conditions);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->idremitos;
+        }
+
 
         return $result;
     }
 
-
-    public function findDestinosByRemitos(Query $query, $options)
+    public function findRemitosByConditionsQueryMaquina(Query $query, $options)
     {
         //Cuando en las condiciones viene el 0, significa que tiene que traer todos
         $conditions = [];
@@ -329,22 +342,46 @@ class RemitosTable extends Table
                 $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
             }
         }
-        if(isset($options['productos_idproductos'])){
-            if($options['productos_idproductos'] != 0 && $options['productos_idproductos'] != null){
-                $conditions['productos_idproductos'] = $options['productos_idproductos'];
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
             }
         }
 
+        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
 
-        $date_start = $options['fecha_inicio'];
-        $date_end = $options['fecha_fin'];
 
-        $conditions['fecha >='] = $date_start;
-        $conditions['fecha <='] = $date_end;
+        $conditions['MONTH(fecha) ='] = $options['mes'];
+        $conditions['YEAR(fecha) ='] = $options['year'];
+
+        $conditions['RemitosMaquinas.maquinas_idmaquinas'] = $options['maquina'];
+
+        $result = $query
+            ->distinct(['idremitos'])
+            ->innerJoinWith('RemitosMaquinas')
+            ->where($conditions);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->idremitos;
+        }
+
+
+        return $result;
+    }
+
+
+
+    public function findDestinosByRemitos(Query $query, $remitos)
+    {
+
+
 
         $result = $query->select(['destinos_iddestinos'])
             ->distinct(['destinos_iddestinos'])
-            ->where($conditions);
+            ->where(['idremitos IN' => $remitos]);
 
         $array_result = [];
 
@@ -503,7 +540,9 @@ class RemitosTable extends Table
                 'Remitos.idremitos IN' => $remitos
             ]);
 
-        return $result;
+        $toneladas = $result->toArray()[0]['sum'];
+
+        return $toneladas;
 
     }
 

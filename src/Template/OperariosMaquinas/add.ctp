@@ -28,6 +28,13 @@
                                 <?= $this->Form->text('nombre', ['class' => 'form-control', 'value' => $operario, 'readOnly' => true]) ?>
                             </div>
 
+                            <div class="form-group" id="sandbox-container">
+                                <?=  $this->Form->label('fecha', 'Fecha: ') ?>
+                                <div class="input-append date">
+                                    <input id="fecha" name="fecha" type="date" class="span2" required>
+                                </div>
+                            </div>
+
                             <?= $this->Form->control('maquinas_idmaquinas', ['options' => $lista_maquinas,
                                 'empty' => '(Elija una opción)', 'type' => 'select',
                                 'class' => 'form-control', 'placeholder' => '',

@@ -50,9 +50,6 @@ class OperariosMaquinasTable extends Table
             'joinType' => 'INNER'
         ]);
 
-        //LO puedo relacionar con costos
-
-
     }
 
     /**
@@ -68,7 +65,7 @@ class OperariosMaquinasTable extends Table
             ->allowEmptyString('idoperarios_maquinas', null, 'create');
 
         $validator
-            ->decimal('sueldo')
+            ->numeric('sueldo')
             ->allowEmptyString('sueldo');
 
         $validator
@@ -82,10 +79,6 @@ class OperariosMaquinasTable extends Table
             ->notEmptyString('maquinas_idmaquinas');
 
         $validator
-            ->date('created')
-            ->allowEmptyDate('created');
-
-        $validator
             ->date('finished')
             ->allowEmptyDate('finished');
 
@@ -93,6 +86,45 @@ class OperariosMaquinasTable extends Table
             ->boolean('active')
             ->notEmptyString('active');
 
+        $validator
+            ->date('fecha')
+            ->allowEmptyDate('fecha');
+
         return $validator;
     }
+
+    /**
+     * @param Query $query
+     * @param $options
+     * TODO this methods needs idmaquina, idoperario and fecha
+     */
+    public function findGetOperariosMaquinasByConditions(Query $query, $options = null)
+    {
+
+        $conditions = [];
+
+        if(isset($options['operarios_idoperarios'])){
+            if($options['operarios_idoperarios'] != 0 ){
+                $conditions['operarios_idoperarios'] = $options['operarios_idoperarios'];
+            }
+        }
+        if(isset($options['maquinas_idmaquinas'])){
+            if($options['maquinas_idmaquinas'] != 0 && $options['maquinas_idmaquinas'] != null) {
+                $conditions['maquinas_idmaquinas'] = $options['maquinas_idmaquinas'];
+            }
+        }
+
+        $conditions['MONTH(fecha) ='] = $options['mes'];
+        $conditions['YEAR(fecha) ='] = $options['year'];
+
+        //Necesito hacer el distinct
+
+        $result = $query
+            ->where($conditions);
+
+        return $result;
+
+    }
+
+
 }

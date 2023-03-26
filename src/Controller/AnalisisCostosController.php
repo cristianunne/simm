@@ -1,18 +1,12 @@
 <?php
 namespace App\Controller;
 
-use App\Controller\AppController;
+use App\Utility\MetodologiaCostosFormula;
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Filesystem\File;
 use Cake\I18n\Date;
-use Cake\ORM\Query;
-use Cassandra\Exception\DivideByZeroException;
 use DateTime;
-use DivisionByZeroError;
-use ErrorException;
-use Exception;
-use phpDocumentor\Reflection\Types\Null_;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
@@ -163,43 +157,54 @@ class AnalisisCostosController extends AppController
             //OBtengo los remitos disponibles
             $array_remitos = $this->getRemitosByConditions($array_options);
 
+            if($array_remitos != false){
 
-            //COntrolo que array remitos no este vacio
-            if(count($array_remitos) > 0)
-            {
-                //Uso estos remitos para traer los totales por maquina
-                $maquinas_filter = $this->preparedDataByMaquina($array_remitos, $array_options);
-
-                //controlo que prepared no venga false
-                if($maquinas_filter != false)
+                //COntrolo que array remitos no este vacio
+                if(count($array_remitos) > 0)
                 {
-                    $centro_costos_array = $this->filterCentroDeCostos($maquinas_filter);
+                    //Uso estos remitos para traer los totales por maquina
+                    $maquinas_filter = $this->preparedDataByMaquina($array_remitos, $array_options);
+                    debug($maquinas_filter);
 
-                    //Tabla centro de costos
-                    $tabla_centro_costos = $this->loadModel('CentrosCostos');
+                    //controlo que prepared no venga false
+                    /*if($maquinas_filter != false)
+                    {
+                        $centro_costos_array = $this->filterCentroDeCostos($maquinas_filter);
 
-                    //TRae los centros de utilizando el array de centro de costos filtrados
-                    $centros_costos = $tabla_centro_costos->find('all', [
-                    ])->where(['idcentros_costos IN' => $centro_costos_array])->toArray();
+                        //Tabla centro de costos
+                        $tabla_centro_costos = $this->loadModel('CentrosCostos');
 
-
-                    //Calculo de las constantes y vairables
-                    //Aqui se obtienen las maquinas con los datos del centro de costos, constantes y gastos
-                    $maquinas_with_var_and_const = $this->calculatedVariablesAndConstantes($maquinas_filter);
-
-                    //debug($maquinas_with_var_and_const);
-
-                    $maquinas_with_result = $this->calculateGrupos($maquinas_with_var_and_const);
+                        //TRae los centros de utilizando el array de centro de costos filtrados
+                        $centros_costos = $tabla_centro_costos->find('all', [
+                        ])->where(['idcentros_costos IN' => $centro_costos_array])->toArray();
 
 
-                    $data_by_centro_costos['centros'] = $this->calculatedByCentroCostos($maquinas_with_result, $centros_costos);
-                 //   debug($data_by_centro_costos);
+                        //Calculo de las constantes y vairables
+                        //Aqui se obtienen las maquinas con los datos del centro de costos, constantes y gastos
+                        $maquinas_with_var_and_const = $this->calculatedVariablesAndConstantes($maquinas_filter);
+
+                        //debug($maquinas_with_var_and_const);
+
+                        $maquinas_with_result = $this->calculateGrupos($maquinas_with_var_and_const);
 
 
-                    return $data_by_centro_costos;
+                        $data_by_centro_costos['centros'] = $this->calculatedByCentroCostos($maquinas_with_result, $centros_costos);
+                     //   debug($data_by_centro_costos);
 
+
+                        return $data_by_centro_costos;
+
+                    }*/
                 }
+
+
+            } else {
+                debug("Sin Remitos");
             }
+
+
+
+
 
         }
 
@@ -341,6 +346,663 @@ class AnalisisCostosController extends AppController
         return $result_informe;
     }
 
+    function getMonthsAndYears($array_options){
+
+        $array_result = [];
+
+        $fechai=strtotime($array_options['fecha_inicio']);
+
+        $array_result[] = ['mes' => date('m',$fechai),
+            'year' => date('Y',$fechai)];
+
+        //$array_result[] = strtotime ('month',$fechai);
+        while($fechai<=strtotime($array_options['fecha_fin'])){
+            $fechai = strtotime ('+1 month',$fechai) ;
+
+            $array_result[] = ['mes' => date('m',$fechai),
+                'year' => date('Y',$fechai)];
+
+        }
+        return $array_result;
+    }
+
+    private function verifiedDataByMonth($array_options)
+    {
+        $this->autoRender = false;
+
+        $meses_years = $this->getMonthsAndYears($array_options);
+
+
+        if(count($meses_years) > 0){
+            //Arreglo no vaio, proceso
+            if(count($array_options) > 0) {
+                foreach ($meses_years as $mes_year){
+
+                    $array_options['mes'] = $mes_year['mes'];
+                    $array_options['year'] = $mes_year['year'];
+                    //OBtengo los remitos disponibles
+                    $array_remitos = $this->getRemitosByConditions($array_options);
+
+                    if(count($array_remitos) > 0){
+
+                        //TRaigo las maquinas que participan en el analisis
+                        $tabla_remitosmaq = $this->loadModel('RemitosMaquinas');
+                        $tabla_maquinas = $this->loadModel('Maquinas');
+
+                        //Variable con las maquinas utilizadas en los remitos filtrados
+                        $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $array_remitos);
+
+                        $is_usomaquinaria_present = true;
+
+                        foreach ($maquinas_array as $maquina)
+                        {
+
+                            //Recorro maquina por maquina buscando los datos
+                            $uso_maquinaria_result = $this->getUsoMaquinaria($maquina, $mes_year['mes'], $mes_year['year'])->toArray();
+                            //debug($maquina);
+
+
+                             if ($this->verifiedUsoMaquinaria($uso_maquinaria_result) == false)
+                             {
+                                 $is_usomaquinaria_present = false;
+                                 //existen maquinas que no tienen datos
+                                debug('PINCHO EN USO DE MAQUINARIA');
+                                 return false;
+                             } else {
+                                 //Suponiendo que tiene todos los usos, ahora verifico que haya cargadao combustible
+
+                                 foreach ($uso_maquinaria_result as $uso_maq)
+                                 {
+
+                                     $uso_maquinaria_comb_result = $this->getUsoMaquinariaCombustible($uso_maq->iduso_maquinaria);
+
+                                     if($this->verifiedUsoMaquinariaCombustible($uso_maquinaria_comb_result) == false)
+                                     {
+                                         return false;
+                                     }
+
+                                 }
+
+                             }
+
+                             //Operarios
+
+                            $result_op = $this->getOperario($maquina, $mes_year['mes'], $mes_year['year']);
+
+                            if($this->verifiedOperario($result_op) == false){
+
+                                return false;
+                            }
+
+
+                        }
+
+                    }
+
+                }
+
+            }
+        } //if final
+
+        return true;
+
+    }
+
+
+
+    private function getUsoMaquinaria($maquina, $mes, $year)
+    {
+
+        //CArgo la tabla uso de maquinaria
+        $uso_maquinaria_model = $this->loadModel('UsoMaquinaria');
+
+        $uso_maq = $uso_maquinaria_model->find('all', [])
+        ->where(['maquinas_idmaquinas' => $maquina, 'MONTH(fecha)' => $mes, 'YEAR(fecha)' => $year]);
+
+
+        return $uso_maq;
+
+
+    }
+
+    private function getUsoMaquinariaCombustible($idusomaquinaria)
+    {
+        //CArgo la tabla uso de maquinaria
+        $uso_maquinaria_model = $this->loadModel('UsoCombLub');
+
+        $uso_maq_comb = $uso_maquinaria_model->find('all', [])
+            ->where(['uso_maquinaria_iduso_maquinaria' => $idusomaquinaria]);
+
+        return $uso_maq_comb;
+    }
+
+    private function verifiedUsoMaquinariaCombustible($uso_maquinaria_comb_result)
+    {
+
+
+
+        if(count($uso_maquinaria_comb_result->toArray()) > 0)
+        {
+            foreach ($uso_maquinaria_comb_result as $uso_comb){
+
+                if($uso_comb->categoria == 'Combustible'){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+
+    private function getOperario($maquina, $mes, $year)
+    {
+
+        $operarios_maquinas_model = $this->loadModel('OperariosMaquinas');
+
+        $operarios_maq = $operarios_maquinas_model->find('all', [])
+        ->where(['maquinas_idmaquinas' => $maquina, 'MONTH(fecha)' => $mes, 'YEAR(fecha)' => $year]);
+
+        return $operarios_maq;
+
+    }
+
+    private function verifiedOperario($operarios_maq)
+    {
+
+        if(count($operarios_maq->toArray()) > 0)
+        {
+
+           return true;
+        }
+        return false;
+
+    }
+
+
+
+    private function verifiedUsoMaquinaria($uso_maquinaria_result)
+    {
+
+      if(count($uso_maquinaria_result) > 0)
+      {
+          return true;
+      }
+
+        return false;
+
+    }
+
+
+
+    private function calculateCostosByMonth($mes, $year, $array_options)
+    {
+
+        $this->autoRender = false;
+
+        $result_by_month = [];
+
+        $general_data = [];
+
+        $maquinas_result = [];
+
+        $general_total_ton = 0;
+
+        $general_data['mes'] = $mes;
+        $general_data['year'] = $year;
+
+        //Arreglo no vaio, proceso
+        if(count($array_options) > 0) {
+
+            $array_options['mes'] = $mes;
+            $array_options['year'] = $year;
+
+            //OBtengo los remitos disponibles
+            $array_remitos = $this->getRemitosByConditions($array_options);
+            $general_data['total_remitos'] = count($array_remitos);
+
+            if(count($array_remitos) > 0){
+
+                //Calculo los resultados globales, TONELADAS
+                $tabla_remitos = $this->loadModel('Remitos');
+                $general_total_ton =  $tabla_remitos->find('GetTotalToneladas', $array_remitos);
+
+                //TRaigo las maquinas que participan en el analisis
+                $tabla_remitosmaq = $this->loadModel('RemitosMaquinas');
+                $tabla_maquinas = $this->loadModel('Maquinas');
+
+                //Variable con las maquinas utilizadas en los remitos filtrados
+                $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $array_remitos);
+
+                $general_data['total_maquinas'] = count($maquinas_array);
+                $general_data['toneladas'] = $general_total_ton;
+
+                //TRaigo las maquinas que participan en el analisis
+
+                foreach ($maquinas_array as $maquina){
+
+                    $maquina_data = $this->getMaquinaById($maquina);
+
+                    //TRaigo para esta maquina en especifico los datos
+                    $remitos_by_maquina = $this->getRemitosByMaquina($maquina, $array_options);
+
+                    $remitos_array_distinc = $this->getRemitosAsArrayDistinc($remitos_by_maquina);
+
+                    //traigo los costos
+                    $costos = $this->getCostosByMaquina($maquina, $mes, $year)->toArray();
+
+
+                    //ARreglos
+                    $arreglos = $this->getArreglosByMaquina($maquina, $array_options);
+                    //debug($arreglos->toArray());
+
+                    //Usos  EL uso tiene solo la parcela para filtrar
+                    $uso_maquinaria = $this->getUsoMaquinariaByMaquina($maquina, $array_options);
+
+                    //TRaigo operarios
+                    $operario_maq =  $this->getOperarioByMaquina($maquina, $remitos_array_distinc);
+                    //Traigo los operarios maquinas donde se encuentra los datos de sueldos
+
+                    $operarios_maquina_data =  $this->getOperariosMaquinasByOperAndRemito($operario_maq, $mes, $year);
+
+                    $maquina_with_data = $this->calculateVariablesyConstantesNew($maquina_data, $remitos_by_maquina, $costos, $arreglos,
+                        $uso_maquinaria, $operarios_maquina_data);
+
+
+                    //Aplico la metodologia de costos aqui y devuelvo ya con eso
+                    $formula = new MetodologiaCostosFormula();
+
+
+
+
+
+                    $maquinas_result[] = $maquina_with_data;
+
+                } //foreach maquina
+
+            }
+
+        }
+
+        $result_by_month['general'] = $general_data;
+        $result_by_month['maquinas'] = $maquinas_result;
+
+        return $result_by_month;
+
+
+    }
+
+
+    private function appliedCostosMetodology($maquina_with_data)
+    {
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $user_id = $session->read('Auth.User.idusers');
+        $user_role = $session->read('Auth.User.role');
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+
+        //Traigo las constantes
+        $constantes_model = $this->loadModel('Constantes');
+        $constantes = $constantes_model->find('list', [
+            'keyField' => 'name',
+            'valueField' => 'value'
+        ])
+            ->where(['active' => true, 'empresas_idempresas' => $id_empresa])
+            ->toArray();
+
+
+        //Preparo las constantes a utilizar
+        $CSE = NULL; $CVD = NULL; $AME = NULL; $CMA = NULL; $CAD = NULL;
+
+        if(isset($constantes['CSE'])){
+            $CSE = $constantes['CSE'];
+        }
+        if(isset($constantes['CVD'])){
+            $CVD = $constantes['CVD'];
+        }
+        if(isset($constantes['AME'])){
+            $AME = $constantes['AME'];
+        }
+        if(isset($constantes['CMA'])){
+            $CMA = $constantes['CMA'];
+        }
+
+        if(isset($constantes['CAD'])){
+            $CAD = $constantes['CAD'];
+        }
+
+        //DEfino nuevamente las variables
+        $VAD = null;
+        $VUN = null;
+        $HTU = null;
+        $HME = null;
+        $TIS = null;
+        $FCI = null;
+        $VAN = null;
+        $HFU = null;
+        $VUE = null;
+        $CCT = null;
+        $CTL = null;
+        $COM = null;
+        $COH = null;
+        $LUB = null;
+        $LUH = null;
+        $SAL = null;
+
+
+    }
+
+
+    private function calculateVariablesyConstantesNew($maquina_data, $remitos_by_maquina, $costos, $arreglos, $uso_maquinaria,
+                                                      $operarios_maquina_data)
+    {
+        //Falta traer el salario del operario
+        //DEfino lOS NOMBRES DE LOS DATOS TEORICOS Y/O REALES, DEBEN COINCIDIR CON LOS DEFINIDOS EN LA MET/COST
+        $VAD = NULL; $VUM = NULL; $HTU = NULL; $HME = NULL; $TIS = null;
+        $FCI = null; $VAN = null; $HFU = null; $VUE = null;
+        $CCT = NULL; $CLT = NULL; $COM = NULL; $COH = NULL;
+        $LUB = NULL; $LUH = NULL; $SAL = NULL; $VUN = NULL;
+
+        $gastos_sueldos = 0;
+        $precio_ton_aux = null;
+        $toneladas =  null;
+        $precio_ton = null;
+        $i = 0;
+
+        //COnsulto si la maquina es alquilada
+        if($maquina_data->propia)
+        {
+            $VAD = $costos[0]->val_adq;
+            $TIS = $costos[0]->tasa_int_simple;
+            $FCI = $costos[0]->factor_cor;
+            $HTU = $costos[0]->horas_total_uso;
+            $VAN = $costos[0]->val_neum;
+            $HFU = $costos[0]->horas_efec_uso;
+            $VUE = $costos[0]->vida_util;
+
+            //DEpreciacion de los neumativos
+            $VUN = $costos[0]->vida_util_neum;
+
+            //Proceso operarios
+            foreach ($operarios_maquina_data as $oper)
+            {
+                $gastos_sueldos = $gastos_sueldos + $oper->sueldo;
+            }
+
+            //El precio por tonelada se calcula de forma diferente, si es alquilada esta en costos, sino esta en el remito
+            foreach ($remitos_by_maquina as $remito) {
+                $toneladas = $toneladas + $remito->ton;
+                $precio_ton_aux = $precio_ton_aux + $remito->precio_ton;
+                $i++;
+
+            }
+
+            if($i > 0){
+                $precio_ton = $precio_ton_aux / $i;
+            }
+
+        } else {
+            //La maquina es alquilada, por lo tanto no tendra operarios
+            //EL precio por tonelada lo traigo de los costos teoricos
+            $precio_ton = $costos[0]->costo_alquiler;
+
+        }
+
+        //LOs gastos de combustibles y lubricantes se calculan igual, independendiente de si es propia o no
+        //Tengo que reccorer USO_MAQUINARIA y sumar los valores de combustibles y horas
+        $COH = 0;
+
+        $gastos_comb = 0;
+        $gastos_lub = 0;
+
+        if(count($uso_maquinaria->toArray()) > 0) {
+
+            $horas_tol = 0;
+            $litros_comb_tol = 0;
+            $litros_lub_tot = 0;
+
+
+            foreach ($uso_maquinaria as $uso_maq) {
+
+                $uso_maquinaria = $this->getUsoMaquinariaCombustible($uso_maq->iduso_maquinaria);
+
+
+                if (count($uso_maquinaria->toArray()) > 0) {
+                    $horas_tol = $horas_tol + $uso_maq->horas_trabajo;
+
+                    foreach ($uso_maq->uso_comb_lub as $uso_comb) {
+                        //COnsulto por la categoria
+
+
+                        if ($uso_comb->categoria == 'Combustible') {
+                            $litros_comb_tol = $litros_comb_tol + $uso_comb->litros;
+                            $gastos_comb = $gastos_comb + ($uso_comb->litros * $uso_comb->precio);
+
+
+                        }
+                        if ($uso_comb->categoria == 'Lubricante') {
+                            $litros_lub_tot = $litros_lub_tot + $uso_comb->litros;
+                            $gastos_lub = $gastos_lub + ($uso_comb->litros * $uso_comb->precio);
+                        }
+                    }
+                }
+            }
+
+            //HME son las horas de trabajo de la maquina sacadas de USO maquinaria
+            $HME = $horas_tol;
+            $CCT = $litros_comb_tol;
+            $CLT = $litros_lub_tot;
+
+            //COH puede dar error de division por cero
+            if($HME > 0){
+                $COH = $CCT / $HME;
+                $LUH = $CLT / $HME;
+            } else {
+                $COH = NULL;
+                $LUH = NULL;
+            }
+
+        }
+
+        //Calculo el Salario, es la SUMA $maq->operarios_maquinas
+        //Recorro el Arreglo de sueldos
+
+        $suma_sal = null;
+
+        foreach ($operarios_maquina_data as $op_maq){
+            $suma_sal = $suma_sal + $op_maq->sueldo;
+        }
+
+        if($HME > 0){
+            $SAL = $suma_sal / $HME;
+        } else {
+            $SAL = null;
+        }
+
+        //verifico los arreglos mecanicos, sino tomo la constante
+        
+
+        debug($maquina_data);
+        debug($arreglos->toArray());
+
+
+        //Agrego los elementos al array return
+        //AGrego gastos en combustibles, arreglos, sueldos operador
+
+        $maquina = [
+            'idmaquinas' => $maquina_data->idmaquinas,
+            'name' => $maquina_data->name,
+            'marca' => $maquina_data->marca,
+            'centro_costos' => $costos[0]->centros_costos,
+            'metod_costos' => $costos[0]->metod_costos_hashmetod_costos,
+            'toneladas' => $toneladas,
+            'precio_ton' => $precio_ton,
+            'alquiler' =>  $costos[0]->alquilada,
+            'constantes' => [
+                'VAD' => $VAD,
+                'VUN' => $VUN,
+                'HTU' => $HTU,
+                'HME' => $HME,
+                'TIS' => $TIS,
+                'FCI' => $FCI,
+                'VAN' => $VAN,
+                'HFU' => $HFU,
+                'VUE' => $VUE,
+                'CCT' => $CCT,
+                'CLT' => $CLT,
+                'COM' => $COM,
+                'COH' => $COH,
+                'LUB' => $LUB,
+                'LUH' => $LUH,
+                'SAL' => $SAL
+            ],
+            'gastos'=> [
+                'gasto_combustible' => $gastos_comb,
+                'gasto_lubricante' => $gastos_lub,
+                'gasto_sueldo' => $gastos_sueldos
+            ]
+        ];
+
+    return $maquina;
+
+    }
+
+
+    private function getMaquinaById($maquina)
+    {
+        $maquinas_model = $this->loadModel('Maquinas');
+
+        $maquina = $maquinas_model->get($maquina);
+
+        return $maquina;
+
+    }
+
+
+    private function getOperarioByMaquina($maquina, $remitos_distinc)
+    {
+
+        $rem_maq_model = $this->loadModel('RemitosMaquinas');
+
+        $operarios = $rem_maq_model->find('all', [
+        ])
+        ->where(['remitos_idremitos IN ' => $remitos_distinc, 'maquinas_idmaquinas' => $maquina]);
+
+        return $operarios;
+
+    }
+
+    private function getOperariosMaquinasByOperAndRemito($operario_maq, $mes, $year)
+    {
+
+        $options = [];
+        $operarios_maquinas_model = $this->loadModel('OperariosMaquinas');
+        $array_result = [];
+
+        foreach ($operario_maq as $op_maq){
+
+            $options['operarios_idoperarios'] = $op_maq->operarios_idoperarios;
+            $options['maquinas_idmaquinas'] = $op_maq->maquinas_idmaquinas;
+            $options['mes'] = $mes;
+            $options['year'] = $year;
+
+            $array_result[] = $operarios_maquinas_model->find('GetOperariosMaquinasByConditions', $options)->toArray();
+
+        }
+
+
+        //Recorro y guardo un nuevo arreglo con sin los repetidos
+        $array_result_new = [];
+
+        foreach ($array_result as $arr){
+           foreach ($arr as $op_maq){
+
+                if(count($array_result_new) == 0){
+                    $array_result_new[] = $op_maq;
+                } else {
+                    $exists_op = false;
+                    foreach ($array_result_new as $new_arr){
+                        if($new_arr->idoperarios_maquinas == $op_maq->idoperarios_maquinas){
+                            $exists_op = true;
+                        }
+                    }
+
+                    if(!$exists_op){
+                        $array_result_new[] = $op_maq;
+                    }
+
+                }
+           }
+        }
+        //debug($array_result_new);
+
+        return $array_result_new;
+    }
+
+
+    private function getUsoMaquinariaByMaquina($maquina, $array_options)
+    {
+        $array_options['maquina'] = $maquina;
+        $usos_model = $this->loadModel('UsoMaquinaria');
+        $arreglos = $usos_model->find('GetUsoMaquinariaByConditions', $array_options);
+
+        return $arreglos;
+    }
+
+
+    private function getArreglosByMaquina($maquina, $array_options)
+    {
+        $array_options['maquina'] = $maquina;
+        $arreglos_model = $this->loadModel('ArreglosMecanicos');
+        $arreglos = $arreglos_model->find('GetArreglosByConditions', $array_options);
+
+        return $arreglos;
+    }
+
+    private function getCostosByMaquina($maquina, $mes, $year)
+    {
+
+        //LOs costos trae el activo
+
+        $costos_maquina_model = $this->loadModel('CostosMaquinas');
+
+        $costos = $costos_maquina_model->find('all', [
+            'contain' => ['CentrosCostos']
+        ])
+        ->where(['maquinas_idmaquinas' => $maquina, 'active' => true]);
+
+        return $costos;
+
+    }
+
+
+    private function getRemitosByMaquina($maquina, $array_options)
+    {
+
+        $array_options['maquina'] = $maquina;
+
+
+        $remitos_model = $this->loadModel('Remitos');
+
+        $remitos = $remitos_model->find('RemitosByConditionsQueryMaquina', $array_options);
+
+        return $remitos;
+    }
+
+
+    private function getRemitosAsArrayDistinc($remitos)
+    {
+        $array_result = [];
+
+        foreach ($remitos as $rem){
+            $array_result[$rem->idremitos] = $rem->idremitos;
+        }
+
+        return $array_result;
+    }
 
     public function calculateCostosGruposCopy()
     {
@@ -393,54 +1055,88 @@ class AnalisisCostosController extends AppController
         $array_options['parcelas_idparcelas'] = $parcelas;
         $array_options['propietarios_idpropietarios'] = $propietarios;
         $array_options['destinos_iddestinos'] = $destinos;
+        $array_options['empresas_idempresas'] = $id_empresa;
+
+
+
 
         //Result costos
-        $data_by_centro_costos = $this->calculateCostos($array_options);
+        //$data_by_centro_costos = $this->calculateCostos($array_options);
 
 
+        $result = $this->verifiedDataByMonth($array_options);
+
+        if($result){
+            //Puedo empezar a calcular los costos
+
+            //EL recorrido de los meses los hago aqui
+            $meses_years = $this->getMonthsAndYears($array_options);
+
+            foreach ($meses_years as $meses_year)
+            {
+                $mes = $meses_year['mes'];
+                $year = $meses_year['year'];
+
+                //devuelve los resultados globales y las constantes para las maquinas
+                $maquinas_with_general_constantes = $this->calculateCostosByMonth($mes, $year, $array_options);
+
+                //Utilizo la metodologia de costos para calcular
+
+
+
+                break;
+
+            }
+
+
+
+        }
 
 
         //OBtengo los remitos disponibles
-        $array_remitos = $this->getRemitosByConditions($array_options);
+        //$array_remitos = $this->getRemitosByConditions($array_options);
+
+
+        //debug($array_remitos);
 
         //Metodo nuevo
 
-        $total_ton_by_cat_centro_costo = $this->getTotalTonByCategoryCentroCostos($array_remitos);
+        //$total_ton_by_cat_centro_costo = $this->getTotalTonByCategoryCentroCostos($array_remitos);
 
 
 
         //A las options le restare los datos de las fechas
         $options['fecha_inicio'] = date("Y-m-d", strtotime($fec_in . "- 3 month"));
         $options['fecha_fin'] = $fecha_final;
-        $facturacion_by_item = $this->getFacturacionByItem($total_ton_by_cat_centro_costo, $options);
+        //$facturacion_by_item = $this->getFacturacionByItem($total_ton_by_cat_centro_costo, $options);
         //Tengo
-        $fact_pond_by_cat = $this->getFacturacionPonderadaByCategory($facturacion_by_item);
+        //$fact_pond_by_cat = $this->getFacturacionPonderadaByCategory($facturacion_by_item);
 
-        //debug($facturacion_by_item);
-        debug($fact_pond_by_cat);
+        //debug($facturacion_by_item)
+        //debug($fact_pond_by_cat);
 
 
         //CAlculo del mai
-        $result_mai = $this->calculateMAIEconomico($facturacion_by_item, null);
-        debug($result_mai);
+        //$result_mai = $this->calculateMAIEconomico($facturacion_by_item, null);
+        //debug($result_mai);
 
         //Result costos
         //$data_by_centro_costos = $this->calculateCostos($array_options);
 
 
-        $total_toneladas = $this->getTotalTonRemitos($array_remitos);
+        //$total_toneladas = $this->getTotalTonRemitos($array_remitos);
 
-        $aaray_res_globales = [];
+        //$aaray_res_globales = [];
         //AGrego las toneladas en resgloab
         $aaray_res_globales['total_toneladas'] = $total_toneladas;
-        $costo_total = $this->calculateCostoTotal($data_by_centro_costos);
-        $aaray_res_globales['costo_total'] = $costo_total;
+       // $costo_total = $this->calculateCostoTotal($data_by_centro_costos);
+        //$aaray_res_globales['costo_total'] = $costo_total;
 
 
 
-        $data_by_centro_costos['res_globales'] = $aaray_res_globales;
+        //$data_by_centro_costos['res_globales'] = $aaray_res_globales;
 
-        debug($data_by_centro_costos);
+       // debug($data_by_centro_costos);
 
         /*if ($data_by_centro_costos != false) {
 
@@ -788,10 +1484,17 @@ class AnalisisCostosController extends AppController
 
         $remitos_table = $this->loadModel('Remitos');
 
-        $remitos = $remitos_table->find('RemitosByConditions',
+        $remitos = $remitos_table->find('RemitosByConditionsQuery',
             $array_options);
 
-        return $remitos;
+
+        $array_result = [];
+
+        foreach ($remitos as $rem){
+            $array_result[$rem->idremitos] = $rem->idremitos;
+        }
+
+        return $array_result;
     }
 
 
@@ -928,6 +1631,7 @@ class AnalisisCostosController extends AppController
         ///debug($servicios->toArray());
         foreach ($total_ton_by_cat_centro_costo as $item) {
 
+            //trigo el precio del servicio del mes o el mas cercano
             $precio_serv_by_rem = $this->getServicioForTonRemito($item, $servicios);
 
 
@@ -1143,6 +1847,9 @@ class AnalisisCostosController extends AppController
         $conditions_usos['fecha >='] = date($date_start);
         $conditions_usos['fecha <='] = date($date_end);
 
+        $conditions_op['created >='] = date($date_start);
+        $conditions_op['created <='] = date($date_end);
+
 
 
         if($maquinas_array != false)
@@ -1164,9 +1871,10 @@ class AnalisisCostosController extends AppController
                         function ($q) use ($conditions_usos){
                             return $q->where($conditions_usos)
                                 ->contain('UsoCombLub');
-                        }, 'OperariosMaquinas' =>
-                        function ($q) {
-                            return $q->where(['OperariosMaquinas.active' => true])
+                        },
+                    'OperariosMaquinas' =>
+                        function ($q) use ($conditions_op){
+                            return $q->where($conditions_op)
                                 ->contain('Operarios');
                         }, 'CostosMaquinas' =>
                         function ($q) {
