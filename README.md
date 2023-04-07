@@ -1,8 +1,6 @@
 # Sistema Integrado de Manejo de Maquinaria (SIMM)
 
 
-![](https://github.com/cristianunne/simm/tree/master/webroot/img/tractor.png){width='100px'}
-
 
 -----------------------------------------------------
 ## Tecnologías
