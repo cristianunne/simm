@@ -42,11 +42,6 @@ class ArreglosMecanicosYearTable extends Table
             'joinType' => 'INNER'
         ]);
 
-        $this->hasOne('Worksgroups', [
-            'foreignKey' => 'idworksgroups',
-            'bindingKey' => 'worksgroups_idworksgroups', //actual
-            'joinType' => 'INNER'
-        ]);
 
         $this->hasOne('Maquinas', [
             'foreignKey' => 'idmaquinas',
@@ -101,10 +96,6 @@ class ArreglosMecanicosYearTable extends Table
             ->decimal('total')
             ->allowEmptyString('total');
 
-        $validator
-            ->integer('worksgroups_idworksgroups')
-            ->requirePresence('worksgroups_idworksgroups', 'create')
-            ->notEmptyString('worksgroups_idworksgroups');
 
         $validator
             ->integer('maquinas_idmaquinas')

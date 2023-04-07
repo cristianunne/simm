@@ -341,6 +341,17 @@ $(function (){
             {
                 sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Centros de Costos')
             }
+
+            else if(subseccion === 'Grupos_costos')
+            {
+                sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Análisis Grupos')
+            }
+
+            else if(subseccion === 'Grupos_costos')
+            {
+                sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Análisis Grupos')
+            }
+
             else {
                 sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + subseccion)
             }
@@ -675,7 +686,7 @@ function loadUsuariosToSelectModal(data){
     }
 }
 
-function filterArreglos()
+function filterArreglos(id_user)
 {
 
     var table = $('#tabladata').DataTable();
@@ -732,7 +743,7 @@ function filterArreglos()
             success: function(data, textStatus){
 
                console.log(data);
-               loadDataFromArreglos(table, data);
+               loadDataFromArreglos(table, data, id_user);
 
 
             },
@@ -744,7 +755,7 @@ function filterArreglos()
 
 }
 
-function loadDataFromArreglos(table, data)
+function loadDataFromArreglos(table, data, id_user)
 {
     for (let i = 0; i < data.length; i++){
 
@@ -754,15 +765,22 @@ function loadDataFromArreglos(table, data)
         let url_edit = "/simm/arreglos-mecanicos/edit/" + data[i].idarreglos_mecanicos.toString();
         let icon_edit = '<a href='+ url_edit + ' class="btn bg-purple" escape="false" style="margin-right: 4px;"><span class="fas fa-edit" aria-hidden="true"></span></a>';
 
-        let icon_delete = '<a href="#" class="btn btn-danger" escape="false"  attr="'+ data[i].idarreglos_mecanicos + '" onclick="deleteRowFilter(this)">' +
-            '<span class="fas fa-trash-alt" aria-hidden="true"></span></a>';
+        let icon_delete = '';
+
+        if(id_user !== undefined && data[i].user.idusers !== undefined){
+            if(id_user === data[i].user.idusers){
+                icon_delete = '<a href="#" class="btn btn-danger" escape="false"  attr="'+ data[i].idarreglos_mecanicos + '" onclick="deleteRowFilter(this)">' +
+                    '<span class="fas fa-trash-alt" aria-hidden="true"></span></a>';
+            }
+        }
 
         //  <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
         // ['action' => 'view', $arreglo->idarreglos_mecanicos], ['class' => 'btn bg-navy', 'escape' => false, 'target' => '_blank']) ?>
 
         var trDOM = table.row.add([icon_eye, data[i].idarreglos_mecanicos,
         data[i].fecha.toString().substr(0,10), data[i].num_comprobante, data[i].maquina.name, data[i].mano_obra, data[i].repuestos, data[i].total,
-            data[i].worksgroup.name, data[i].user.firstname + ' ' + data[i].user.lastname,  icon_edit + icon_delete] ).draw().node();
+            data[i].user.firstname + ' ' + data[i].user.lastname,
+            icon_edit + icon_delete] ).draw().node();
 
         $( trDOM ).addClass('dt-center');
     }
@@ -1010,8 +1028,7 @@ function loadDataToCostosMaquinaView(data, element, history_costos) {
 
     maq_name.html(data[0].maquina.marca.toString() + ": " + data[0].maquina.name.toString());
     grupo_name.html(data[0].worksgroup.name.toString());
-    centro_costo_name.html(data[0].centros_costo.name.toString());
-
+    centro_costo_name.html(data[0].centros_costos[0].name.toString());
 
     if(data[0].alquilada){
         alquilada.html('SI');
@@ -1668,7 +1685,15 @@ function selectTypeFilterRemitos(option){
     }
 }
 
-function filterRemitos()
+function pruebaSesion()
+{
+    let name = sessionStorage.getItem("idusers")
+
+    console.log(name);
+}
+
+
+function filterRemitos(iduser)
 {
 
     var table = $('#tabladata').DataTable();
@@ -1745,7 +1770,7 @@ function filterRemitos()
 
                 //console.log(data);
                 setTimeout(function (){
-                    loadDataToTableRemitos(table, data);
+                    loadDataToTableRemitos(table, data, iduser);
                     $("#content_loading").hide();
                 }, 2000);
 
@@ -1759,7 +1784,7 @@ function filterRemitos()
 
 
 
-function loadDataToTableRemitos(table, data)
+function loadDataToTableRemitos(table, data, iduser)
 {
     for (let i = 0; i < data.length; i++) {
 
@@ -1769,9 +1794,12 @@ function loadDataToTableRemitos(table, data)
         let url_edit = "/simm/remitos/edit/" + data[i].idremitos.toString();
         let icon_edit = '<a href=' + url_edit + ' class="btn bg-purple" escape="false" style="margin-right: 4px;"><span class="fas fa-edit" aria-hidden="true"></span></a>';
 
-        let icon_delete = '<a href="#" class="btn btn-danger" escape="false"  attr="' + data[i].idremitos + '" onclick="deleteRowFilterRemitos(this)">' +
-            '<span class="fas fa-trash-alt" aria-hidden="true"></span></a>';
+        let icon_delete = '';
 
+        if(data[i].users_idusers === iduser){
+            icon_delete = '<a href="#" class="btn btn-danger" escape="false"  attr="' + data[i].idremitos + '" onclick="deleteRowFilterRemitos(this)">' +
+                '<span class="fas fa-trash-alt" aria-hidden="true"></span></a>';
+        }
 
         let url_maq = "/simm/remitos/add-maquinas/" + data[i].idremitos.toString();
         let icon_maq = '<a href=' + url_edit + ' class="btn bg-green" escape="false" style="margin-right: 4px;"><span class="fas fa-truck" aria-hidden="true"></span></a>';
@@ -1801,7 +1829,8 @@ function loadDataToTableRemitos(table, data)
             data[i].destino.name,
             data[i].user.firstname + ' ' + data[i].user.lastname,
             icon_maq,
-            icon_edit + icon_delete] ).draw().node();
+            icon_edit + icon_delete]
+        ).draw().node();
         $( trDOM ).addClass('dt-center');
 
     }
@@ -2673,7 +2702,7 @@ function processCalcCostosGroups(variables)
     $.ajax({
         type: "POST",
         async: true,
-        url: 'calculateCostosGrupos',
+        url: 'calculateCostosGruposAjax',
         data: variables,
 
         beforeSend: function (xhr) { // Add this line
@@ -2689,9 +2718,11 @@ function processCalcCostosGroups(variables)
 
           if(data.result === undefined)
           {
-              data_info = data.centros;
-              console.log(data);
-              $.when(showDataCostosToDisplayLeft(data.centros)).then(
+
+              data_info = data;
+             // console.log(data);
+
+              $.when(showDataCostosToDisplayLeft(data)).then(
                   function () {
 
                       //DEbo verificar que el infrome este en true
@@ -2708,8 +2739,25 @@ function processCalcCostosGroups(variables)
               );
 
           } else {
+              a.close();
               //SIn datos
-              console.log('SIN DATOS');
+              $.confirm({
+                  icon: 'fas fa-exclamation-circle',
+                  title: '¡Error!',
+                  content: '<strong>' + data.msg.toString() + '</strong>' + '<br>' + 'Verifique que los datos de Remitos, ' +
+                      'Uso de Maquinaria, Operarios y ' +
+                      'Costos de Maquinas esten cargados!',
+                  type: 'red',
+                  typeAnimated: true,
+                  buttons: {
+                      close:
+                          {
+                              text: 'Aceptar',
+                              btnClass: 'btn-red',
+                              function () {
+                              }}
+                  }
+              });
           }
 
 
@@ -2739,12 +2787,14 @@ function showDataCostosToDisplayLeft(data) {
     let toneladas = 0;
     let info_header = $("#info-header-left");
 
+    toneladas = data.general.toneladas;
+    data = data.centros;
 
     for (let i = 0; i < data.length; i++) {
         costo_total = costo_total + data[i].costo_total;
-        toneladas = toneladas + data[i].toneladas_total;
-        //console.log(data.centros[i]);
     }
+
+
 
     info_header.text("Costo Total: " + costo_total.toFixed(2) + " $/t");
 
@@ -2825,16 +2875,18 @@ function openCentroCostos(button)
         centro_costo_input.val(centro_costo);
         costo_input.val(costo);
 
-        for (let i = 0; i < data_info.length; i++){
+        console.log(data_info);
 
-            if(id.toString() === data_info[i].idcentros_costos.toString()){
+        for (let i = 0; i < data_info['centros'].length; i++){
 
-                console.log(data_info[i]);
+            if(id.toString() === data_info['centros'][i].idcentros_costos.toString()){
 
-                for (let j = 0; j < data_info[i].maquinas.length; j++){
+                console.log(data_info['centros'][i]);
+
+                for (let j = 0; j < data_info['centros'][i].maquinas.length; j++){
 
                     //Llamo al constructor del item
-                    let item = createdItemAcordionMaquinas(data_info[i].maquinas[j], j, data_info[i]);
+                    let item = createdItemAcordionMaquinas(data_info['centros'][i].maquinas[j], j, data_info['centros'][i]);
                     div_maq_cont.append(item);
                 }
 

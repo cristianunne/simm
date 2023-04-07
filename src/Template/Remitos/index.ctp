@@ -27,6 +27,9 @@
                     <?= $this->Html->link($this->Html->tag('span', ' Nuevo Remito', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
                         ['controller' => 'Remitos', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
                 </div>
+
+
+
                 <hr>
                 <br>
 
@@ -91,8 +94,6 @@
                                 <td class="dt-center"></td>
                             <?php endif; ?>
 
-
-
                             <!-- COnsulto por el tipo de propietario -->
                             <?php if ($rem->propietario->tipo == 'Empresa'): ?>
                                 <td class="dt-center"><?= h($rem->propietario->name) ?></td>
@@ -117,10 +118,11 @@
                                 <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
                                     ['action' => 'edit', $rem->idremitos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin' or
+                                        $current_user['idusers'] == $rem->users_idusers):  ?>
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                         ['action' => 'remove', $rem->idremitos],
-                                        ['confirm' => __('Eliminar {0}?', $rem->remito_number), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                        ['confirm' => __('Eliminar Remito {0}?', $rem->remito_number), 'class' => 'btn btn-danger','escape' => false]) ?>
                                 <?php endif;?>
 
                             </td>
@@ -344,7 +346,7 @@
                                     attr="modal_filter" onclick="closeModal(this)">Cancelar</button>
 
                             <button id="button_upload" type="button" class="btn-navy btn bg-navy float-right"
-                                    attr="modal_filter" onclick="filterRemitos()">Aplicar</button>
+                                    attr="modal_filter" onclick="filterRemitos( <?= h($current_user['idusers']) ?>)">Aplicar</button>
                         </div>
                     </div>
                 </div>

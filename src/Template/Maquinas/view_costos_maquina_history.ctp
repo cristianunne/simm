@@ -55,7 +55,7 @@
 
                             <td class="dt-center"><?= h($maq->worksgroup->name) ?></td>
 
-                            <td class="dt-center"><?= h($maq->centros_costo->name) ?></td>
+                            <td class="dt-center"><?= h($maq->centros_costos[0]->name) ?></td>
 
                             <!-- Uso un for para la metodologia de costos-->
                             <?php foreach ($met_costos_tabla as $met): ?>

@@ -3,7 +3,7 @@
 <div class="content-wrapper content-wrapper-other">
 
     <!-- Main content -->
-    <div class="content login-page bg-navy">
+    <div class="content login-page">
         <?= $this->Flash->render() ?>
         <div class="login-box">
             <!-- /.login-logo -->

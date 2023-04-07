@@ -82,13 +82,13 @@ class MetodologiaCostosFormula
 
     }
 
-    public function calculateAdministracion($interes, $seguro, $dep_maquina, $dep_lubricante, $arreglos, $cons_comb, $cons_lub,
+    public function calculateAdministracion($interes, $seguro, $dep_maquina, $dep_neum, $arreglos, $cons_comb, $cons_lub,
     $operador, $mantenimiento, $CAD)
     {
         //($VAD*($TIS/100)*$FCI/$HTU + $VAD*$CSE/$HTU + ($VAD*$CVD-$VAN)/($HFU*$VUE)
         // + ($VAN/$VUN) + (($VAD*$CVD-$VAN)/($HFU*$VUE))*$AME + $COH*$COM + $LUH*$LUB + $SAL/$HME + ($SAL/$HME)*$CMA) * $CAD
 
-        $suma_result = $interes + $seguro + $dep_maquina + $dep_lubricante + $arreglos+ $cons_comb + $cons_lub + $operador + $mantenimiento;
+        $suma_result = $interes + $seguro + $dep_maquina + $dep_neum + $arreglos+ $cons_comb + $cons_lub + $operador + $mantenimiento;
         $result = $suma_result * $CAD;
 
         return $result;

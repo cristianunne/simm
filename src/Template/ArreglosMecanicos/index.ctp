@@ -53,7 +53,6 @@
                         <th scope="col"><?= $this->Paginator->sort('Mano de Obra') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Repuestos') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Total') ?></th>
-                        <th scope="col"><?= $this->Paginator->sort('Grupo') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Usuario') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
 
@@ -77,7 +76,6 @@
                             <td class="dt-center"><?= h($arreglo->mano_obra) ?></td>
                             <td class="dt-center"><?= h($arreglo->repuestos) ?></td>
                             <td class="dt-center"><?= h($arreglo->total) ?></td>
-                            <td class="dt-center"><?= h($arreglo->worksgroup->name) ?></td>
                             <td class="dt-center"><?= h($arreglo->user->lastname . ' ' . $arreglo->user->firstname) ?></td>
 
 
@@ -85,7 +83,8 @@
                                 <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
                                     ['action' => 'edit', $arreglo->idarreglos_mecanicos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin' or
+                                $current_user['idusers'] == $arreglo->users_idusers):  ?>
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                         ['action' => 'remove', $arreglo->idarreglos_mecanicos],
                                         ['confirm' => __('Eliminar {0}?', $arreglo->idarreglos_mecanicos), 'class' => 'btn btn-danger','escape' => false]) ?>
@@ -224,7 +223,7 @@
                             <button id="button_upload" type="button" class="btn-default btn bg-gray-light float-left"
                                     attr="modal_filter" onclick="closeModal(this)">Cancelar</button>
                             <button id="button_upload" type="button" class="btn-navy btn bg-navy float-right"
-                                    attr="modal_filter" onclick="filterArreglos()">Aplicar</button>
+                                    attr="modal_filter" onclick="filterArreglos(<?= h($current_user['idusers']) ?>)">Aplicar</button>
                         </div>
                     </div>
                 </div>

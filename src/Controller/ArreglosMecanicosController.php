@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\ORM\Query;
 
 /**
  * ArreglosMecanicos Controller
@@ -54,14 +55,20 @@ class ArreglosMecanicosController extends AppController
             return $this->redirect(['controller' => 'Pages', 'action' => 'index']);
         }
 
+        //AGregar el index comun
 
-        $arregos_model = $this->loadModel('arreglos_mecanicos_year');
+        $arreglos = $this->ArreglosMecanicos->find('all', [
+            'contain' => ['Users', 'Maquinas']
+            ])->where(['ArreglosMecanicos.empresas_idempresas' => $id_empresa]);
+
+
+        /*$arregos_model = $this->loadModel('arreglos_mecanicos_year');
 
         $arreglos =  $arregos_model->find('all', [
             'contain' => ['Users', 'Worksgroups', 'Maquinas']
         ])->where(['arreglos_mecanicos_year.empresas_idempresas' => $id_empresa]);
+        $this->set(compact('arreglos'));*/
         $this->set(compact('arreglos'));
-
         $this->set(compact('id_empresa'));
         //debug($arreglos->toArray());
 
@@ -94,18 +101,6 @@ class ArreglosMecanicosController extends AppController
 
         $arreglos = $this->ArreglosMecanicos->newEntity();
 
-        //TRaigo los WorksGroups activos
-        $worksgroup_model = $this->loadModel('Worksgroups');
-
-        $worksgroup_data = $worksgroup_model->find('list',
-            [
-                'keyField' => 'idworksgroups',
-                'valueField' => 'name',
-                'order' => ['name' => 'ASC']
-            ])->where(['empresas_idempresas' => $id_empresa, 'active' => true])
-            ->toArray();
-
-        $this->set(compact('worksgroup_data'));
 
         //Traigo los datos de la maquina filtrado por empresa
         $maquinas_model = $this->loadModel('Maquinas');
@@ -142,6 +137,8 @@ class ArreglosMecanicosController extends AppController
 
             $arreglos->empresas_idempresas = $id_empresa;
             $arreglos->users_idusers = $user_id;
+
+            //debug($arreglos);
 
             if($this->ArreglosMecanicos->save($arreglos)){
                 $this->Flash->success(__('El Registro se ha almacenado correctamente'));
@@ -239,20 +236,6 @@ class ArreglosMecanicosController extends AppController
                     ['contain' => ['Users', 'Maquinas', 'Parcelas' => ['Lotes']]]);
             }
 
-
-
-            //TRaigo los WorksGroups activos
-            $worksgroup_model = $this->loadModel('Worksgroups');
-
-            $worksgroup_data = $worksgroup_model->find('list',
-                [
-                    'keyField' => 'idworksgroups',
-                    'valueField' => 'name',
-                    'order' => ['name' => 'ASC']
-                ])->where(['empresas_idempresas' => $id_empresa, 'active' => true])
-                ->toArray();
-
-            $this->set(compact('worksgroup_data'));
 
 
             //Traigo los datos de la maquina filtrado por empresa
@@ -490,7 +473,7 @@ class ArreglosMecanicosController extends AppController
         //no uso all_date dado que tengo el rango de fechas
 
         $data = $this->ArreglosMecanicos->find('all', [
-            'contain' => ['Users', 'Maquinas', 'Worksgroups']
+            'contain' => ['Users', 'Maquinas']
         ])->where(['ArreglosMecanicos.fecha >=' => strval($fecha_desde), 'ArreglosMecanicos.fecha <=' => strval($fecha_hasta),
             'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
             ->toArray();
@@ -504,24 +487,42 @@ class ArreglosMecanicosController extends AppController
         $data = [];
 
         //Uso la tabla que trae el ultimo año de registros
+        //Para los grupos puedo utilizar las maquinas
+
         if($all_date == 'SI')
         {
             $data = $this->ArreglosMecanicos->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['worksgroups_idworksgroups' => $grupo, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
-                ->toArray();
+                'contain' => ['Users', 'Maquinas'=> ['CostosMaquinas' =>
+                ['Worksgroups' => function(Query $q) use ($grupo){
+                    return $q->where(['idworksgroups' => $grupo]);
+                }]]]
+                ])->where(['ArreglosMecanicos.empresas_idempresas' => $id_empresa]);
+
 
         } else {
             //Uso la Vista arreglos mecanicos year
             $arreglos_model = $this->loadModel('ArreglosMecanicosYear');
             $data = $arreglos_model->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
-            ])->where(['worksgroups_idworksgroups' => $grupo,  'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
-                ->toArray();
+                'contain' => ['Users', 'Maquinas'=> ['CostosMaquinas' =>
+                    ['Worksgroups' => function(Query $q) use ($grupo){
+                    return $q->where(['idworksgroups' => $grupo]);
+                }]]]
+            ])->where(['ArreglosMecanicosYear.empresas_idempresas' => $id_empresa]);
 
         }
 
-        return $data;
+        //recorro y devuelvo los que coinciden con el id
+        $data_new = [];
+        foreach ($data as $arreglo)
+        {
+            if(!empty($arreglo->maquina->costos_maquinas)){
+
+                $data_new[] = $arreglo;
+            }
+        }
+
+
+        return $data_new;
 
     }
 
@@ -534,7 +535,7 @@ class ArreglosMecanicosController extends AppController
         {
             //Uso la tabla arreglos mecanicos
             $data = $this->ArreglosMecanicos->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+                'contain' => ['Users', 'Maquinas']
             ])->where(['maquinas_idmaquinas' => $maquina, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
@@ -546,7 +547,7 @@ class ArreglosMecanicosController extends AppController
 
             //Uso la tabla arreglos mecanicos
             $data = $arreglos_model->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+                'contain' => ['Users', 'Maquinas']
             ])->where(['maquinas_idmaquinas' => $maquina, 'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
@@ -566,7 +567,7 @@ class ArreglosMecanicosController extends AppController
         {
             //Uso la tabla arreglos mecanicos
             $data = $this->ArreglosMecanicos->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+                'contain' => ['Users', 'Maquinas']
             ])->where(['parcelas_idparcelas' => $parcela, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
@@ -576,7 +577,7 @@ class ArreglosMecanicosController extends AppController
 
             //Uso la tabla arreglos mecanicos
             $data = $arreglos_model->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+                'contain' => ['Users', 'Maquinas']
             ])->where(['parcelas_idparcelas' => $parcela, 'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
                 ->toArray();
         }
@@ -596,7 +597,7 @@ class ArreglosMecanicosController extends AppController
         {
             //Uso la tabla arreglos mecanicos
             $data = $this->ArreglosMecanicos->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+                'contain' => ['Users', 'Maquinas']
             ])->where(['ArreglosMecanicos.users_idusers' => $usuario, 'ArreglosMecanicos.empresas_idempresas' => $id_empresa])
                 ->toArray();
 
@@ -606,7 +607,7 @@ class ArreglosMecanicosController extends AppController
 
             //Uso la tabla arreglos mecanicos
             $data = $arreglos_model->find('all', [
-                'contain' => ['Users', 'Maquinas', 'Worksgroups']
+                'contain' => ['Users', 'Maquinas']
             ])->where(['ArreglosMecanicosYear.users_idusers' => $usuario, 'ArreglosMecanicosYear.empresas_idempresas' => $id_empresa])
                 ->toArray();
         }

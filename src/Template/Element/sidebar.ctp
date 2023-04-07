@@ -91,7 +91,7 @@
                         <li class="nav-item">
 
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Inicio',
+                                '<i class="fas fa-greater-than nav-icon"></i> Inicio',
                                 ['controller' => 'Remitos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-remitos-Inicio']) ?>
                         </li>
@@ -116,7 +116,7 @@
                         <li class="nav-item">
 
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Inicio',
+                                '<i class="fas fa-greater-than nav-icon"></i> Inicio',
                                 ['controller' => 'UsoMaquinaria', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-uso_maquinaria-Inicio']) ?>
                         </li>
@@ -142,13 +142,58 @@
                         <li class="nav-item">
 
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Inicio',
+                                '<i class="fas fa-greater-than nav-icon"></i> Inicio',
                                 ['controller' => 'ArreglosMecanicos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
                         </li>
 
                     </ul>
                 </li>
+
+
+                <li class="nav-item menu-close" id="analisis_costos">
+
+                    <a href="#" class="nav-link" id="title-analisis_costos">
+                        <i class="nav-icon fas fa-calculator"></i>
+                        <p>
+                            Análisis de Costos
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Inicio',
+                                ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-analisis_costos-Inicio']) ?>
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Análisis Grupos',
+                                ['controller' => 'AnalisisCostos', 'action' => 'groupsCostosAnalysis'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-analisis_costos-Grupos_costos']) ?>
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Análisis Máquinas',
+                                ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Informes',
+                                ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Variaciones',
+                                ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
+                        </li>
+
+                    </ul>
+                </li>
+
 
 
 
@@ -165,21 +210,21 @@
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Inicio',
+                                '<i class="fas fa-greater-than nav-icon"></i> Inicio',
                                 ['controller' => 'SystemsConfigurations', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-inicio']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Centros de Costos',
+                                '<i class="fas fa-greater-than nav-icon"></i> Centros de Costos',
                                 ['controller' => 'CentrosCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Centros_costos']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Constantes',
+                                '<i class="fas fa-greater-than nav-icon"></i> Constantes',
                                 ['controller' => 'Constantes', 'action' => 'view'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Constantes']) ?>
                         </li>
@@ -187,63 +232,63 @@
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Destinos',
+                                '<i class="fas fa-greater-than nav-icon"></i> Destinos',
                                 ['controller' => 'Destinos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Destinos']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Grupos de Trabajo',
+                                '<i class="fas fa-greater-than nav-icon"></i> Grupos de Trabajo',
                                 ['controller' => 'Worksgroups', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Worksgroups']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Lotes',
+                                '<i class="fas fa-greater-than nav-icon"></i> Lotes',
                                 ['controller' => 'Lotes', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Lotes']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Maquinas',
+                                '<i class="fas fa-greater-than nav-icon"></i> Maquinas',
                                 ['controller' => 'Maquinas', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Maquinas']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Metodología de Costos',
+                                '<i class="fas fa-greater-than nav-icon"></i> Metodología de Costos',
                                 ['controller' => 'MetodCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-MetodCostos']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Operarios',
+                                '<i class="fas fa-greater-than nav-icon"></i> Operarios',
                                 ['controller' => 'Operarios', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Operarios']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Parcelas',
+                                '<i class="fas fa-greater-than nav-icon"></i> Parcelas',
                                 ['controller' => 'Parcelas', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Parcelas']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Precios por Destinos',
+                                '<i class="fas fa-greater-than nav-icon"></i> Precios por Destinos',
                                 ['controller' => 'DestinosProductos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-DestinosProductos']) ?>
                         </li>
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Productos',
+                                '<i class="fas fa-greater-than nav-icon"></i> Productos',
                                 ['controller' => 'Productos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Productos']) ?>
                         </li>
@@ -251,7 +296,7 @@
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Propietarios',
+                                '<i class="fas fa-greater-than nav-icon"></i> Propietarios',
                                 ['controller' => 'Propietarios', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-Propietarios']) ?>
                         </li>
@@ -259,7 +304,7 @@
 
                         <li class="nav-item">
                             <?=  $this->Html->link(
-                                '<i class="far fa-circle nav-icon"></i> Salarios',
+                                '<i class="fas fa-greater-than nav-icon"></i> Salarios',
                                 ['controller' => 'OperariosMaquinas', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-system-OperariosMaquinas']) ?>
                         </li>

@@ -25,11 +25,6 @@
                     <div class="col-md-6 card box-simm-shadow" style="margin: 0 auto; padding: 1.25rem">
                         <?= $this->Form->create($arreglos, ['']) ?>
 
-                        <div class="form-group">
-                            <?= $this->Form->control('worksgroups_idworksgroups', ['options' => $worksgroup_data,
-                                'empty' => '(Elija una opción)', 'type' => 'select',
-                                'class' => 'form-control', 'label' => 'Grupo de Trabajo:', 'required']) ?>
-                        </div>
 
                         <div class="form-group">
                             <?= $this->Form->control('maquinas_idmaquinas', ['options' => $maquinas_data,

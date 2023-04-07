@@ -16,12 +16,12 @@ class UsoMaquinariaController extends AppController
     {
         if (isset($user['role']) and $user['role'] === 'user') {
             if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'deleteUsoComb', 'viewCombLub',
-                'deleteUsoCombSimple'])) {
+                'deleteUsoCombSimple', 'addUsoMaqAjax'])) {
                 return true;
             }
         } else if (isset($user['role']) and $user['role'] === 'supervisor') {
             if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'deleteUsoComb', 'viewCombLub',
-                'deleteUsoCombSimple'])) {
+                'deleteUsoCombSimple', 'addUsoMaqAjax'])) {
                 return true;
             }
         }
@@ -107,7 +107,7 @@ class UsoMaquinariaController extends AppController
             'keyField' => 'idmaquinas',
             'valueField' => ['marca', 'name'],
         ])
-        ->where(['empresas_idempresas' => $id_empresa, 'active' => true])
+        ->where(['empresas_idempresas' => $id_empresa, 'active' => true, 'propia' => true])
             ->toArray();
 
 
@@ -248,7 +248,7 @@ class UsoMaquinariaController extends AppController
                 //debug($uso_maquina);
 
                 //Creo un array con las categorias y elimino las que estan presente
-                $combustibles = ['Ultra Diesel' => 'Ultra Diesel', 'Infinia Diesel' => 'Infinia Diesel', 'Nafta' => 'Nafta'];
+                $combustible_aux = ['Ultra Diesel' => 'Ultra Diesel', 'Infinia Diesel' => 'Infinia Diesel', 'Nafta' => 'Nafta'];
                 $combustibles = [];
 
 
@@ -270,24 +270,6 @@ class UsoMaquinariaController extends AppController
 
                 }
 
-                foreach ($uso_maquina->uso_comb_lub as $comb){
-                    $is_present = false;
-
-                    //Primero consuto por la categoria
-                    if($comb->categoria == 'Combustible'){
-                        foreach ($combustible_aux as $comb_aux){
-                            if($comb_aux == $comb->producto){
-                                $is_present = true;
-                            }
-                        }
-                        //Si no esta presente lo agrego a la lista
-                        if(!$is_present){
-                            $combustibles[] = $comb->producto;
-                        }
-
-                    }
-
-                }
                 $this->set(compact('combustibles'));
 
                 //Proceso el array de Lubricantes ahora

@@ -25,7 +25,6 @@ class ArreglosMecanicosTableTest extends TestCase
     public $fixtures = [
         'app.ArreglosMecanicos',
         'app.Users',
-        'app.Worksgroups',
         'app.Maquinas',
         'app.Parcelas',
     ];
@@ -70,6 +69,16 @@ class ArreglosMecanicosTableTest extends TestCase
      * @return void
      */
     public function testValidationDefault()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test findGetArreglosByConditions method
+     *
+     * @return void
+     */
+    public function testFindGetArreglosByConditions()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

@@ -44,6 +44,11 @@ class ArreglosMecanicosTable extends Table
             'joinType' => 'INNER'
         ]);
 
+        $this->hasOne('Worksgroups', [
+            'foreignKey' => 'idworksgroups',
+            'bindingKey' => 'worksgroups_idworksgroups', //actual
+            'joinType' => 'INNER'
+        ]);
 
         $this->hasOne('Maquinas', [
             'foreignKey' => 'idmaquinas',
@@ -56,7 +61,6 @@ class ArreglosMecanicosTable extends Table
             'bindingKey' => 'parcelas_idparcelas', //actual
             'joinType' => 'INNER'
         ]);
-
     }
 
     /**
@@ -95,8 +99,13 @@ class ArreglosMecanicosTable extends Table
             ->allowEmptyString('repuestos');
 
         $validator
-            ->numeric('total')
+            ->decimal('total')
             ->allowEmptyString('total');
+
+        $validator
+            ->integer('worksgroups_idworksgroups')
+            ->requirePresence('worksgroups_idworksgroups', 'create')
+            ->notEmptyString('worksgroups_idworksgroups');
 
         $validator
             ->integer('maquinas_idmaquinas')
@@ -119,6 +128,8 @@ class ArreglosMecanicosTable extends Table
 
         return $validator;
     }
+
+
     public function findGetArreglosByConditions(Query $query, $options = null)
     {
 

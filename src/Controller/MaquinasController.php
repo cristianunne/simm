@@ -245,6 +245,8 @@ class MaquinasController extends AppController
                 ->where(['maquinas_idmaquinas' => $id, 'CostosMaquinas.active' => true]);
 
 
+
+
             //TRaigo las metodologias de costos
             $met_costos_model = $this->loadModel('metod_costos');
             $met_costos_tabla = $met_costos_model->find('all', [])

@@ -45,7 +45,7 @@ class AnalisisCostosMaquinasController extends AppController
 
     public function calculateCostosMaquina()
     {
-        $seccion = 'system';
+        $seccion = 'analisis_costos';
         $sub_seccion = 'Maquinas';
 
         $this->set(compact('seccion'));

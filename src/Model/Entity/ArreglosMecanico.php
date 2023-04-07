@@ -13,7 +13,6 @@ use Cake\ORM\Entity;
  * @property float|null $mano_obra
  * @property float|null $repuestos
  * @property float|null $total
- * @property int $worksgroups_idworksgroups
  * @property int $maquinas_idmaquinas
  * @property int|null $parcelas_idparcelas
  * @property int $empresas_idempresas
@@ -22,7 +21,6 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenTime|null $modified
  *
  * @property \App\Model\Entity\User $user
- * @property \App\Model\Entity\Worksgroup $worksgroup
  * @property \App\Model\Entity\Maquina $maquina
  * @property \App\Model\Entity\Parcela $parcela
  */
@@ -44,7 +42,6 @@ class ArreglosMecanico extends Entity
         'mano_obra' => true,
         'repuestos' => true,
         'total' => true,
-        'worksgroups_idworksgroups' => true,
         'maquinas_idmaquinas' => true,
         'parcelas_idparcelas' => true,
         'empresas_idempresas' => true,
@@ -52,7 +49,6 @@ class ArreglosMecanico extends Entity
         'created' => true,
         'modified' => true,
         'user' => true,
-        'worksgroup' => true,
         'maquina' => true,
         'parcela' => true,
     ];

@@ -99,7 +99,7 @@
 
                                     <?= $this->Html->link('',
                                         ['controller' => 'AnalisisCostos', 'action' => 'index'],
-                                        ['class' => 'btn-simm btn-arreglos btn btn-default', 'escape' => false]) ?>
+                                        ['class' => 'btn-simm btn-analisis-costos btn btn-default', 'escape' => false]) ?>
                                 </div>
                                 <div class="div_content">
                                     <p class="center text-color-navy">Análisis de Costos</p>

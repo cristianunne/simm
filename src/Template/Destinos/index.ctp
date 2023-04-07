@@ -71,7 +71,8 @@
                             <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
                                 ['action' => 'edit', $destino->iddestinos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                            <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                            <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin' or
+                                $current_user['idusers'] == $destino->users_idusers):  ?>
                                 <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                     ['action' => 'delete', $destino->iddestinos],
                                     ['confirm' => __('Eliminar {0}?', $destino->name), 'class' => 'btn btn-danger','escape' => false]) ?>
