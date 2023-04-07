@@ -23,10 +23,14 @@
             </div>
 
             <div class="card-body table-responsive">
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Centro de Costo', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'CentrosCostos', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
+
+                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+
+                    <div>
+                        <?= $this->Html->link($this->Html->tag('span', ' Agregar Centro de Costo', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
+                            ['controller' => 'CentrosCostos', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                    </div>
+                <?php endif;?>
 
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
@@ -58,11 +62,12 @@
                             <td class="dt-center"><?= h($centro->user->lastname . ' ' . $centro->user->firstname) ?></td>
 
                             <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
-                                    ['action' => 'edit', $centro->idcentros_costos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
-
 
                                 <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+
+                                    <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
+                                        ['action' => 'edit', $centro->idcentros_costos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
+
                                     <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                         ['action' => 'delete', $centro->idcentros_costos],
                                         ['confirm' => __('Eliminar {0}?', $centro->name), 'class' => 'btn btn-danger','escape' => false]) ?>

@@ -24,10 +24,12 @@
 
 
             <div class="card-body table-responsive">
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Constante', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'Constantes', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
+                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                    <div>
+                        <?= $this->Html->link($this->Html->tag('span', ' Agregar Constante', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
+                            ['controller' => 'Constantes', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                    </div>
+                <?php endif;?>
 
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
@@ -38,8 +40,9 @@
                         <th scope="col"><?= $this->Paginator->sort('¿Activo?') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Alta') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Usuario') ?></th>
-                        <th scope="col" class="actions"><?= __('Acciones') ?></th>
-
+                        <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                            <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                        <?php endif;?>
                     </tr>
                     </thead>
                     <tbody>
@@ -58,15 +61,14 @@
                             <td class="dt-center"><?= h($cons->created->format('d-m-Y')) ?></td>
 
                             <td class="dt-center"><?= h($cons->user->lastname . ' ' . $cons->user->firstname) ?></td>
+                            <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                <td class="actions" style="text-align: center">
 
-                            <td class="actions" style="text-align: center">
-
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
-                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                        ['action' => 'delete', $cons->idconstantes],
-                                        ['confirm' => __('Eliminar {0}?', $cons->name), 'class' => 'btn btn-danger','escape' => false]) ?>
-                                <?php endif;?>
-                            </td>
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                            ['action' => 'delete', $cons->idconstantes],
+                                            ['confirm' => __('Eliminar {0}?', $cons->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+                                </td>
+                            <?php endif;?>
                         </tr>
                     <?php endforeach; ?>
 

@@ -24,11 +24,13 @@
             </div>
 
             <div class="card-body table-responsive">
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Grupo de Trabajo', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'Worksgroups', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
-                <br>
+                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                    <div>
+                        <?= $this->Html->link($this->Html->tag('span', ' Agregar Grupo de Trabajo', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
+                            ['controller' => 'Worksgroups', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                    </div>
+                    <br>
+                <?php endif;?>
                 <div>
                     <?= $this->Html->link($this->Html->tag('span', ' Ver Activos', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
                         ['controller' => 'Worksgroups', 'action' => 'index'], ['class' => 'btn btn-warning', 'escape' => false]) ?>
@@ -41,7 +43,9 @@
                         <th scope="col"><?= $this->Paginator->sort('Hash ID') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('¿Activo?') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Alta') ?></th>
-                        <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                        <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                            <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                        <?php endif;?>
 
                     </tr>
                     </thead>
@@ -60,16 +64,17 @@
 
                             <td class="dt-center"><?= h($wg->created->format('d-m-Y')) ?></td>
 
+                            <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                <td class="actions" style="text-align: center">
+                                        <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
+                                            ['action' => 'edit', $wg->idworksgroups], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                            <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
-                                    ['action' => 'edit', $wg->idworksgroups], ['class' => 'btn bg-purple', 'escape' => false]) ?>
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                            ['action' => 'delete', $wg->idworksgroups],
+                                            ['confirm' => __('Eliminar {0}?', $wg->name), 'class' => 'btn btn-danger','escape' => false]) ?>
 
-                                <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                    ['action' => 'delete', $wg->idworksgroups],
-                                    ['confirm' => __('Eliminar {0}?', $wg->name), 'class' => 'btn btn-danger','escape' => false]) ?>
-
-                            </td>
+                                </td>
+                            <?php endif;?>
 
                         </tr>
                     <?php endforeach; ?>

@@ -24,10 +24,12 @@
 
 
             <div class="card-body table-responsive">
-                <div>
-                    <?= $this->Html->link($this->Html->tag('span', ' Agregar Constante', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
-                        ['controller' => 'Constantes', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
-                </div>
+                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                    <div>
+                        <?= $this->Html->link($this->Html->tag('span', ' Agregar Constante', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
+                            ['controller' => 'Constantes', 'action' => 'add'], ['class' => 'btn bg-navy', 'escape' => false]) ?>
+                    </div>
+                <?php endif;?>
 
                 <table id="tabladata" class="table table-bordered table-hover dataTable">
                     <thead>
@@ -38,7 +40,9 @@
                         <th scope="col"><?= $this->Paginator->sort('¿Activo?') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha de Alta') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Usuario') ?></th>
-                        <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                        <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                            <th scope="col" class="actions"><?= __('Acciones') ?></th>
+                        <?php endif;?>
                         <th scope="col" class="actions"><?= __('Histórico') ?></th>
 
                     </tr>
@@ -60,17 +64,18 @@
 
                             <td class="dt-center"><?= h($cons->user->lastname . ' ' . $cons->user->firstname) ?></td>
 
-                            <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
-                                    ['action' => 'edit', $cons->idconstantes], ['class' => 'btn bg-purple', 'escape' => false]) ?>
+                            <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                <td class="actions" style="text-align: center">
 
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
-                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                        ['action' => 'delete', $cons->idconstantes],
-                                        ['confirm' => __('Eliminar {0}?', $cons->name), 'class' => 'btn btn-danger','escape' => false]) ?>
-                                <?php endif;?>
-                            </td>
+                                        <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
+                                            ['action' => 'edit', $cons->idconstantes], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                            ['action' => 'delete', $cons->idconstantes],
+                                            ['confirm' => __('Eliminar {0}?', $cons->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+
+                                </td>
+                            <?php endif;?>
                             <td class="actions" style="text-align: center">
                                 <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
                                     ['action' => 'viewHistory', $cons->name], ['class' => 'btn bg-navy', 'escape' => false]) ?>
