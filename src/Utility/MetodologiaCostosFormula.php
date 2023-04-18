@@ -39,11 +39,11 @@ class MetodologiaCostosFormula
 
     }
 
-    public function calculateArreglosMecanicos($VAD, $CVD, $VAN, $HFU, $VUE, $AME)
+    public function calculateArreglosMecanicos($AME, $HME)
     {
         //(($VAD*$CVD-$VAN)/($HFU*$VUE))*$AME
 
-        return ($HFU*$VUE) == 0 ? 0 : ((($VAD*$CVD-$VAN)/($HFU*$VUE))*$AME);
+        return ($HME) == 0 ? 0 : ($AME / $HME);
 
 
     }
@@ -66,19 +66,19 @@ class MetodologiaCostosFormula
         return $HME == 0 ? 0 : ($gasto_lubricante / $HME);
     }
 
-    public function calculateOperador($SAL, $HME)
+    public function calculateOperador($SAL)
     {
         //$SAL/$HME
 
-        return $HME == 0 ? 0 : ($SAL / $HME);
+        return $SAL;
 
     }
 
-    public function calculateMantenimiento($SAL, $HME, $CMA)
+    public function calculateMantenimiento($SAL, $CMA)
     {
         //($SAL/$HME)*$CMA
 
-        return $HME == 0 ? 0 : (($SAL / $HME) * $CMA);
+        return ($SAL * $CMA);
 
     }
 

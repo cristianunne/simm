@@ -43,6 +43,152 @@ class AnalisisCostosController extends AppController
         $this->set(compact('sub_seccion'));
 
     }
+    public function groupsCostosAnalysis()
+    {
+        //Variable usada para el sidebar
+        $seccion = 'analisis_costos';
+        $sub_seccion = 'Grupos_costos';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $user_id = $session->read('Auth.User.idusers');
+        $user_role = $session->read('Auth.User.role');
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        //TRaigo los grupos todos sin filtros
+        $grupos_model = $this->loadModel('Worksgroups');
+        $grupos_data = $grupos_model->find('list', [
+            'keyField' => 'idworksgroups',
+            'valueField' => 'name'
+        ])
+            ->where(['active' => true, 'empresas_idempresas' => $id_empresa])
+            ->toArray();
+
+        $insertar = [0 => 'Todos'];
+
+        array_splice($grupos_data, 0, 0, $insertar);
+
+        $this->set(compact('grupos_data'));
+
+
+        //Traigo los lotes
+        $tablaLotes = $this->loadModel('Lotes');
+        $lotes =  $tablaLotes->find('all', [
+            'contain' => []
+        ])->where(['Lotes.active' => true, 'Lotes.empresas_idempresas' => $id_empresa]);
+        $this->set(compact('lotes'));
+
+
+        //Traigo los datos de los propietarios
+        $tablaPropietarios = $this->loadModel('Propietarios');
+        $propietarios =  $tablaPropietarios->find('all', [
+            'contain' => []
+        ])->where(['Propietarios.active' => true, 'Propietarios.empresas_idempresas' => $id_empresa]);
+        $this->set(compact('propietarios'));
+
+        //Traigo los datos de los propietarios
+        $tablaDestinos = $this->loadModel('Destinos');
+
+        $destinos =  $tablaDestinos->find('all', [
+            'contain' => 'Users'
+        ])->where(['Destinos.active' => true, 'Destinos.empresas_idempresas' => $id_empresa]);
+        $this->set(compact('destinos'));
+
+
+
+    }
+
+
+    public function calculateCostosGruposAjax()
+    {
+
+        $this->autoRender = false;
+
+        $seccion = 'system';
+        $sub_seccion = 'Maquinas';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $user_id = $session->read('Auth.User.idusers');
+        $user_role = $session->read('Auth.User.role');
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+        if($this->request->is('ajax')) {
+
+
+            //COnsulto que los indices esten definidos
+            $worksgroup = $_POST['groups'];
+            $fecha_inicio = $_POST['fecha_inicio'];
+            $fecha_final = $_POST['fecha_final'];
+            $lotes = $_POST['lotes'];
+            $parcelas = $_POST['parcelas'];
+            $propietarios = $_POST['propietarios'];
+            $destinos = $_POST['destinos'];
+            $informe = $_POST['informe'];
+
+            $array_options['worksgroup'] = $worksgroup;
+            $array_options['fecha_inicio'] = $fecha_inicio;
+            $array_options['fecha_fin'] = $fecha_final;
+            $array_options['lotes_idlotes'] = $lotes;
+            $array_options['parcelas_idparcelas'] = $parcelas;
+            $array_options['propietarios_idpropietarios'] = $propietarios;
+            $array_options['destinos_iddestinos'] = $destinos;
+            $array_options['empresas_idempresas'] = $id_empresa;
+
+
+
+            //INstancio la clase GetFunction
+            $get_function_class = New GetFunctions();
+
+            //instancio la clase AalisisCostos
+            $analisis_costos_class =  new AnalisisCostosGrupos();
+
+            //EL recorrido de los meses los hago aqui
+            $meses_years = $get_function_class->getMonthsAndYearsWithLast($array_options);
+
+            $result = true;
+
+
+            foreach ($meses_years as $meses_year)
+            {
+                $mes = $meses_year['mes'];
+                $year = $meses_year['year'];
+
+                $result = $analisis_costos_class->verifiedDataByMonth($array_options, $mes, $year);
+
+                //SI uno ya es false, cancelo la operacion
+                if(!$result){
+                    break;
+                }
+
+            }
+
+            if($result) {
+                //Utilizo la clase para calcular los costos
+                //devuelve un arreglos con los datos de la maquina
+                $costos_maquinas = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
+
+                // $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
+
+                //Llamo a excel processing
+                //$excel_processing_class = new ExcelProcesssing();
+                //$excel_processing_class->CostosGruposExcelInforme($metadata, null, null, null);
+                return $this->json($costos_maquinas);
+
+            }
+
+
+        }
+        return $this->json(['result' => false]);
+    }
+
 
 
     public function calculateCostosGruposCopy()
@@ -78,7 +224,7 @@ class AnalisisCostosController extends AppController
 
         $worksgroup = 0;
         $fecha_inicio = '2022-09-01';
-        $fecha_final = '2022-10-31';
+        $fecha_final = '2022-09-30';
         $lotes = 0;
         $parcelas = 0;
         $propietarios = 0;
@@ -126,7 +272,8 @@ class AnalisisCostosController extends AppController
 
         $result = true;
 
-        $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
+        //$metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
+
 
         foreach ($meses_years as $meses_year)
         {
@@ -142,18 +289,20 @@ class AnalisisCostosController extends AppController
 
         }
 
+
+
         //INstancio las clases getfunction y costos
         if($result) {
             //Utilizo la clase para calcular los costos
             //devuelve un arreglos con los datos de la maquina
-            $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
+            $costos_maquinas = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
 
-            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
-
+           // $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
+            debug($costos_maquinas);
 
             //Llamo a excel processing
-            $excel_processing_class = new ExcelProcesssing();
-            $excel_processing_class->CostosGruposExcelInforme($metadata, null, null, null);
+            //$excel_processing_class = new ExcelProcesssing();
+            //$excel_processing_class->CostosGruposExcelInforme($metadata, null, null, null);
 
 
         }

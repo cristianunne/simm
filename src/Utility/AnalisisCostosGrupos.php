@@ -15,7 +15,7 @@ class AnalisisCostosGrupos
         //Instancio la clase GetFUnctions
         $get_functions = new GetFunctions();
 
-        $meses_years = $get_functions->getMonthsAndYears($array_options);
+        $meses_years = $get_functions->getMonthsAndYearsWithLast($array_options);
 
         foreach ($meses_years as $meses_year)
         {
@@ -23,16 +23,15 @@ class AnalisisCostosGrupos
             $year = $meses_year['year'];
             //devuelve los resultados globales y las constantes para las maquinas
             $maquinas_with_general_constantes = $this->calculateCostosByMonth($mes, $year, $array_options, $id_empresa);
+            //debug($maquinas_with_general_constantes);
+
             $data_organized_by_month[] = $maquinas_with_general_constantes;
         }
+
 
         //Obtengo las maquinas distinct
         $maquinas_distinct = $get_functions->getMaquinasDistinct($data_organized_by_month);
         $new_lista_maquinas_with_data = null;
-
-        /*SI son varios meses se deben sumar las maquinas que coincidan
-        Si es solo un mes, no pasa nada*/
-        //SI es un periodo, los costos se suman mes a mes
         $new_lista_maquinas_with_data = $this->resumeResultMaquinasFromMonths($data_organized_by_month, $maquinas_distinct);
 
         $centros_costos_array = $get_functions->getCentroCostosDistinct($new_lista_maquinas_with_data);
@@ -41,7 +40,8 @@ class AnalisisCostosGrupos
 
         $maquinas_by_centros_costos['general'] = $this->resumeGeneralData($data_organized_by_month);
 
-        $maquinas_by_centros_costos['centros'] = $this->resumeDataMaquinasByCentroCostos($new_lista_maquinas_with_data, $centros_costos);
+
+        $maquinas_by_centros_costos['centros'] = $this->resumeDataMaquinasByCentroCostos($new_lista_maquinas_with_data, $centros_costos, $maquinas_by_centros_costos['general']);
 
         return $maquinas_by_centros_costos;
     }
@@ -94,14 +94,7 @@ class AnalisisCostosGrupos
 
         //COnsulto si AME viene null de la maquina para asigar la constante
 
-        if($maquina_with_data['constantes']['AME'] == null)
-        {
-            if(isset($constantes['AME'])){
-                $AME = $constantes['AME'];
-            }
-        } else {
-            $AME = $maquina_with_data['constantes']['AME'];
-        }
+        ///REVISAR AME
 
 
         //Cargo los valores de las variables
@@ -121,6 +114,7 @@ class AnalisisCostosGrupos
         $LUB = $maquina_with_data['constantes']['LUB'];
         $LUH = $maquina_with_data['constantes']['LUH'];
         $SAL = $maquina_with_data['constantes']['SAL'];
+        $AME = $maquina_with_data['constantes']['AME'];
 
         //traigo la clase y aplico la metodologia
 
@@ -130,11 +124,11 @@ class AnalisisCostosGrupos
         $seguro = $metodologia_costo->calculateSeguros($VAD, $CSE, $HTU);
         $dep_maq = $metodologia_costo->calculateDeprecacionMaquina($VAD, $CVD, $VAN, $HFU, $VUE);
         $dep_neum = $metodologia_costo->calculateDepreciacionNeumatico($VAN, $VUN);
-        $arreglos_maq = $metodologia_costo->calculateArreglosMecanicos($VAD, $CVD, $VAN, $HFU, $VUE, $AME);
+        $arreglos_maq = $metodologia_costo->calculateArreglosMecanicos($AME, $HME);
         $cons_comb = $metodologia_costo->calculateConsumoCombustible($maquina_with_data['gastos']['gasto_combustible'], $HME);
         $cons_lub = $metodologia_costo->calculateConsumoLubricante($maquina_with_data['gastos']['gasto_lubricante'], $HME);
-        $operador = $metodologia_costo->calculateOperador($SAL, $HME);
-        $mantenimiento = $metodologia_costo->calculateMantenimiento($SAL, $HME, $CMA);
+        $operador = $metodologia_costo->calculateOperador($SAL);
+        $mantenimiento = $metodologia_costo->calculateMantenimiento($SAL, $CMA);
         $administracion = $metodologia_costo->calculateAdministracion($interes, $seguro, $dep_maq, $dep_neum, $arreglos_maq,
             $cons_comb, $cons_lub, $operador, $mantenimiento, $CAD);
 
@@ -222,6 +216,8 @@ class AnalisisCostosGrupos
                     $maquina_with_data = $this->calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos,
                         $uso_maquinaria, $operarios_maquina_data);
 
+                    ///debug($maquina_with_data);
+
                     //Aplico la metodologia de costos aqui y devuelvo ya con eso
                     $maquina_with_data['result_metod'] = $this->appliedCostosMetodology($maquina_with_data, $id_empresa);
                     $maquina_with_data['costos'] = $this->calculateCostosByHours($maquina_with_data);
@@ -277,8 +273,116 @@ class AnalisisCostosGrupos
 
 
     }
-
     private function calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos, $uso_maquinaria,
+                                                            $operarios_maquina_data)
+    {
+
+        //INstancio la clase getFUnctions
+        $get_functions_class = new GetFunctions();
+
+        $variablesAndConstantesClass = new VariablesAndConstantes($costos[0], $operarios_maquina_data, $remitos_by_maquina,
+        $uso_maquinaria, $arreglos);
+
+        //Falta traer el salario del operario
+        //DEfino lOS NOMBRES DE LOS DATOS TEORICOS Y/O REALES, DEBEN COINCIDIR CON LOS DEFINIDOS EN LA MET/COST
+        $VAD = NULL; $VUM = NULL; $HTU = NULL; $HME = NULL; $TIS = null;
+        $FCI = null; $VAN = null; $HFU = null; $VUE = null;
+        $CCT = NULL; $CLT = NULL; $COM = NULL; $COH = NULL;
+        $LUB = NULL; $LUH = NULL; $SAL = NULL; $VUN = NULL;
+        $AME = NULL;
+
+        //DEfinos los gastos
+        $gastos_comb = null;
+        $gastos_lub = null;
+        $gastos_sueldos = null;
+        $gastos_arreglos = null;
+
+        $toneladas = null;
+        $precio_ton = null;
+
+
+
+        if($maquina_data->propia)
+        {
+            //Seteo los valores de las var and cons
+            $VAD = $variablesAndConstantesClass->getVAD();
+            $TIS = $variablesAndConstantesClass->getTIS();
+            $FCI = $variablesAndConstantesClass->getFCI();
+            $HTU = $variablesAndConstantesClass->getHTU();
+            $VAN = $variablesAndConstantesClass->getVAN();
+            $HFU = $variablesAndConstantesClass->getHFU();
+            $VUE = $variablesAndConstantesClass->getVUE();
+            $VUN = $variablesAndConstantesClass->getVUN();
+
+            $HME = $variablesAndConstantesClass->getHME();
+            $CCT = $variablesAndConstantesClass->getCCT();
+            $CLT = $variablesAndConstantesClass->getCLT();
+            $COH = $variablesAndConstantesClass->getCOH();
+            $LUH = $variablesAndConstantesClass->getLUH();
+            $SAL = $variablesAndConstantesClass->getSAL();
+
+            //seteo los gastos
+            $gastos_sueldos = $variablesAndConstantesClass->getGastosSueldo();
+            $gastos_comb = $variablesAndConstantesClass->getGastosCombustibles();
+            $gastos_lub = $variablesAndConstantesClass->getGastosLubricantes();
+
+
+            $toneladas = $variablesAndConstantesClass->getToneladas();
+            $precio_ton = $variablesAndConstantesClass->getPrecioTonelada();
+
+            $COM = $variablesAndConstantesClass->getCOM();
+            $LUB = $variablesAndConstantesClass->getLUB();
+
+        }
+
+
+        $AME = $variablesAndConstantesClass->getAME();
+        $gastos_arreglos = $variablesAndConstantesClass->getGastosArreglos();
+
+
+
+        $maquina = [
+            'idmaquinas' => $maquina_data->idmaquinas,
+            'name' => $maquina_data->name,
+            'marca' => $maquina_data->marca,
+            'centro_costos' => $costos[0]->centros_costos,
+            'metod_costos' => $costos[0]->metod_costos_hashmetod_costos,
+            'toneladas' => $toneladas,
+            'precio_ton' => $precio_ton,
+            'alquiler' =>  $costos[0]->alquilada,
+            'constantes' => [
+                'VAD' => $VAD,
+                'VUN' => $VUN,
+                'HTU' => $HTU,
+                'HME' => $HME,
+                'TIS' => $TIS,
+                'FCI' => $FCI,
+                'VAN' => $VAN,
+                'HFU' => $HFU,
+                'VUE' => $VUE,
+                'CCT' => $CCT,
+                'CLT' => $CLT,
+                'COM' => $COM,
+                'COH' => $COH,
+                'LUB' => $LUB,
+                'LUH' => $LUH,
+                'SAL' => $SAL,
+                'AME' => $AME
+            ],
+            'gastos'=> [
+                'gasto_combustible' => $gastos_comb,
+                'gasto_lubricante' => $gastos_lub,
+                'gasto_sueldo' => $gastos_sueldos,
+                'gastos_arreglos' => $gastos_arreglos
+            ]
+        ];
+
+        return $maquina;
+
+
+    }
+
+    private function calculateVariablesyConstantesByMaquina_($maquina_data, $remitos_by_maquina, $costos, $arreglos, $uso_maquinaria,
                                                       $operarios_maquina_data)
     {
         //INstancio la clase getFUnctions
@@ -319,6 +423,8 @@ class AnalisisCostosGrupos
             }
 
             //El precio por tonelada se calcula de forma diferente, si es alquilada esta en costos, sino esta en el remito
+            //EL precio por tonelada es ponderado
+
             foreach ($remitos_by_maquina as $remito) {
                 $toneladas = $toneladas + $remito->ton;
                 $precio_ton_aux = $precio_ton_aux + $remito->precio_ton;
@@ -347,10 +453,10 @@ class AnalisisCostosGrupos
 
                 foreach ($uso_maquinaria as $uso_maq) {
 
-                    $uso_maquinaria = $get_functions_class->getUsoMaquinariaCombustible($uso_maq->iduso_maquinaria);
+                    $uso_maquinaria_ = $get_functions_class->getUsoMaquinariaCombustible($uso_maq->iduso_maquinaria);
 
 
-                    if (count($uso_maquinaria->toArray()) > 0) {
+                    if (count($uso_maquinaria_->toArray()) > 0) {
                         $horas_tol = $horas_tol + $uso_maq->horas_trabajo;
 
                         foreach ($uso_maq->uso_comb_lub as $uso_comb) {
@@ -468,6 +574,17 @@ class AnalisisCostosGrupos
 
     }
 
+    /*
+     $VAD = NULL; $VUM = NULL; $HTU = NULL; $HME = NULL; $TIS = null;
+        $FCI = null; $VAN = null; $HFU = null; $VUE = null;
+        $CCT = NULL; $CLT = NULL; $COM = NULL; $COH = NULL;
+        $LUB = NULL; $LUH = NULL; $SAL = NULL; $VUN = NULL;
+        $AME = NULL;
+     */
+
+
+
+
     public function verifiedDataByMonth($array_options, $mes, $year)
     {
         $result_by_month = [];
@@ -491,6 +608,8 @@ class AnalisisCostosGrupos
             $array_remitos = $get_functions->getRemitosByConditions($array_options);
             $general_data['total_remitos'] = count($array_remitos);
 
+
+
             //COntrolo que leguen remitos
             if(count($array_remitos) > 0){
                 //TRaigo las maquinas que participan en el analisis
@@ -498,6 +617,7 @@ class AnalisisCostosGrupos
 
                 //Variable con las maquinas utilizadas en los remitos filtrados
                 $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $array_remitos);
+
                 if(count($maquinas_array) > 0){
                     foreach ($maquinas_array as $maquina) {
 
@@ -532,31 +652,31 @@ class AnalisisCostosGrupos
                                     {
                                         return true;
                                     } else {
-                                        //debug("La Maquina no tiene Operarios con datos");
+                                        debug("La Maquina no tiene Operarios con datos");
                                         return false;
 
                                     }
 
                                 } else {
-                                    //debug("La Maquina no tiene Usos");
+                                    debug("La Maquina no tiene Usos");
                                     return false;
                                 }
 
                             } else {
-                                //debug("La Maquina no tiene costos");
+                                debug("La Maquina no tiene costos");
                                 return false;
 
                             }
 
                         } else {
-                            //debug("La Maquina no tiene remitos distinct");
+                            debug("La Maquina no tiene remitos distinct");
                             return false;
 
                         }
                     }
 
                 } else {
-                    //debug("No hay Maquinas");
+                    debug("No hay Maquinas");
                     return false;
 
                 }
@@ -576,7 +696,7 @@ class AnalisisCostosGrupos
     }
 
 
-    private function resumeDataMaquinasByCentroCostos($new_lista_maquinas_with_data, $centros_costos)
+    private function resumeDataMaquinasByCentroCostos($new_lista_maquinas_with_data, $centros_costos, $general_data)
     {
         $this->autoRender = false;
 
@@ -601,6 +721,7 @@ class AnalisisCostosGrupos
                 'categoria' => $centro->categoria
             ];
 
+
             $array_maquinas = [];
             $i = 0;
             foreach ($new_lista_maquinas_with_data as $maq){
@@ -615,8 +736,14 @@ class AnalisisCostosGrupos
                         $total_ton = $total_ton + $maq['costos']['toneladas'];
                         //$total_precio = $total_precio + $maq['precio_ton'];
 
-                        //COto por toneladas total
-                        $costo_total = $costo_total + $maq['costos']['costo_ton'] * $maq['costos']['toneladas'];
+                        if(!empty($general_data['toneladas'])){
+
+                            if($general_data['toneladas'] > 0){
+                                //COto por toneladas total
+                                $costo_total = $costo_total + (($maq['costos']['costo_ton'] * $maq['costos']['toneladas']) / $general_data['toneladas']);
+                            }
+
+                        }
                         $horas = $horas + $maq['costos']['horas'];
 
                     }

@@ -810,3 +810,22 @@ div.jfilestyle label{
     vertical-align: baseline;
 }
 
+
+/* VARIACIONES **/
+
+#rb-evolucion div label{
+    font-weight: normal;
+}
+.box-variaciones-header{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-top: 10px;
+}
+
+.box-variaciones-header p{
+    display: contents;
+}
+
+
+

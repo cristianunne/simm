@@ -95,7 +95,7 @@
                     <div class="btn-group flex-vertical " role="group" aria-label="Third group">
                         <div>
                             <?= $this->Html->link('',
-                                ['controller' => 'AnalisisCostos', 'action' => 'index'],
+                                ['controller' => 'Variaciones', 'action' => 'index'],
                                 ['class' => 'btn-simm btn-centro_costos btn btn-default', 'escape' => false]) ?>
                         </div>
                         <div class="div_content">

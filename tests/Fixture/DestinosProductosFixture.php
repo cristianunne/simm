@@ -18,7 +18,7 @@ class DestinosProductosFixture extends TestFixture
         'iddestinos_productos' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true, 'precision' => null],
         'destinos_iddestinos' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'productos_idproductos' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
-        'precio' => ['type' => 'decimal', 'length' => 10, 'precision' => 0, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
+        'precio' => ['type' => 'float', 'length' => null, 'precision' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
         'created' => ['type' => 'date', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'finished' => ['type' => 'date', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'active' => ['type' => 'boolean', 'length' => null, 'null' => true, 'default' => '1', 'comment' => '', 'precision' => null],
@@ -33,7 +33,7 @@ class DestinosProductosFixture extends TestFixture
         ],
         '_options' => [
             'engine' => 'InnoDB',
-            'collation' => 'utf8mb4_0900_ai_ci'
+            'collation' => 'utf8mb4_unicode_ci'
         ],
     ];
     // @codingStandardsIgnoreEnd
@@ -49,9 +49,9 @@ class DestinosProductosFixture extends TestFixture
                 'iddestinos_productos' => 1,
                 'destinos_iddestinos' => 1,
                 'productos_idproductos' => 1,
-                'precio' => 1.5,
-                'created' => '2022-07-11',
-                'finished' => '2022-07-11',
+                'precio' => 1,
+                'created' => '2023-04-07',
+                'finished' => '2023-04-07',
                 'active' => 1,
             ],
         ];

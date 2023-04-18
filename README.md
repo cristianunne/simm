@@ -1,6 +1,6 @@
 # Sistema Integrado de Manejo de Maquinaria (SIMM)
 
-
+<img height="90" src="/var/www/html/simm/webroot/img/tractor.png" width="90"/>
 
 -----------------------------------------------------
 ## Tecnologías

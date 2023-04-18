@@ -428,6 +428,9 @@ function getParcelaByLoteFromDb(lote) {
 
         },
         error: function (data) {
+
+
+
         }
     });
 }
@@ -2413,6 +2416,8 @@ function deleteProductUsoMaqLub(element) {
         let variable = $(object).attr('attr').toString();
         let id = $(object).attr('attr2').toString();
 
+        let origen = $(object).attr('attr3').toString();
+
         //aca debo cambiar
 
         //$("#input_lotes").val(variable);
@@ -2437,14 +2442,14 @@ function deleteProductUsoMaqLub(element) {
 
             //Verifico si es el EDIT
 
-            getParcelaByLoteCostos($("#lotes_idlotes"));
+            getParcelaByLoteCostos($("#lotes_idlotes"), origen);
 
         }
         closeModalById('modal_lotes');
 
     }
 
-function getParcelaByLoteCostos(lote) {
+function getParcelaByLoteCostos(lote, origen) {
 
     let option_select = $(lote).val().toString();
 
@@ -2455,22 +2460,30 @@ function getParcelaByLoteCostos(lote) {
         $("#parcela").prop('disabled', false);
         //alert(option_select);
         //Llamo al metodo getDptos
-        getParcelaByLoteFromDbCostos(option_select);
+        getParcelaByLoteFromDbCostos(option_select, origen);
     }
 
 }
 
 
 
-function getParcelaByLoteFromDbCostos(lote) {
+function getParcelaByLoteFromDbCostos(lote, origen) {
 
+    let url = null;
     //Verificar si viene de un edit la peticion
+    if(origen === 'variaciones'){
+        url = 'Parcelas/getParcelaByLote';
+
+    } else {
+        url = '../Parcelas/getParcelaByLote';
+
+    }
 
 
     $.ajax({
         type: "POST",
         async: true,
-        url: '../Parcelas/getParcelaByLote',
+        url: url,
         data: {'lote' : lote},
 
         beforeSend: function (xhr) { // Add this line

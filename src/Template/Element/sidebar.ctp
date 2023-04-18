@@ -187,7 +187,7 @@
 
                             <?=  $this->Html->link(
                                 '<i class="fas fa-greater-than nav-icon"></i> Variaciones',
-                                ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                ['controller' => 'Variaciones', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
                         </li>
 

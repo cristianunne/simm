@@ -169,27 +169,26 @@ class OperariosMaquinasController extends AppController
                 $data = $this->request->getData();
 
 
-                //Consulto si hay cambios en los datos
-                if ($this->compareData($data, $operarios_maq->toArray()))
-                {
+                //Consulto si hay cambios en los datos YA NO ES NECESARIO
 
-                    //si hay cambios creo un nuevo registro y seteo a false el anterior
 
-                    //al actual lo seteo como inactivo
-                    $operarios_maq_new = $this->OperariosMaquinas->newEntity();
+                //si hay cambios creo un nuevo registro y seteo a false el anterior
+
+                //al actual lo seteo como inactivo
+                $operarios_maq_new = $this->OperariosMaquinas->newEntity();
 
                     //Solo cambiara el active si la fecha es mas actual que el que esta activo
-                    if(strtotime($data['fecha']) > strtotime($operarios_maq->fecha)){
-                        $operarios_maq->active = 0;
-                    } else {
-                        $operarios_maq_new->active = 0;
-                    }
+                if(strtotime($data['fecha']) > strtotime($operarios_maq->fecha)){
+                    $operarios_maq->active = 0;
+                } else {
+                    $operarios_maq_new->active = 0;
+                }
 
 
-                    $operarios_maq->finished = date("Y-m-d");
+                $operarios_maq->finished = date("Y-m-d");
 
 
-                    if($this->OperariosMaquinas->save($operarios_maq)){
+                if($this->OperariosMaquinas->save($operarios_maq)){
 
                         //setee a false el estado, entonces creo uno nuevo
 
@@ -208,15 +207,7 @@ class OperariosMaquinasController extends AppController
                         }
 
                     } else {
-                        $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
-                    }
-
-                }
-                else {
-                    //son iguales no hago nada
-
-                    $this->Flash->error(__('No se han realizado modificaciones. Cambie los valores para proceder.'));
-                    return $this->redirect(['action' => 'index']);
+                    $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
                 }
 
             }

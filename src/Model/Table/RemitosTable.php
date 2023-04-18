@@ -300,13 +300,6 @@ class RemitosTable extends Table
         $result = $query
             ->where($conditions);
 
-        $array_result = [];
-
-        foreach ($result as $rem){
-
-            $array_result[] = $rem->idremitos;
-        }
-
 
         return $result;
     }
@@ -323,7 +316,7 @@ class RemitosTable extends Table
         }
         if(isset($options['lotes_idlotes'])){
             if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
-                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+                $conditions['lotes_idlotes'] = $options['lotes_idlotes'];
             }
         }
         if(isset($options['parcelas_idparcelas'])){
@@ -342,19 +335,17 @@ class RemitosTable extends Table
                 $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
             }
         }
-        if(isset($options['destinos_iddestinos'])){
-            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
-                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
-            }
-        }
 
-        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
+
+        //$conditions['empresas_idempresas'] = $options['empresas_idempresas'];
 
 
         $conditions['MONTH(fecha) ='] = $options['mes'];
         $conditions['YEAR(fecha) ='] = $options['year'];
 
-        $conditions['RemitosMaquinas.maquinas_idmaquinas'] = $options['maquina'];
+        $conditions['maquinas_idmaquinas'] = $options['maquina'];
+
+
 
         $result = $query
             ->distinct(['idremitos'])
@@ -451,26 +442,35 @@ class RemitosTable extends Table
 
 
         if(isset($options['worksgroup'])){
-            if($options['worksgroup'] != 0){
+            if($options['worksgroup'] != 0 ){
                 $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
             }
         }
-
-
-        if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
-            $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
         }
 
-        if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
-            $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
         }
-
-        if($options['propietarios_idpropietarios'] != 0){
-            $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
-        }
-
-        if($options['destinos_iddestinos'] != 0){
-            $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
         }
 
 
@@ -558,5 +558,124 @@ class RemitosTable extends Table
         return $result;
 
     }
+
+    public function findGetWorksGroupDistinct(Query $query, $options = null)
+    {
+
+        $conditions = [];
+
+
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0 ){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
+        }
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
+        }
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+
+
+        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
+
+
+        $conditions["DATE_FORMAT(fecha,'%Y-%m') >="] = $options['fecha_inicio'];
+        $conditions["DATE_FORMAT(fecha,'%Y-%m') <="] = $options['fecha_fin'];
+
+        $result = $query->select(['worksgroups_idworksgroups'])
+            ->where($conditions)->distinct(['worksgroups_idworksgroups']);
+
+
+        return $result;
+
+    }
+
+    public function findGetSumaToneladasByWorksgroup(Query $query, $options = null)
+    {
+
+        $conditions = [];
+
+
+        $conditions['worksgroups_idworksgroups ='] = $options['worksgroup'];
+        $conditions['MONTH(fecha) ='] = $options['mes'];
+        $conditions['YEAR(fecha) ='] = $options['year'];
+
+        $result = $query->select(['worksgroups_idworksgroups',
+            'toneladas' => $query->func()->sum('ton')])
+            ->where($conditions)->distinct(['worksgroups_idworksgroups']);
+
+        return $result;
+
+    }
+
+    public function findGetSumaToneladasByMaquina(Query $query, $options = null)
+    {
+
+        $conditions = [];
+
+
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+
+
+        $conditions['MONTH(fecha) ='] = $options['mes'];
+        $conditions['YEAR(fecha) ='] = $options['year'];
+
+        //$conditions['RemitosMaquinas.maquinas_idmaquinas'] = $options['maquina'];
+
+        debug($conditions);
+
+        $result = $query ->innerJoinWith('RemitosMaquinas')->where($conditions);
+
+
+        /*$result = $query->select(['RemitosMaquinas.maquinas_idmaquinas',
+            'toneladas' => $query->func()->sum('ton')])
+            ->innerJoinWith('RemitosMaquinas')
+            ->where($conditions)->distinct(['RemitosMaquinas.maquinas_idmaquinas']);*/
+
+        debug($result->toArray());
+
+        return $result;
+
+    }
+
+
 
 }

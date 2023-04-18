@@ -17,13 +17,14 @@ class DestinosProductosController extends AppController
     public function isAuthorized($user)
     {
         if (isset($user['role']) and $user['role'] === 'user') {
-            if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'addByDestino', 'viewPricesByDestino', 'viewHistory',
-                'updatePrice'])) {
+            if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'addByDestino',
+                'viewPricesByDestino', 'viewHistory',
+                'updatePrice', 'deleteByProduct'])) {
                 return true;
             }
         } else if (isset($user['role']) and $user['role'] === 'supervisor') {
             if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'addByDestino', 'viewPricesByDestino', 'viewHistory',
-                'updatePrice'])) {
+                'updatePrice', 'deleteByProduct'])) {
                 return true;
             }
         }
@@ -89,7 +90,7 @@ class DestinosProductosController extends AppController
             'keyField' => 'idproductos',
             'valueField' => 'name',
             'order' => ['name' => 'ASC']
-        ])->where(['idproductos NOT IN' => $productos_cargados])
+        ])->where(['idproductos NOT IN' => $productos_cargados, 'empresas_idempresas' => $id_empresa])
             ->toArray();
 
         $this->set(compact('lista_productos'));
@@ -212,16 +213,20 @@ class DestinosProductosController extends AppController
                         //AGrego lo datos falantes
                         $destino_productos_new->created = date("Y-m-d");
 
+
                         if($this->DestinosProductos->save($destino_productos_new)){
                             $this->Flash->success(__('El Precio se ha actualizado correctamente'));
                             return $this->redirect(['action' => 'viewPricesByDestino', $destino_productos->destinos_iddestinos]);
                         } else {
-
+                            debug('entreooooooooereryerywverjetyjooo');
+                            debug($destino_productos_new->getErrors());
                             //debug($destino_productos_new->toArray());
                             $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
                         }
 
                     } else {
+                        debug('entreooooooooooo');
+                        debug($destino_productos->getErrors());
                         $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
                     }
 
@@ -239,12 +244,15 @@ class DestinosProductosController extends AppController
             $this->set(compact('destino_productos'));
 
         } catch (InvalidPrimaryKeyException $e){
+            debug($e);
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
 
         } catch (RecordNotFoundException $e){
+            debug($e);
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
         }
         catch (Exception $e){
+            debug($e);
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
         }
 
@@ -289,8 +297,10 @@ class DestinosProductosController extends AppController
             $this->set(compact('destinos_productos'));
 
             //debug($destinos->toArray());
-
         }
+
+        $this->set(compact('id_destino'));
+
     }
 
 
@@ -328,4 +338,38 @@ class DestinosProductosController extends AppController
         }
 
     }
+
+
+    public function deleteByProduct($id_product = null, $id_destino = null)
+    {
+
+        $this->autoRender = false;
+        $this->request->allowMethod(['post', 'delete']);
+
+        try{
+
+            //Variable usada para el sidebar
+
+            //debo consultar si esta constante se usa en otro lugar antes de eliminar
+
+            if ($this->DestinosProductos->deleteAll(['productos_idproductos' => $id_product])) {
+                $this->Flash->success(__('El Registro ha sido eliminado.'));
+
+                return $this->redirect(['action' => 'viewPricesByDestino', $id_destino]);
+            } else {
+                $this->Flash->error(__('El Registro no pudo ser eliminada. Intente nuevamente.'));
+            }
+
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+        }
+        catch (Exception $e){
+            $this->Flash->error(__('Error al eliminar los cambios. Intenta nuevamente'));
+        }
+
+    }
+
 }

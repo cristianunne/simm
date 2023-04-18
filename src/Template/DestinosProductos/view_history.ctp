@@ -80,12 +80,11 @@
 
 
                                     <td class="actions" style="text-align: center">
-                                        <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
-                                            <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                                 ['action' => 'delete', $destino->iddestinos_productos, $destino->destinos_iddestinos, $destino->productos_idproductos],
                                                 ['confirm' => __('Eliminar {0}?', ($destino->producto->name . ': ' .$destino->precio)),
                                                     'class' => 'btn btn-danger','escape' => false]) ?>
-                                        <?php endif;?>
+
                                     </td>
 
                                 </tr>
@@ -94,7 +93,7 @@
                         </table>
                         <br>
                         <div class="pull-left">
-                            <?= $this->Html->link("Volver", ['action' => 'viewPricesByDestino', $destino->destinos_iddestinos], ['class' => 'btn btn-danger btn-flat']) ?>
+                            <?= $this->Html->link("Volver", ['action' => 'viewPricesByDestino', $id_destino], ['class' => 'btn btn-danger btn-flat']) ?>
                         </div>
                     </div>
                 </div>

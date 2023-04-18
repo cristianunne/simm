@@ -89,20 +89,12 @@
                                 <?php endif;?>
 
 
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
-                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                        ['action' => 'deleteCostosMaquina', $maq->idcostos_maquinas, 0, $hash_id],
-                                        ['confirm' => __('Eliminar {0}?', $maq->name), 'class' => 'btn btn-danger','escape' => false]) ?>
 
-                                <?php else: ?>
+                                <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                    ['action' => 'deleteCostosMaquina', $maq->idcostos_maquinas, $id_maquina, $hash_id],
+                                    ['confirm' => __('Eliminar {0}?', $maq->name), 'class' => 'btn btn-danger','escape' => false]) ?>
 
-                                    <?php if($current_user['idusers'] == $maq->user->idusers):  ?>
-                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                            ['action' => 'delete', $maq->idcostos_maquinas, 0, $hash_id],
-                                            ['confirm' => __('Eliminar {0}?', $maq->name), 'class' => 'btn btn-danger','escape' => false]) ?>
 
-                                    <?php endif;?>
-                                <?php endif;?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

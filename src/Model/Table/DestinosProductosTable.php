@@ -38,6 +38,7 @@ class DestinosProductosTable extends Table
 
         $this->addBehavior('Timestamp');
 
+
         $this->hasOne('Destinos', [
             'foreignKey' => 'iddestinos',
             'bindingKey' => 'destinos_iddestinos', //actual
@@ -49,7 +50,6 @@ class DestinosProductosTable extends Table
             'bindingKey' => 'productos_idproductos', //actual
             'joinType' => 'INNER'
         ]);
-
 
     }
 
@@ -76,7 +76,7 @@ class DestinosProductosTable extends Table
             ->notEmptyString('productos_idproductos');
 
         $validator
-            ->decimal('precio')
+            ->numeric('precio')
             ->allowEmptyString('precio');
 
         $validator

@@ -13,6 +13,9 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenDate|null $created
  * @property \Cake\I18n\FrozenDate|null $finished
  * @property bool|null $active
+ *
+ * @property \App\Model\Entity\Destino $destino
+ * @property \App\Model\Entity\Producto $producto
  */
 class DestinosProducto extends Entity
 {
@@ -32,5 +35,7 @@ class DestinosProducto extends Entity
         'created' => true,
         'finished' => true,
         'active' => true,
+        'destino' => true,
+        'producto' => true,
     ];
 }

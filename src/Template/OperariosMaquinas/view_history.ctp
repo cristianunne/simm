@@ -85,11 +85,11 @@
                                                 $oper->maquinas_idmaquinas], ['class' => 'btn bg-purple', 'escape' => false]) ?>
                                   <?php endif;?>
 
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
-                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+
+                                  <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                         ['action' => 'delete', $oper->idoperarios_maquinas],
                                         ['confirm' => __('Eliminar {0}?', $oper->name), 'class' => 'btn btn-danger','escape' => false]) ?>
-                                <?php endif;?>
+
                             </td>
 
 

@@ -113,7 +113,44 @@ class GetFunctions
 
     }
 
+    public function getGroupsByRemitos($remitos)
+    {
 
+        $remitos_distinct = $this->getRemitosAsArrayDistinct($remitos);
+
+        $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
+
+        //TRagi eo array distinc de workgroup
+        $grupos_distinct = $remitos_model->find('all', [
+            'fields' => ['worksgroups_idworksgroups']]
+        )
+            ->distinct(['worksgroups_idworksgroups'])
+            ->where(['idremitos IN' => $remitos_distinct])
+        ->toArray();
+
+        $grupos_distinct_array = $this->getGroupsAsArray($grupos_distinct);
+
+
+        $worksgroups_model = TableRegistry::getTableLocator()->get('Worksgroups');
+        $grupos = $worksgroups_model->find('all', [
+
+        ])->where(['idworksgroups IN ' => $grupos_distinct_array]);
+
+        return $grupos;
+
+    }
+
+    public function getGroupsAsArray($grupos_distinct)
+    {
+        $arrar_result = [];
+
+        foreach ($grupos_distinct as $group)
+        {
+            $arrar_result[] = $group['worksgroups_idworksgroups'];
+        }
+
+        return $arrar_result;
+    }
 
     public function getLoteById($id_lote)
     {
@@ -157,6 +194,31 @@ class GetFunctions
             return null;
         }
 
+    }
+
+    public function getMaquinas($options)
+    {
+        //va recibir 0 si son todas las maquinas o el id de la maquina
+        //id empresa
+
+        $conditions = [];
+
+
+        if(isset($options['maquina'])){
+            if($options['maquina'] != 0 ){
+                $conditions['idmaquinas'] = intval($options['maquina']);
+            }
+        }
+        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
+
+
+        $maquinas_model = TableRegistry::getTableLocator()->get('Maquinas');
+
+        $maquinas = $maquinas_model->find('all', [])
+        ->where($conditions);
+
+
+        return $maquinas;
     }
 
 
@@ -261,6 +323,28 @@ class GetFunctions
 
         }
         array_pop($array_result);
+        return $array_result;
+
+    }
+
+    public function getMonthsAndYearsWithLast($array_options = null)
+    {
+        $array_result = [];
+
+        $fechai=strtotime($array_options['fecha_inicio']);
+
+        $array_result[] = ['mes' => date('m',$fechai),
+            'year' => date('Y',$fechai)];
+
+        //$array_result[] = strtotime ('month',$fechai);
+        while($fechai < strtotime($array_options['fecha_fin'])){
+            $fechai = strtotime ('+1 month',$fechai) ;
+
+            $array_result[] = ['mes' => date('m',$fechai),
+                'year' => date('Y',$fechai)];
+
+        }
+
         return $array_result;
 
     }
@@ -396,11 +480,36 @@ class GetFunctions
         return $array_result;
     }
 
+    public function getRemitosByConditionsData($array_options)
+    {
+        $this->autoRender = false;
+
+
+        $remitos_table = TableRegistry::getTableLocator()->get('Remitos');
+        //$this->loadModel('Remitos');
+
+        $remitos = $remitos_table->find('RemitosByConditionsQuery',
+            $array_options);
+
+        return $remitos;
+    }
+
+
     public function getRemitosByMaquina($maquina, $array_options)
     {
 
         $array_options['maquina'] = $maquina;
 
+
+        $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
+
+        $remitos = $remitos_model->find('RemitosByConditionsQueryMaquina', $array_options);
+
+        return $remitos;
+    }
+
+    public function getRemitosByMaquinaWithoutOptions($array_options)
+    {
 
         $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
 
@@ -464,6 +573,77 @@ class GetFunctions
         }
 
 
+    }
+
+    public function getWorksgroupDistinctFromRemitos($array_options)
+    {
+        $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
+
+        $workgroups = $remitos_model->find('GetWorksGroupDistinct', $array_options);
+
+        $array_result = [];
+
+        foreach ($workgroups as $group)
+        {
+            $array_result[] = $group->worksgroups_idworksgroups;
+        }
+
+        return $array_result;
+
+    }
+
+
+    public function getSumaToneladasByWorksgroups($array_options)
+    {
+        //findGetSumaToneladasByWorksgroup
+        $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
+
+        $suma_worksgroup = $remitos_model->find('GetSumaToneladasByWorksgroup', $array_options);
+
+        $result = empty($suma_worksgroup->toArray()[0]->toneladas) ? 0 : $suma_worksgroup->toArray()[0]->toneladas;
+
+
+        return $result;
+    }
+
+    public function getSumaToneladasByMaquina($array_options)
+    {
+        //findGetSumaToneladasByWorksgroup
+        $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
+
+        $remitos_maq_model = TableRegistry::getTableLocator()->get('RemitosMaquinas');
+
+        //debug($array_options);
+
+        $remitos = $remitos_model->find('RemitosByConditionsQueryMaquina', $array_options);
+
+        $suma = 0;
+        foreach ($remitos as $rem)
+        {
+            $suma = $suma + $rem->ton;
+        }
+
+
+        return $suma;
+    }
+
+
+    public function getHorasTrabajadasByMaquina($array_options)
+    {
+        //findGetSumaToneladasByWorksgroup
+        $uso_maquinaria = TableRegistry::getTableLocator()->get('UsoMaquinaria');
+
+        $uso_maquinaria_ = $uso_maquinaria->find('GetUsoMaquinariaByConditionsVariacion', $array_options);
+
+        //debug($uso_maquinaria_->toArray());
+        $suma = 0;
+        foreach ($uso_maquinaria_ as $uso)
+        {
+            $suma = $suma + $uso->horas_trabajo;
+
+        }
+
+        return $suma;
     }
 
 

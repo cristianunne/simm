@@ -47,14 +47,14 @@
                         <div class="form-group sandbox-container" id="sandbox-container">
                             <?=  $this->Form->label('fecha_inicio', 'Inicio: ', ['class' => 'label-m10']) ?>
                             <div class="input-append date" style="margin-left: 1px;">
-                                <input id="fecha_inicio" name="fecha_inicio" type="date" class="span2" required>
+                                <input id="fecha_inicio" name="fecha_inicio" type="month" class="span2" required>
                             </div>
                         </div>
 
                         <div class="form-group sandbox-container" id="sandbox-container">
                             <?=  $this->Form->label('fecha_final', 'Final: ', ['class' => 'label-m10 width-45px']) ?>
                             <div class="input-append date">
-                                <input id="fecha_final" name="fecha_final" type="date" class="span2" required>
+                                <input id="fecha_final" name="fecha_final" type="month" class="span2" required>
                             </div>
                         </div>
                     </div>

@@ -75,6 +75,7 @@
                             <?= $this->Form->text('lotes_idlotes', ['class' => 'form-control', 'id' => 'lotes_idlotes']) ?>
                         </div>
 
+                        <br>
                         <div class="form-group">
                             <?= $this->Form->control('active', ['options' => ['1' => 'SI', '0' => 'NO'],
                                 'empty' => '(Elija una opción)', 'type' => 'select',

@@ -70,13 +70,16 @@
                             <td class="dt-center"><?= h($lote->user->lastname . ' ' . $lote->user->firstname) ?></td>
 
                             <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
-                                    ['action' => 'edit', $lote->idlotes], ['class' => 'btn bg-purple', 'escape' => false]) ?>
 
-                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
-                                    <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
-                                        ['action' => 'delete', $lote->idlotes],
-                                        ['confirm' => __('Eliminar {0}?', $lote->name), 'class' => 'btn btn-danger','escape' => false]) ?>
+
+                                <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'
+                                    or $current_user['idusers'] == $lote->users_idusers):  ?>
+                                        <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-edit', 'aria-hidden' => 'true']),
+                                            ['action' => 'edit', $lote->idlotes], ['class' => 'btn bg-purple', 'escape' => false]) ?>
+
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                            ['action' => 'delete', $lote->idlotes],
+                                            ['confirm' => __('Eliminar {0}?', $lote->name), 'class' => 'btn btn-danger','escape' => false]) ?>
                                 <?php endif;?>
 
 

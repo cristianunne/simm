@@ -180,6 +180,10 @@ class MaquinasController extends AppController
 
     public function delete($id = null)
     {
+
+        $this->autoRender = false;
+
+
         $this->request->allowMethod(['post', 'delete']);
 
         try {
@@ -581,7 +585,6 @@ class MaquinasController extends AppController
 
             //debug($maquinas_costos->toArray());
 
-
             //TRaigo los grupos todos sin filtros
             $grupos_model = $this->loadModel('Worksgroups');
             $grupos_data = $grupos_model->find('list', [
@@ -625,9 +628,9 @@ class MaquinasController extends AppController
 
                 $new_costos_maquina->maquinas_idmaquinas = $maquinas_costos->maquina->idmaquinas;
                 $new_costos_maquina->worksgroups_idworksgroups = $maquinas_costos->worksgroup->idworksgroups;
+                $new_costos_maquina->centros_costos_idcentros_costos = $maquinas_costos->centros_costos_idcentros_costos;
 
                 //El centro de costo ahora es un hash
-                $new_costos_maquina->centros_costos_idcentros_costos = $maquinas_costos->centros_costo->idcentros_costos;
                 $new_costos_maquina->metod_costos_hashmetod_costos = $maquinas_costos->metod_costos_hashmetod_costos;
                 $new_costos_maquina->alquilada = $maquinas_costos->alquilada;
                 $new_costos_maquina->active = true;
@@ -853,6 +856,7 @@ class MaquinasController extends AppController
 
     public function deleteCostosMaquina($id = null, $id_maquina = null, $hash_id = null)
     {
+        $this->autoRender = false;
         $this->request->allowMethod(['post', 'delete']);
 
         try{
@@ -883,7 +887,7 @@ class MaquinasController extends AppController
                     return $this->redirect(['action' => 'indexCostos', $id_maquina]);
 
                 } else {
-                    return $this->redirect(['action' => 'viewCostosMaquinaHistory', $hash_id]);
+                    return $this->redirect(['action' => 'viewCostosMaquinaHistory', $hash_id, $id_maquina]);
                 }
 
 

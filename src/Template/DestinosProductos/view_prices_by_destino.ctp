@@ -33,6 +33,7 @@
                                 <th scope="col"><?= $this->Paginator->sort('Producto') ?></th>
                                 <th scope="col"><?= $this->Paginator->sort('Precio') ?></th>
                                 <th scope="col" class="actions"><?= __('Actualizar') ?></th>
+                                <th scope="col" class="actions"><?= __('Acciones') ?></th>
                                 <th scope="col" class="actions"><?= __('Histórico') ?></th>
 
 
@@ -46,6 +47,12 @@
                                     <td class="actions" style="text-align: center">
                                     <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-sync', 'aria-hidden' => 'true']),
                                         ['action' => 'updatePrice', $destino->iddestinos_productos], ['class' => 'btn bg-purple', 'escape' => false]) ?>
+                                    </td>
+
+                                    <td class="dt-center">
+                                        <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
+                                            ['action' => 'deleteByProduct', $destino->productos_idproductos, $destino->destinos_iddestinos],
+                                            ['confirm' => __('Eliminar {0}?', $destino->producto->name), 'class' => 'btn btn-danger','escape' => false]) ?>
                                     </td>
 
                                     <td class="actions" style="text-align: center">
