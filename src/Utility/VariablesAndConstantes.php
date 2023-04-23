@@ -63,7 +63,7 @@ class VariablesAndConstantes
     public function setLUB()
     {
 
-        $this->LUB = $this->getCLT() == 0 ? null : ($this->getGastosLubricantes() / $this->getCLT());
+        $this->LUB = $this->getHME() == 0 ? null : ($this->getGastosLubricantes() / $this->getHME());
 
     }
 
@@ -78,7 +78,7 @@ class VariablesAndConstantes
     public function setCOM()
     {
         //CAlcula el precio ponderado de los combustibles
-        $this->COM = $this->getCCT() == 0 ? null : ($this->getGastosCombustibles() / $this->getCCT());
+        $this->COM = $this->getHME() == 0 ? null : ($this->getGastosCombustibles() / $this->getHME());
 
     }
 

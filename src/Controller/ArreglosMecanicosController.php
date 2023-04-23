@@ -58,7 +58,7 @@ class ArreglosMecanicosController extends AppController
         //AGregar el index comun
 
         $arreglos = $this->ArreglosMecanicos->find('all', [
-            'contain' => ['Users', 'Maquinas']
+            'contain' => ['Users', 'Maquinas', 'Lotes']
             ])->where(['ArreglosMecanicos.empresas_idempresas' => $id_empresa]);
 
 
@@ -131,6 +131,8 @@ class ArreglosMecanicosController extends AppController
         if ($this->request->is('post')) {
 
             $data = $this->request->getData();
+
+            debug($data);
 
 
             $arreglos = $this->ArreglosMecanicos->patchEntity($arreglos, $this->request->getData());

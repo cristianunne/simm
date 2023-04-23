@@ -1411,7 +1411,7 @@ class AnalisisCostosController extends AppController
 
 
 
-    private function resumeGeneralData($data_organized_by_month)
+    private function resumeGeneralData($data_organized_by_month, $maquinas_distinct)
     {
         $general = [
         'total_remitos' => null,
@@ -1422,10 +1422,13 @@ class AnalisisCostosController extends AppController
         foreach ($data_organized_by_month as $data)
         {
             $general['total_remitos'] =   $general['total_remitos'] + $data['general']['total_remitos'];
-            $general['total_maquinas'] =   $general['total_maquinas'] + $data['general']['total_maquinas'];
+            //$general['total_maquinas'] =   $general['total_maquinas'] + $data['general']['total_maquinas'];
             $general['toneladas'] =   $general['toneladas'] + $data['general']['toneladas'];
         }
 
+        debug($general);
+
+       // $general['total_maquinas'] = count($maquinas_distinct);
         return $general;
 
     }

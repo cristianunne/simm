@@ -21,8 +21,8 @@ class ExcelProcesssing
 
         $spreadsheet = new Spreadsheet();
 
-        $myWorkSheet_res = $this->createSheetResumenCostosGrupos($spreadsheet, $metadata, null, null,
-            null);
+        $myWorkSheet_res = $this->createSheetResumenCostosGrupos($spreadsheet, $metadata, $data_costos, $data_year_back,
+            $data_six_month_back);
 
         //$myWorkSheet_res =  $this->createdSheetResumen($data, $spreadsheet, $data_resumen, $data_year_back, $data_six_month_back);
         //$myWorkSheet_maq =  $this->createdSheetMaquinas($data['centros'], $spreadsheet);
@@ -81,7 +81,7 @@ class ExcelProcesssing
         $this->createInfoMetadataSheet($myWorkSheet_res, $metadata, $font_bold);
 
         //Llamo al metodo que crea el contenido
-        $this->createResumenResultadosCostosGrupos($myWorkSheet_res, $metadata, null, $styleArray, $font_bold);
+        $this->createResumenResultadosCostosGrupos($myWorkSheet_res, $data_costos, $styleArray, $font_bold);
 
         //Llamo al metodo que crea el box margenes y costos
         $this->createBoxCostosMargenesCostosGrupos($myWorkSheet_res, $data_costos, $styleArray, $font_bold);
@@ -476,10 +476,11 @@ class ExcelProcesssing
 
 
 
-    private function createResumenResultadosCostosGrupos($myWorkSheet_res, $metadatos, $data_costos, $styleArray, $font_bold)
+    private function createResumenResultadosCostosGrupos($myWorkSheet_res, $data_costos, $styleArray, $font_bold)
     {
         //Array informe se corresponde con los metadatos
         //Segundo BOX, LO HAGO CON BORDES, Empiezo desde A8
+        debug($data_costos);
 
         //$data_costos son los datos de los costos calculados y organizados
 
@@ -509,29 +510,29 @@ class ExcelProcesssing
 
         //Convertir todos estos valores a enteros
 
-        /*$ton = intval($data_costos['toneladas']);
+        $ton = floatval($data_costos['general']['toneladas']);
         $myWorkSheet_res->getStyle('B9')->getNumberFormat()->setFormatCode('#,##0');
         $myWorkSheet_res->setCellValueExplicit('B9', $ton, DataType::TYPE_NUMERIC);
 
-        $costo_tot = intval($data_costos['costo_total']);
+        $costo_tot = floatval($data_costos['general']['costo_total']);
         $myWorkSheet_res->getStyle('B10')->getNumberFormat()->setFormatCode('#,##0');
         $myWorkSheet_res->setCellValueExplicit('B10', $costo_tot, DataType::TYPE_NUMERIC);
 
 
-        $costo_var = intval($data_costos['costo_variable']);
+        $costo_var = floatval($data_costos['general']['costos_suma']['sum_costo_variable']);
         $myWorkSheet_res->getStyle('B11')->getNumberFormat()->setFormatCode('#,##0');
         $myWorkSheet_res->setCellValueExplicit('B11', $costo_var, DataType::TYPE_NUMERIC);
 
-        $costo_fijo = intval($data_costos['costo_fijo']);
+        $costo_fijo = floatval($data_costos['general']['costos_suma']['sum_costos_fijos']);
         $myWorkSheet_res->getStyle('B12')->getNumberFormat()->setFormatCode('#,##0');
         $myWorkSheet_res->setCellValueExplicit('B12', $costo_fijo, DataType::TYPE_NUMERIC);
 
 
-        $mai_ = intval($data_costos['mai_economico']);
+        /*$mai_ = floatval($data_costos['mai_economico']);
         $myWorkSheet_res->getStyle('D10')->getNumberFormat()->setFormatCode('#,##0');
         $myWorkSheet_res->setCellValueExplicit('D10', $mai_, DataType::TYPE_NUMERIC);
 
-        $mai_fin = intval($data_costos['mai_financiero']);
+        $mai_fin = floatval($data_costos['mai_financiero']);
         $myWorkSheet_res->getStyle('D11')->getNumberFormat()->setFormatCode('#,##0');
         $myWorkSheet_res->setCellValueExplicit('D11', $mai_fin, DataType::TYPE_NUMERIC);*/
 
@@ -597,8 +598,6 @@ class ExcelProcesssing
         foreach (range('A12:D12', $myWorkSheet_res->getHighestColumn()) as $col) {
             $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
         }
-
-
 
     }
 

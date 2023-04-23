@@ -143,6 +143,15 @@ class AnalisisCostosController extends AppController
             $array_options['empresas_idempresas'] = $id_empresa;
 
 
+            $array_options_['worksgroup'] = $worksgroup;
+            $array_options_['fecha_inicio'] = $fecha_inicio;
+            $array_options_['fecha_fin'] = $fecha_final;
+            $array_options_['lotes_idlotes'] = $lotes;
+            $array_options_['parcelas_idparcelas'] = $parcelas;
+            $array_options_['propietarios_idpropietarios'] = $propietarios;
+            $array_options_['destinos_iddestinos'] = $destinos;
+            $array_options_['empresas_idempresas'] = $id_empresa;
+
 
             //INstancio la clase GetFunction
             $get_function_class = New GetFunctions();
@@ -170,10 +179,34 @@ class AnalisisCostosController extends AppController
 
             }
 
+
             if($result) {
                 //Utilizo la clase para calcular los costos
                 //devuelve un arreglos con los datos de la maquina
                 $costos_maquinas = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
+                //debug($costos_maquinas);
+
+                //Tengo que calcular los costos backtime
+                $date_six_inicio_back = $get_function_class->getDateSixMonthsBack($fecha_inicio);
+                $date_six_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
+
+                //remplazo el array options
+                $array_options_['fecha_inicio'] = $date_six_inicio_back;
+                $array_options_['fecha_fin'] = $date_six_final_back;
+
+                $costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+
+
+                $date_year_inicio_back = $get_function_class->getDateOneYearBack($fecha_inicio);
+                $date_year_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
+
+                //remplazo el array options
+                $array_options_['fecha_inicio'] = $date_year_inicio_back;
+                $array_options_['fecha_fin'] = $date_year_final_back;
+
+                //debug("UN ANO ATRAS");
+                $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+
 
                 // $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
 
@@ -223,8 +256,8 @@ class AnalisisCostosController extends AppController
         //$fecha_final = '2020-02-20';
 
         $worksgroup = 0;
-        $fecha_inicio = '2022-09-01';
-        $fecha_final = '2022-09-30';
+        $fecha_inicio = '2022-09';
+        $fecha_final = '2022-09';
         $lotes = 0;
         $parcelas = 0;
         $propietarios = 0;
@@ -244,6 +277,7 @@ class AnalisisCostosController extends AppController
         $informe = true;
 
         $array_options = [];
+        $array_options_ = [];
 
         $array_options['worksgroup'] = $worksgroup;
         $array_options['fecha_inicio'] = $fecha_inicio;
@@ -253,6 +287,15 @@ class AnalisisCostosController extends AppController
         $array_options['propietarios_idpropietarios'] = $propietarios;
         $array_options['destinos_iddestinos'] = $destinos;
         $array_options['empresas_idempresas'] = $id_empresa;
+
+        $array_options_['worksgroup'] = $worksgroup;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['propietarios_idpropietarios'] = $propietarios;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
 
 
         //Result costos
@@ -268,7 +311,7 @@ class AnalisisCostosController extends AppController
         $analisis_costos_class =  new AnalisisCostosGrupos();
 
         //EL recorrido de los meses los hago aqui
-        $meses_years = $get_function_class->getMonthsAndYears($array_options);
+        $meses_years = $get_function_class->getMonthsAndYearsWithLast($array_options);
 
         $result = true;
 
@@ -289,23 +332,127 @@ class AnalisisCostosController extends AppController
 
         }
 
-
-
         //INstancio las clases getfunction y costos
         if($result) {
             //Utilizo la clase para calcular los costos
             //devuelve un arreglos con los datos de la maquina
             $costos_maquinas = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
 
-           // $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
             debug($costos_maquinas);
 
+
+
+            //$costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
+
+            //Calculo los costos seis meses atras
+
+            //Tengo que calcular los costos backtime
+            $date_six_inicio_back = $get_function_class->getDateSixMonthsBack($fecha_inicio);
+            $date_six_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
+
+            //remplazo el array options
+            $array_options_['fecha_inicio'] = $date_six_inicio_back;
+            $array_options_['fecha_fin'] = $date_six_final_back;
+
+            $costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+
+            //debug($costos_maquinas_six_back);
+
+            $date_year_inicio_back = $get_function_class->getDateOneYearBack($fecha_inicio);
+            $date_year_final_back = $get_function_class->getDateOneYearBack($fecha_final);
+
+            //remplazo el array options
+            $array_options_['fecha_inicio'] = $date_year_inicio_back;
+            $array_options_['fecha_fin'] = $date_year_final_back;
+
+            //debug("UN ANO ATRAS");
+            $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+
+            //debug($costos_one_year_back);
+
+            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
+            debug($metadata);
+
             //Llamo a excel processing
-            //$excel_processing_class = new ExcelProcesssing();
-            //$excel_processing_class->CostosGruposExcelInforme($metadata, null, null, null);
+            $excel_processing_class = new ExcelProcesssing();
+            $excel_processing_class->CostosGruposExcelInforme($metadata, $costos_maquinas, $costos_maquinas_six_back,
+                $costos_one_year_back);
 
 
         }
+
+
+    }
+
+    public function verifiedDataForAnalisysCostos()
+    {
+        $this->autoRender = false;
+
+        $seccion = 'system';
+        $sub_seccion = 'Maquinas';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $user_id = $session->read('Auth.User.idusers');
+        $user_role = $session->read('Auth.User.role');
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        if($this->request->is('ajax')) {
+            //COnsulto que los indices esten definidos
+            $worksgroup = $_POST['groups'];
+            $fecha_inicio = $_POST['fecha_inicio'];
+            $fecha_final = $_POST['fecha_final'];
+            $lotes = $_POST['lotes'];
+            $parcelas = $_POST['parcelas'];
+            $propietarios = $_POST['propietarios'];
+            $destinos = $_POST['destinos'];
+            $informe = $_POST['informe'];
+
+            $array_options['worksgroup'] = $worksgroup;
+            $array_options['fecha_inicio'] = $fecha_inicio;
+            $array_options['fecha_fin'] = $fecha_final;
+            $array_options['lotes_idlotes'] = $lotes;
+            $array_options['parcelas_idparcelas'] = $parcelas;
+            $array_options['propietarios_idpropietarios'] = $propietarios;
+            $array_options['destinos_iddestinos'] = $destinos;
+            $array_options['empresas_idempresas'] = $id_empresa;
+
+
+            //INstancio la clase GetFunction
+            $get_function_class = New GetFunctions();
+
+            //instancio la clase AalisisCostos
+            $analisis_costos_class =  new AnalisisCostosGrupos();
+
+            //EL recorrido de los meses los hago aqui
+            $meses_years = $get_function_class->getMonthsAndYearsWithLast($array_options);
+
+            $result = true;
+
+
+            foreach ($meses_years as $meses_year)
+            {
+                $mes = $meses_year['mes'];
+                $year = $meses_year['year'];
+
+                $result = $analisis_costos_class->verifiedDataByMonth($array_options, $mes, $year);
+
+                //SI uno ya es false, cancelo la operacion
+                if(!$result){
+                    break;
+                }
+
+            }
+
+
+
+            return $this->json(['result' => $result]);
+        }
+
 
 
     }

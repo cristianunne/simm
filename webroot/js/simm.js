@@ -2416,7 +2416,7 @@ function deleteProductUsoMaqLub(element) {
         let variable = $(object).attr('attr').toString();
         let id = $(object).attr('attr2').toString();
 
-        let origen = $(object).attr('attr3').toString();
+        let origen = $(object).attr('attr3') === undefined ? null : $(object).attr('attr3').toString();
 
         //aca debo cambiar
 
@@ -2520,9 +2520,64 @@ function loadParcelasToSelectCostos(data){
 
 /*** CAlculo de costos ***/
 
+function getConfirmRed(title, content)
+{
+    $.confirm({
+        icon: 'fas fa-exclamation-circle',
+        title: title,
+        content: content,
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+            close:
+                {
+                    text: 'Aceptar',
+                    btnClass: 'btn-red',
+                    function () {
+                    }}
+        }
+    });
+}
+
+
+var result_verified = null;
+
+function verifiedverifiedDataByMonth(variables)
+{
+    let url = 'verifiedDataForAnalisysCostos';
+    $.ajax({
+        type: "POST",
+        async: false,
+        url: url,
+        data: variables,
+
+        beforeSend: function (xhr) { // Add this line
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        },
+        success: function(data, textStatus){
+            console.log(data);
+
+            if(data.result === false || data.result === 'false')
+            {
+                result_verified = false;
+                return false;
+            }
+
+            result_verified = true;
+            return true;
+
+        },
+        error: function (data) {
+        }
+    });
+
+}
+
+
+
 var data_info = null;
 
-function groupsCostosCalc(button){
+function groupsCostosCalc(button) {
 
     //Primero verifico que me haya pasado los datos
     let groups_control = $("#worksgroups_idworksgroups");
@@ -2534,27 +2589,13 @@ function groupsCostosCalc(button){
     let destinos_iddestinos_control = $("#destinos_iddestinos");
 
 
-
-    if(groups_control.val() === '' || fecha_inicio_control.val() === '' || fecha_final_control.val() === '' ||
+    if (groups_control.val() === '' || fecha_inicio_control.val() === '' || fecha_final_control.val() === '' ||
         lotes_idlotes_control.val() === '' || parcelas_idparcelas_control.val() === '' || parcelas_idparcelas_control.val() === undefined
         || propietarios_idpropietarios_control === '' ||
-        destinos_iddestinos_control === ''){
+        destinos_iddestinos_control === '') {
 
-        $.confirm({
-            icon: 'fas fa-exclamation-circle',
-            title: '¡Advertencia!',
-            content: 'Debe completar todos los campos para proceder!',
-            type: 'red',
-            typeAnimated: true,
-            buttons: {
-                close:
-                    {
-                        text: 'Aceptar',
-                        btnClass: 'btn-red',
-                        function () {
-                }}
-            }
-        });
+        getConfirmRed('¡Advertencia!', 'Debe completar todos los campos para proceder!')
+
     } else {
 
         //SI paso el proceso, proceso la info :selected
@@ -2580,10 +2621,9 @@ function groupsCostosCalc(button){
         //Verifico si los filtros de Lotes, parcelas, propietarios y destinos estan activos, si lo estan
         //notifico que el calculo puede fallar
 
-        if(lote_name !== 'Todos' || parcelas_name !== 'Todos' || propietarios_name !== 'Todos' || destinos_name !== 'Todos')
-        {
+        if (lote_name !== 'Todos' || parcelas_name !== 'Todos' || propietarios_name !== 'Todos' || destinos_name !== 'Todos') {
             let lot_n = lote_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' : '<p style="color: red; display: contents;">NO</p>';
-            let par_n = parcelas_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' :'<p style="color: red; display: contents;">NO</p>';
+            let par_n = parcelas_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' : '<p style="color: red; display: contents;">NO</p>';
             let prop_n = propietarios_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' : '<p style="color: red; display: contents;">NO</p>';
             let dest_n = destinos_name !== 'Todos' ? '<p style="color: #117427; display: contents;">SI</p>' : '<p style="color: red; display: contents;">NO</p>';
 
@@ -2596,7 +2636,7 @@ function groupsCostosCalc(button){
                 '<br> <br> Para realizar este tipo de procesamiento la información debe estar completeamente cargada! <br><br>'
                 + '<h5>¿Desea continuar con el procesamiento?</h5>';
 
-                $.confirm({
+            $.confirm({
                 icon: 'fas fa-exclamation-circle',
                 title: 'Advertencia de aplicación de Filtros',
                 content: text,
@@ -2607,7 +2647,7 @@ function groupsCostosCalc(button){
                         {
                             text: 'Aceptar',
                             btnClass: 'btn-green',
-                            action: function() {
+                            action: function () {
 
                                 //Creo un confirm para saber si almacenar el informe o no
                                 $.confirm({
@@ -2621,23 +2661,79 @@ function groupsCostosCalc(button){
                                             {
                                                 text: 'Aceptar',
                                                 btnClass: 'btn-green',
-                                                action: function() {
-                                                    let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
-                                                        'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
-                                                        'informe' : true, 'group_name' : group_name, 'lote_name' : lote_name, 'parcelas_name' : parcelas_name,
-                                                        'propietarios_name' : propietarios_name,  'destinos_name' : destinos_name};
-                                                    processCalcCostosGroups(variables);
+                                                action: function () {
+                                                    let variables = {
+                                                        'groups': groups,
+                                                        'fecha_inicio': fecha_inicio,
+                                                        'fecha_final': fecha_final,
+                                                        'lotes': lotes,
+                                                        'propietarios': propietarios,
+                                                        'destinos': destinos,
+                                                        'parcelas': parcelas,
+                                                        'informe': true,
+                                                        'group_name': group_name,
+                                                        'lote_name': lote_name,
+                                                        'parcelas_name': parcelas_name,
+                                                        'propietarios_name': propietarios_name,
+                                                        'destinos_name': destinos_name
+                                                    };
+
+
+                                                    result_verified = null;
+                                                    $.when(verifiedverifiedDataByMonth(variables)).done(
+                                                        function () {
+                                                            console.log(result_verified);
+                                                            if(result_verified){
+                                                                processCalcCostosGroups(variables);
+                                                            } else {
+                                                                let title = 'Error';
+                                                                let content = 'Es posible que no esten completos los datos ' +
+                                                                    'para el periodo seleccionado!'
+                                                                getConfirmRed(title, content);
+                                                            }
+
+                                                        }
+                                                    );
+
+
+
                                                 }
                                             },
                                         cancel:
                                             {
                                                 text: 'Cancelar',
                                                 btnClass: 'btn-red',
-                                                action: function() {
-                                                    let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
-                                                        'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
-                                                        'informe' : false};
-                                                    processCalcCostosGroups(variables);
+                                                action: function () {
+                                                    let variables = {
+                                                        'groups': groups,
+                                                        'fecha_inicio': fecha_inicio,
+                                                        'fecha_final': fecha_final,
+                                                        'lotes': lotes,
+                                                        'propietarios': propietarios,
+                                                        'destinos': destinos,
+                                                        'parcelas': parcelas,
+                                                        'informe': false
+                                                    };
+
+
+                                                    $.when(verifiedverifiedDataByMonth(variables)).done(
+                                                        function () {
+
+
+                                                            if(result_verified){
+                                                                processCalcCostosGroups(variables);
+                                                            } else {
+                                                                let title = 'Error';
+                                                                let content = 'Es posible que no esten completos los datos ' +
+                                                                    'para el periodo seleccionado'
+                                                                getConfirmRed(title, content);
+                                                            }
+
+                                                        }
+                                                    );
+
+
+
                                                 }
                                             }
                                     }
@@ -2649,7 +2745,7 @@ function groupsCostosCalc(button){
                         {
                             text: 'Cancelar',
                             btnClass: 'btn-red',
-                            action: function() {
+                            action: function () {
 
                             }
                         }
@@ -2669,30 +2765,88 @@ function groupsCostosCalc(button){
                         {
                             text: 'Aceptar',
                             btnClass: 'btn-green',
-                            action: function() {
-                                let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
-                                    'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
-                                    'informe' : true, 'group_name' : group_name, 'lote_name' : lote_name, 'parcelas_name' : parcelas_name,
-                                    'propietarios_name' : propietarios_name,  'destinos_name' : destinos_name};
-                                processCalcCostosGroups(variables);
+                            action: function () {
+                                let variables = {
+                                    'groups': groups,
+                                    'fecha_inicio': fecha_inicio,
+                                    'fecha_final': fecha_final,
+                                    'lotes': lotes,
+                                    'propietarios': propietarios,
+                                    'destinos': destinos,
+                                    'parcelas': parcelas,
+                                    'informe': true,
+                                    'group_name': group_name,
+                                    'lote_name': lote_name,
+                                    'parcelas_name': parcelas_name,
+                                    'propietarios_name': propietarios_name,
+                                    'destinos_name': destinos_name
+                                };
+
+
+                                $.when(verifiedverifiedDataByMonth(variables)).done(
+                                    function () {
+
+                                        if(result_verified){
+
+
+                                            processCalcCostosGroups(variables);
+
+
+                                        } else {
+                                            let title = 'Error';
+                                            let content = 'Es posible que no esten completos los datos ' +
+                                                'para el periodo seleccionado'
+                                            getConfirmRed(title, content);
+                                        }
+
+                                    }
+                                );
+
+
+
                             }
                         },
                     cancel:
                         {
                             text: 'Cancelar',
                             btnClass: 'btn-red',
-                            action: function() {
-                                let variables = {'groups' : groups, 'fecha_inicio' : fecha_inicio, 'fecha_final' : fecha_final,
-                                    'lotes' : lotes, 'propietarios' : propietarios, 'destinos' : destinos, 'parcelas' : parcelas,
-                                    'informe' : false};
-                                processCalcCostosGroups(variables);
+                            action: function () {
+                                let variables = {
+                                    'groups': groups,
+                                    'fecha_inicio': fecha_inicio,
+                                    'fecha_final': fecha_final,
+                                    'lotes': lotes,
+                                    'propietarios': propietarios,
+                                    'destinos': destinos,
+                                    'parcelas': parcelas,
+                                    'informe': false
+                                };
+
+
+                                $.when(verifiedverifiedDataByMonth(variables)).then(
+                                    function () {
+
+
+                                        if(result_verified){
+                                            processCalcCostosGroups(variables);
+                                        } else {
+                                            let title = 'Error';
+                                            let content = 'Es posible que no esten completos los datos ' +
+                                                'para el periodo seleccionado'
+                                            getConfirmRed(title, content);
+                                        }
+
+                                    }
+                                );
+
+
                             }
                         }
                 }
             });
+
+
         }
-
-
     }
 }
 
@@ -2752,6 +2906,7 @@ function processCalcCostosGroups(variables)
               );
 
           } else {
+
               a.close();
               //SIn datos
               $.confirm({
@@ -3034,11 +3189,11 @@ function createdItemAcordionMaquinas(maquina, id, centro_costo)
                 '<div class="accordion-body">' +
                     //COntenido de la maquina
                         '<ul>' +
-                           '<li> <strong>Costo/t: </strong>' + costo_ton + '</li>' +
+                           '<li> <strong>Costo/t: </strong>' + costo_ton + ' $/t' + '</li>' +
                             '<li><strong> Toneladas: </strong>' + toneladas + '</li>' +
-                            '<li><strong> Costo/h: </strong>' + costo_h + '</li>' +
+                            '<li><strong> Costo/h: </strong>' + costo_h + ' $/h' + '</li>' +
                             '<li> <strong>Horas: </strong>' + horas + '</li>' +
-                            '<li><strong> Rendimiento: </strong>' + rendimiento + '</li>' +
+                            '<li><strong> Rendimiento: </strong>' + rendimiento + ' t/h' + '</li>' +
                         '</ul>' +
                 '</div>' +
             '</div>' +
@@ -3085,6 +3240,7 @@ function showInfoMaquina(element) {
 
     let alquiler = $(element).attr('alquiler').toString();
     let alquiler_ = alquiler === 'true' ? 'No' : 'Si';
+    let alquiler_bool = alquiler === 'true' ? false : true;
 
 
     //cargo el ul con el detalle
@@ -3096,35 +3252,51 @@ function showInfoMaquina(element) {
 
     let alquiler_li = '<li><strong>¿Máquina Propia?: </strong>' + alquiler_ + '</li>';
 
-    let interes_li = '<li><strong>Interés: </strong>' + interes + '</li>';
-    let seguro_li = '<li><strong>Seguro: </strong>' + seguro + '</li>';
-
-    let dep_maq_li = '<li><strong>Dep. Máquina: </strong>' + dep_maq + '</li>';
-    let dep_neum_li = '<li><strong>Dep. Neumáticos: </strong>' + dep_neum + '</li>';
-    let arreglos_li = '<li><strong>Arreglos Mecánicos: </strong>' + arreglos + '</li>';
-
-    let combustibles_li = '<li><strong>Combustible: </strong>' + combustibles + '</li>';
-    let lubricantes_li = '<li><strong>Lubricante: </strong>' + lubricantes + '</li>';
-
-    let operador_li = '<li><strong>Operador: </strong>' + operador + '</li>';
-    let mantenimiento_li = '<li><strong>Mantenimiento: </strong>' + mantenimiento + '</li>';
-    let administracion_li = '<li><strong>Administración: </strong>' + administracion + '</li>';
-
     ul_detalles.append(alquiler_li);
     ul_detalles.append('<br/>');
-    ul_detalles.append(interes_li);
-    ul_detalles.append(seguro_li);
-    ul_detalles.append('<br/>');
-    ul_detalles.append(dep_maq_li);
-    ul_detalles.append(dep_neum_li);
-    ul_detalles.append(arreglos_li);
-    ul_detalles.append('<br/>');
-    ul_detalles.append(combustibles_li);
-    ul_detalles.append(lubricantes_li);
-    ul_detalles.append('<br/>');
-    ul_detalles.append(operador_li);
-    ul_detalles.append(mantenimiento_li);
-    ul_detalles.append(administracion_li);
+
+    //consulto si es alquilada
+    if(alquiler_bool == false)
+    {
+        let interes_li = '<li><strong>Alquiler: </strong>' + costo_t + ' $/t' + '</li>';
+
+        ul_detalles.append(interes_li);
+        ul_detalles.append('<br/>');
+
+    } else {
+        let interes_li = '<li><strong>Interés: </strong>' + interes + ' $/t' + '</li>';
+        let seguro_li = '<li><strong>Seguro: </strong>' + seguro + ' $/t' + '</li>';
+
+        let dep_maq_li = '<li><strong>Dep. Máquina: </strong>' + dep_maq + ' $/t' + '</li>';
+        let dep_neum_li = '<li><strong>Dep. Neumáticos: </strong>' + dep_neum + ' $/t' + '</li>';
+        let arreglos_li = '<li><strong>Arreglos Mecánicos: </strong>' + arreglos + ' $/t' + '</li>';
+
+        let combustibles_li = '<li><strong>Combustible: </strong>' + combustibles + ' $/t' + '</li>';
+        let lubricantes_li = '<li><strong>Lubricante: </strong>' + lubricantes + ' $/t' + '</li>';
+
+        let operador_li = '<li><strong>Operador: </strong>' + operador + ' $/t' + '</li>';
+        let mantenimiento_li = '<li><strong>Mantenimiento: </strong>' + mantenimiento + ' $/t' + '</li>';
+        let administracion_li = '<li><strong>Administración: </strong>' + administracion + ' $/t' + '</li>';
+
+
+        ul_detalles.append(interes_li);
+        ul_detalles.append(seguro_li);
+        ul_detalles.append('<br/>');
+        ul_detalles.append(dep_maq_li);
+        ul_detalles.append(dep_neum_li);
+        ul_detalles.append(arreglos_li);
+        ul_detalles.append('<br/>');
+        ul_detalles.append(combustibles_li);
+        ul_detalles.append(lubricantes_li);
+        ul_detalles.append('<br/>');
+        ul_detalles.append(operador_li);
+        ul_detalles.append(mantenimiento_li);
+        ul_detalles.append(administracion_li);
+
+    }
+
+
+
 
 
 }
@@ -3362,8 +3534,4 @@ function changeStyleBtns() {
     $("#div_accept_btn").css("display", "block");
     $("#div_btn_check").css("display", "none");
 }
-
-
-
-
 

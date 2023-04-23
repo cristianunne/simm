@@ -56,11 +56,6 @@ class ArreglosMecanicosTable extends Table
             'bindingKey' => 'parcelas_idparcelas', //actual
             'joinType' => 'INNER'
         ]);
-        $this->hasOne('Lotes', [
-            'foreignKey' => 'idlotes',
-            'bindingKey' => 'lotes_idlotes', //actual
-            'joinType' => 'INNER'
-        ]);
 
     }
 
@@ -122,14 +117,8 @@ class ArreglosMecanicosTable extends Table
             ->requirePresence('users_idusers', 'create')
             ->notEmptyString('users_idusers');
 
-        $validator
-            ->integer('lotes_idlotes')
-            ->requirePresence('lotes_idlotes', 'create')
-            ->notEmptyString('lotes_idlotes');
-
         return $validator;
     }
-
     public function findGetArreglosByConditions(Query $query, $options = null)
     {
 
@@ -143,7 +132,7 @@ class ArreglosMecanicosTable extends Table
         }
         if(isset($options['lotes_idlotes'])){
             if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
-                $conditions['lotes_idlotes'] = $options['lotes_idlotes'];
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
             }
         }
         if(isset($options['parcelas_idparcelas'])){
@@ -162,7 +151,11 @@ class ArreglosMecanicosTable extends Table
                 $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
             }
         }
-
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
 
         $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
 

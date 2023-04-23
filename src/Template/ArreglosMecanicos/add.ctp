@@ -53,7 +53,7 @@
                             <div class="card-body">
                                 <div class="col-md-12" >
                                     <div class="form-group">
-                                        <?= $this->Form->control('lotes', ['options' => $lotes_data,
+                                        <?= $this->Form->control('lotes_idlotes', ['options' => $lotes_data,
                                             'empty' => '(Elija una opción)', 'type' => 'select',
                                             'class' => 'form-control', 'label' => 'Lotes:',
                                             'id' => 'lotes', 'onChange' => 'getParcelaByLote(this)']) ?>

@@ -4,6 +4,7 @@ namespace App\Utility;
 
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\I18n\Date;
 use Cake\ORM\TableRegistry;
 use Exception;
 
@@ -54,6 +55,42 @@ class GetFunctions
         return $array_centros;
     }
 
+
+    public function getCostosFijosyVariablesByMaquina($maq)
+    {
+        $costos = [
+            'costo_fijo_horario' => null,
+            'costo_semifijo_horario' => null,
+            'costo_variable_horario' => null,
+            'costo_mantenimiento_horario' => null,
+            'costo_administracion_horario' => null,
+            'costo_fijo_tonelada' => null,
+            'costo_semifijo_tonelada' => null,
+            'costo_variable_tonelada' => null,
+            'costo_mantenimiento_tonelada' => null,
+            'costo_administracion_tonelada' => null
+        ];
+
+        //CAlculo el costo fijo
+
+        $costo_mai_class = new CostosMai();
+
+
+        $costos['costo_fijo_horario'] =  $costo_mai_class->getCostoFijoHorario($maq);
+        $costos['costo_semifijo_horario'] =  $costo_mai_class->getCostoSemifijoHorario($maq);
+        $costos['costo_variable_horario'] =  $costo_mai_class->getCostoVariableHorario($maq);
+        $costos['costo_mantenimiento_horario'] = $costo_mai_class->getCostoMantenimientoHorario($maq);
+        $costos['costo_administracion_horario'] =  $costo_mai_class->getCostoAdministracioHorario($maq);
+
+        $costos['costo_fijo_tonelada'] =  $costo_mai_class->getCostos_Tonelada($maq, 1);
+        $costos['costo_semifijo_tonelada'] =  $costo_mai_class->getCostos_Tonelada($maq, 2);
+        $costos['costo_variable_tonelada'] =  $costo_mai_class->getCostos_Tonelada($maq, 3);
+        $costos['costo_mantenimiento_tonelada'] =  $costo_mai_class->getCostos_Tonelada($maq, 4);
+        $costos['costo_administracion_tonelada'] =  $costo_mai_class->getCostos_Tonelada($maq, 5);
+
+        return $costos;
+
+    }
 
 
     public function getConstantesByEmpresa($id_empresa = null)
@@ -226,7 +263,9 @@ class GetFunctions
     {
         $array_maquinas_distinct = [];
 
+
         foreach ($data_organized_by_month as $data){
+
             foreach ($data['maquinas'] as $maq){
 
                 $array_maquinas_distinct[$maq['idmaquinas']] = $maq['idmaquinas'];
@@ -349,6 +388,23 @@ class GetFunctions
 
     }
 
+    public function getDateSixMonthsBack($fecha)
+    {
+        $fec_in = new Date($fecha);
+        $date_six_inicio_back = date("Y-m", strtotime($fec_in . "- 6 month"));
+
+
+        return $date_six_inicio_back;
+    }
+
+    public function getDateOneYearBack($fecha)
+    {
+        $fec_in = new Date($fecha);
+        $date_year_inicio_back = date("Y-m", strtotime($fec_in . "- 1 year"));
+
+
+        return $date_year_inicio_back;
+    }
 
     public function getOperarioByMaquina($maquina, $remitos_distinc)
     {

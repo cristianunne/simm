@@ -53,6 +53,7 @@
                         <th scope="col"><?= $this->Paginator->sort('Mano de Obra') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Repuestos') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Total') ?></th>
+                        <th scope="col"><?= $this->Paginator->sort('Lote') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Usuario') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
 
@@ -76,6 +77,7 @@
                             <td class="dt-center"><?= h($arreglo->mano_obra) ?></td>
                             <td class="dt-center"><?= h($arreglo->repuestos) ?></td>
                             <td class="dt-center"><?= h($arreglo->total) ?></td>
+                            <td class="dt-center"><?= h($arreglo->lote->name) ?></td>
                             <td class="dt-center"><?= h($arreglo->user->lastname . ' ' . $arreglo->user->firstname) ?></td>
 
 

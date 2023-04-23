@@ -19,10 +19,7 @@ use Cake\ORM\Entity;
  * @property int $users_idusers
  * @property \Cake\I18n\FrozenTime|null $created
  * @property \Cake\I18n\FrozenTime|null $modified
- *
- * @property \App\Model\Entity\User $user
- * @property \App\Model\Entity\Maquina $maquina
- * @property \App\Model\Entity\Parcela $parcela
+ * @property int $lotes_idlotes
  */
 class ArreglosMecanico extends Entity
 {
@@ -48,8 +45,6 @@ class ArreglosMecanico extends Entity
         'users_idusers' => true,
         'created' => true,
         'modified' => true,
-        'user' => true,
-        'maquina' => true,
-        'parcela' => true,
+        'lotes_idlotes' => true,
     ];
 }

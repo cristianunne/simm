@@ -57,7 +57,7 @@
                                     <?php if($arreglos->parcelas_idparcelas != ''):  ?>
 
                                         <div class="form-group">
-                                            <?= $this->Form->control('parcela.lote.idlotes', ['options' => $lotes_data,
+                                            <?= $this->Form->control('lotes_idlotes', ['options' => $lotes_data,
                                                 'empty' => '(Elija una opción)', 'type' => 'select',
                                                 'class' => 'form-control', 'label' => 'Lotes:',
                                                 'id' => 'lotes', 'onChange' => 'getParcelaByLoteEdit(this)']) ?>

@@ -87,6 +87,11 @@ class ServiciosController extends AppController
 
             } else {
 
+                //Consulto si por el mes y el tipo de servicio ya esta cargado
+                $data = $this->request->getData();
+
+
+
                 $servicios = $this->Servicios->patchEntity($servicios, $this->request->getData());
                 //AGrego lo datos falantes
                 $servicios->created = date("Y-m-d");
@@ -104,6 +109,12 @@ class ServiciosController extends AppController
             }
         }
         $this->set(compact('servicios'));
+    }
+
+
+    private function evaluateDataExist($data)
+    {
+
     }
 
 

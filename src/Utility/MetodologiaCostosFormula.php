@@ -5,6 +5,12 @@ class MetodologiaCostosFormula
 {
 
 
+
+
+
+
+
+
     public function calculateInteres($VAD, $TIS, $FCI, $HTU)
     {
         //$VAD*($TIS/100)*$FCI/$HTU
