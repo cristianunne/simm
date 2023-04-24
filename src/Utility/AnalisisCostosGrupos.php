@@ -39,12 +39,13 @@ class AnalisisCostosGrupos
             //Obtengo las maquinas distinct
             $maquinas_distinct = $get_functions->getMaquinasDistinct($data_organized_by_month);
 
+
             //utilizando la media ponderada
             $maquinas_resume = $this->resumeCostosHorariosByMaquina($data_organized_by_month, $maquinas_distinct);
-
             //debug($maquinas_resume);
+
             $maquinas_resume_new =  $this->calculateCostosFijosYVariables($maquinas_resume);
-            //debug($maquinas_resume_new);
+
 
             $centros_costos_array = $get_functions->getCentroCostosDistinct($maquinas_resume_new);
 
@@ -54,6 +55,7 @@ class AnalisisCostosGrupos
 
             $maquinas_by_centros_costos['general'] = $this->resumeGeneralData($data_organized_by_month, $maquinas_distinct);
 
+            $maquinas_by_centros_costos['general']['precio_servicio'] = $this->precioServicioGeneral($data_organized_by_month);
             //debug($maquinas_by_centros_costos);
 
             //AGrego la informaci[on de costos a resumen
@@ -66,7 +68,21 @@ class AnalisisCostosGrupos
             //ACa deberia mandarlo a que calcule el costo total
             $maquinas_by_centros_costos = $this->calculateCostoTotal($maquinas_by_centros_costos);
 
+            $maquinas_by_centros_costos['general']['mai']['economico'] = $this->calculateMAIEconomico($maquinas_by_centros_costos);
+            $maquinas_by_centros_costos['general']['mai']['financiero'] = $this->calculateMAIFinanciero($maquinas_by_centros_costos);
 
+            $maquinas_by_centros_costos['general']['categorias']['costos'] = $this->calculateCostosByCategoria($maquinas_by_centros_costos);
+
+            //ordeno los datos por elaboracion y transporte
+            $maquinas_by_centros_costos['general']['categorias']['precio']['elaboracion'] = $this->precioServicioByCategory($data_organized_by_month,
+            'Elaboracion');
+
+            $maquinas_by_centros_costos['general']['categorias']['precio']['transporte'] = $this->precioServicioByCategory($data_organized_by_month,
+                'Transporte');
+
+            $maquinas_by_centros_costos['general']['categorias']['mai']['elaboracion'] = $this->calculateMAIElaboracionTransporte($maquinas_by_centros_costos, 'Elaboracion');
+
+            $maquinas_by_centros_costos['general']['categorias']['mai']['transporte'] = $this->calculateMAIElaboracionTransporte($maquinas_by_centros_costos, 'Transporte');
 
             return $maquinas_by_centros_costos;
         }
@@ -399,6 +415,10 @@ class AnalisisCostosGrupos
             //OBtengo los remitos disponibles
             $array_remitos = $get_functions_class->getRemitosByConditions($array_options);
             $general_data['total_remitos'] = count($array_remitos);
+
+
+
+
             if(count($array_remitos) > 0){
 
                 //Calculo los resultados globales, TONELADAS
@@ -416,6 +436,9 @@ class AnalisisCostosGrupos
                 $general_data['toneladas'] = $general_total_ton;
 
                 //TRaigo las maquinas que participan en el analisis
+                $general_data['toneladas_categorias'] = $this->getToneladasByCategories($array_remitos, $mes, $year);
+
+                //sumo las toneladas para cada categoria
 
 
                 foreach ($maquinas_array as $maquina){
@@ -457,6 +480,7 @@ class AnalisisCostosGrupos
                     $maquinas_result[] = $maquina_with_data;
 
                 }  //foreach maquina
+
             }
         }
 
@@ -543,14 +567,266 @@ class AnalisisCostosGrupos
 
     }
 
-    public function calculateCostosFijosByMaquina()
+    public function calculateMAIEconomico($maquinas_by_centros_costos)
     {
 
-        $costo_fijo = null;
+        $costos_mai_class = new CostosMai();
+        $mai = null;
+        $costo_total_general = $maquinas_by_centros_costos['general']['costo_total'];
+        $precio_servicio = $maquinas_by_centros_costos['general']['precio_servicio'];
 
+        $costo_variable = $maquinas_by_centros_costos['general']['costos_suma']['sum_costo_variable'];
+        $costo_mantenimiento = $maquinas_by_centros_costos['general']['costos_suma']['sum_costo_mantenimiento'];
+        $costo_administracion = $maquinas_by_centros_costos['general']['costos_suma']['sum_costo_administracion'];
+
+
+        //obtengo el precio del servicio de elaboracion
+        //el total de las toneladas es el global
+        $mai = $costos_mai_class->calculateMAIEconomico($costo_total_general, $precio_servicio);
+
+
+        return $mai;
+    }
+
+    public function calculateMAIFinanciero($maquinas_by_centros_costos)
+    {
+        $costos_mai_class = new CostosMai();
+        $mai = null;
+
+        $precio_servicio = $maquinas_by_centros_costos['general']['precio_servicio'];
+        $costo_variable = $maquinas_by_centros_costos['general']['costos_suma']['sum_costo_variable'];
+        $costo_mantenimiento = $maquinas_by_centros_costos['general']['costos_suma']['sum_costo_mantenimiento'];
+        $costo_administracion = $maquinas_by_centros_costos['general']['costos_suma']['sum_costo_administracion'];
+
+
+        //obtengo el precio del servicio de elaboracion
+        //el total de las toneladas es el global
+        $mai = $costos_mai_class->calculateMAIFinanciero($precio_servicio, $costo_variable, $costo_mantenimiento, $costo_administracion);
+
+
+        return $mai;
+    }
+
+
+
+    /*
+     * Resume todos los precios de los servicios
+     */
+
+    private function precioServicioGeneral($data_organized_by_month)
+    {
+
+        $get_function_class = new GetFunctions();
+        //precio del servicio ponderado
+        $toneladas = null;
+        $precio_servicio = null;
+
+        foreach ($data_organized_by_month as $date)
+        {
+            $ton = isset($date['general']['toneladas']) ? $date['general']['toneladas'] : 0;
+
+            $toneladas = $toneladas + $ton;
+            $mes = $date['general']['mes'];
+            $year = $date['general']['year'];
+
+            $precio = $get_function_class->getPrecioServicioByMonth($year, $mes, 'Elaboracion');
+
+            $precio_servicio = $precio_servicio + ($precio * $ton);
+
+        }
+
+        $precio_servicio = $precio_servicio / $toneladas;
+
+        return $precio_servicio;
+    }
+
+    private function precioServicioByCategory($data_organized_by_month, $categoria)
+    {
+
+
+        //debug($data_organized_by_month);
+        $get_function_class = new GetFunctions();
+        //precio del servicio ponderado
+        $toneladas = null;
+        $precio_servicio = null;
+
+        foreach ($data_organized_by_month as $date)
+        {
+            $ton = $date['general']['toneladas_categorias']['tonelada_elaboracion'] ?? 0;
+            $toneladas = $toneladas + $ton;
+            $mes = $date['general']['mes'];
+            $year = $date['general']['year'];
+
+            $precio = $get_function_class->getPrecioServicioByMonth($year, $mes, $categoria);
+
+            $precio_servicio = $precio_servicio + ($precio * $ton);
+
+        }
+
+        $precio_servicio = $precio_servicio / $toneladas;
+
+
+
+        return $precio_servicio;
+    }
+
+
+
+    public function calculateCostosByCategoria($maquinas_by_centros_costos)
+    {
+        $get_functions_class = new GetFunctions();
+
+        $elaboracion = $get_functions_class->getCostosByCategoria($maquinas_by_centros_costos['centros'],
+        'Elaboracion');
+
+        $transporte = $get_functions_class->getCostosByCategoria($maquinas_by_centros_costos['centros'],
+            'Transporte');
+
+        $result = ['elaboracion' => $elaboracion, 'transporte' => $transporte];
+
+        return $result;
+
+    }
+
+
+
+    public function calculateMAIElaboracionTransporte($maquinas_by_centros_costos, $category)
+    {
+
+        $costos_mai_class = new CostosMai();
+        $mai = null;
+
+        if($category == 'Elaboracion')
+        {
+            $precio_servicio = $maquinas_by_centros_costos['general']['categorias']['precio']['elaboracion'];
+            $costo = $maquinas_by_centros_costos['general']['categorias']['costos']['elaboracion'];
+            //obtengo el precio del servicio de elaboracion
+            //el total de las toneladas es el global
+            $mai = $costos_mai_class->calculateMAIElaboracionTransporte($costo, $precio_servicio);
+        } else {
+            $precio_servicio = $maquinas_by_centros_costos['general']['categorias']['precio']['transporte'];
+            $costo = $maquinas_by_centros_costos['general']['categorias']['costos']['transporte'];
+            //obtengo el precio del servicio de elaboracion
+            //el total de las toneladas es el global
+            $mai = $costos_mai_class->calculateMAIElaboracionTransporte($costo, $precio_servicio);
+        }
+
+
+
+        return $mai;
 
 
     }
+
+    public function getToneladasByCategories($array_remitos, $mes, $year)
+    {
+        $get_functions_class = new GetFunctions();
+        $remitos_elaboracion = [];
+        $remitos_transporte = [];
+
+        //debug($array_remitos);
+
+        //TRaigo las maquinas que participan en el analisis
+        $tabla_remitosmaq = TableRegistry::getTableLocator()->get('RemitosMaquinas');
+
+
+        foreach ($array_remitos as $remito)
+        {
+            $rem = null;
+            $rem[$remito] = $remito;
+
+            $maquinas_array = null;
+            //TRaigo las maquinas para este remito
+            //Variable con las maquinas utilizadas en los remitos filtrados
+            $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $rem);
+
+            foreach ($maquinas_array as $maquina)
+            {
+                $costos = null;
+
+                //traigo los costos
+                $costos = $get_functions_class->getCostosByMaquina($maquina, $mes, $year)->toArray();
+
+                if($costos[0]['centros_costos'][0]->categoria == 'Elaboracion'){
+                    $remitos_elaboracion[$remito] = $remito;
+
+                }
+
+                if($costos[0]['centros_costos'][0]->categoria == 'Transporte'){
+                    $remitos_transporte[$remito] = $remito;
+                    //debug('pichilo');
+
+                }
+
+            }
+
+
+        }
+
+        $tabla_remitos = TableRegistry::getTableLocator()->get('Remitos');
+
+        $toneladas_elaboracion = null;
+        $toneladas_transporte = null;
+
+
+        if(count($remitos_elaboracion) > 0)
+        {
+            $toneladas_elaboracion =  $tabla_remitos->find('GetTotalToneladas', $remitos_elaboracion);
+
+        }
+
+        if(count($remitos_transporte) > 0)
+        {
+            $toneladas_transporte =  $tabla_remitos->find('GetTotalToneladas', $remitos_transporte);
+
+        }
+
+        $result = [
+            'tonelada_elaboracion' => $toneladas_elaboracion,
+            'tonelada_transporte' => $toneladas_transporte
+        ];
+
+        return $result;
+    }
+
+    private function organizedDataByCategory($data_organized_by_month)
+    {
+        $data_organized_by_month_category = null;
+
+        $general = null;
+        $lista_elaboracion = null;
+        $lista_transporte = null;
+
+        foreach ($data_organized_by_month as $data)
+        {
+            $lista_aux = null;
+
+            $general = $data['general'];
+
+            //recorro las maquinas
+            foreach ($data['maquinas'] as $maq)
+            {
+                if($maq['centro_costos'][0]->categoria == 'Elaboracion')
+                {
+                    $lista_elaboracion[] = $maq;
+                } else {
+                    $lista_transporte[] = $maq;
+                }
+            }
+
+            $lista_aux['general'] = $general;
+            $lista_aux['maquinas'] = [
+                'Elaboracion' => $lista_elaboracion,
+                'Transporte' => $lista_transporte
+            ];
+
+            $data_organized_by_month_category[] = $lista_aux;
+
+        }
+
+            return $data_organized_by_month_category;
+    }
+
 
 
     private function calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos, $uso_maquinaria,

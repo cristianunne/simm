@@ -294,7 +294,7 @@ class GetFunctions
 
 
         if(isset($array_options['worksgroup'])){
-            $array_result['worksgroup'] = $array_options['worksgroup'] == 0 ? 'Todos' :
+            $array_result['worksgroups'] = $array_options['worksgroup'] == 0 ? 'Todos' :
                 $this->getWorksgroupById($array_options['worksgroup'])->name;
         }
 
@@ -585,6 +585,74 @@ class GetFunctions
         return $array_result;
     }
 
+
+
+    public function getPrecioServicioByMonth($year, $month, $categoria)
+    {
+        $servicios_model = TableRegistry::getTableLocator()->get('Servicios');
+
+        $conditions['MONTH(fecha) ='] = $month;
+        $conditions['YEAR(fecha) ='] = $year;
+
+        $conditions['categoria LIKE'] = $categoria;
+
+
+        $result = $servicios_model->find('all', [])
+            ->where($conditions);
+
+        foreach ($result as $res)
+        {
+            return $res->precio;
+        }
+
+    }
+
+
+    /*
+     * DEvuelve el costo para ELABROACION Y TRANSPORTE
+     */
+    public function getCostosByCategoria($centros_costos, $category)
+    {
+        $suma_result = 0;
+        foreach ($centros_costos as $centro)
+        {
+
+            if($centro['categoria'] == $category)
+            {
+                $suma_result = $suma_result + $centro['costo_total'];
+            }
+        }
+        return $suma_result;
+    }
+
+    public function getToneladasByCategory($centros_costos, $category)
+    {
+        $toneladas = null;
+
+
+        $index_ = 0;
+
+        foreach ($centros_costos as $centro)
+        {
+            if($centro['categoria'] == $category)
+            {
+                if($index_ == 0)
+                {
+                    $toneladas = $centro['toneladas_total'];
+                    $index_++;
+                } else {
+
+                    if($centro['toneladas_total'] > $toneladas)
+                    {
+                        $toneladas = $centro['toneladas_total'] ;
+                    }
+
+                }
+            }
+        }
+
+        return $toneladas;
+    }
 
     public function getUsoMaquinariaByMaquina($maquina, $array_options)
     {

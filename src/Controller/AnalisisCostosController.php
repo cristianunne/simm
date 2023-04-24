@@ -194,26 +194,35 @@ class AnalisisCostosController extends AppController
                 $array_options_['fecha_inicio'] = $date_six_inicio_back;
                 $array_options_['fecha_fin'] = $date_six_final_back;
 
+                $costos_maquinas_six_back = null;
+
                 $costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
 
 
                 $date_year_inicio_back = $get_function_class->getDateOneYearBack($fecha_inicio);
-                $date_year_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
+                $date_year_final_back = $get_function_class->getDateOneYearBack($fecha_final);
 
                 //remplazo el array options
                 $array_options_['fecha_inicio'] = $date_year_inicio_back;
                 $array_options_['fecha_fin'] = $date_year_final_back;
 
-                //debug("UN ANO ATRAS");
+                $costos_one_year_back = null;
                 $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
 
-
-                // $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
+                $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
+                $metadata['users_idusers'] = $user_id;
+                $array_result = null;
 
                 //Llamo a excel processing
-                //$excel_processing_class = new ExcelProcesssing();
-                //$excel_processing_class->CostosGruposExcelInforme($metadata, null, null, null);
-                return $this->json($costos_maquinas);
+                $excel_processing_class = new ExcelProcesssing();
+                $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
+
+                $array_result = [
+                    'costos' => $costos_maquinas,
+                    'informe' => $informe
+                ];
+
+                return $this->json($array_result);
 
             }
 
@@ -338,7 +347,7 @@ class AnalisisCostosController extends AppController
             //devuelve un arreglos con los datos de la maquina
             $costos_maquinas = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
 
-            debug($costos_maquinas);
+            //debug($costos_maquinas);
 
 
 
@@ -368,16 +377,22 @@ class AnalisisCostosController extends AppController
             //debug("UN ANO ATRAS");
             $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
 
-            //debug($costos_one_year_back);
 
             $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
-            debug($metadata);
+            $metadata['users_idusers'] = $user_id;
+
 
             //Llamo a excel processing
             $excel_processing_class = new ExcelProcesssing();
-            $excel_processing_class->CostosGruposExcelInforme($metadata, $costos_maquinas, $costos_maquinas_six_back,
-                $costos_one_year_back);
+            $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
 
+            $array_result = [
+                'costos' => $costos_maquinas,
+                'informe' => $informe
+            ];
+            debug($array_result);
+
+            return $this->json($array_result);
 
         }
 

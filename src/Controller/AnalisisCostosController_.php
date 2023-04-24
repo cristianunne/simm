@@ -3115,7 +3115,7 @@ class AnalisisCostosController extends AppController
                $myWorkSheet_maq->setCellValue('F3', 'Costo/h');
                $myWorkSheet_maq->setCellValue('G3', '% costo total');*/
 
-
+               $i++;
 
            } else {
                //SUmo para seguir con el siguiente centro
@@ -3182,11 +3182,12 @@ class AnalisisCostosController extends AppController
                $myWorkSheet_maq->setCellValue('E'.$i,  $centro['ton_h']);
                $myWorkSheet_maq->setCellValue('F'.$i, 'Costo/h');
                $myWorkSheet_maq->setCellValue('G'.$i, '% costo total');*/
+               $i++;
 
            }
 
            //Recorro las maquinas
-           foreach ($centro['maquinas'] as $maq){
+           /*foreach ($centro['maquinas'] as $maq){
                $i++;
                $myWorkSheet_maq->setCellValue('A'.$i, $maq['name']);
                $myWorkSheet_maq->setCellValue('B'.$i, number_format($maq['costos']['toneladas'], 2, ',', '.'));
@@ -3226,7 +3227,7 @@ class AnalisisCostosController extends AppController
                $myWorkSheet_maq->getStyle('G'.$i)->getAlignment()->setVertical('center');
 
 
-           }
+           }*/
 
        }
         return $myWorkSheet_maq;

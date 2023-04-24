@@ -2517,6 +2517,78 @@ function loadParcelasToSelectCostos(data){
     }
 }
 
+function loadPropietarioToSelectCostos(propietario)
+{
+    let control = $("#propietarios_idpropietarios");
+    //Limpio el select primero
+    control.empty();
+    control.append(new Option('(Elija un Propietario)', null));
+    control.append(new Option('Todos', 0));
+
+
+    let optionText = propietario.name;
+    let optionValue = propietario.idpropietarios;
+    control.append(new Option(optionText, optionValue));
+
+    control.val(optionValue).change();
+
+
+}
+
+
+
+function parcelaInputChanged(input)
+{
+    let val = $(input).val();
+
+    let context = $(input).attr('attr');
+
+    getPropietarioByParcela(val, context);
+
+}
+
+
+function getPropietarioByParcela(id_parcela, context)
+{
+
+    if(id_parcela !== undefined || id_parcela !== '')
+    {
+        url = null;
+        if(context === 'edit')
+        {
+            url = '../../Parcelas/getPropietarioByParcela';
+        } else {
+            url = '../Parcelas/getPropietarioByParcela';
+        }
+
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: url,
+            data: {id_parcela: id_parcela},
+
+            beforeSend: function (xhr) { // Add this line
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            },
+            success: function (data, textStatus) {
+
+                if(data.propietario !== null){
+                    loadPropietarioToSelectCostos(data.propietario);
+                }
+
+            },
+            error: function (data) {
+                console.log('error ' + data);
+            }
+        });
+
+
+    }
+
+
+}
+
+
 
 /*** CAlculo de costos ***/
 
@@ -2555,7 +2627,7 @@ function verifiedverifiedDataByMonth(variables)
             xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         },
         success: function(data, textStatus){
-            console.log(data);
+            //console.log(data);
 
             if(data.result === false || data.result === 'false')
             {
@@ -2886,7 +2958,7 @@ function processCalcCostosGroups(variables)
           if(data.result === undefined)
           {
 
-              data_info = data;
+              data_info = data.costos;
              // console.log(data);
 
               $.when(showDataCostosToDisplayLeft(data)).then(
@@ -2951,6 +3023,9 @@ function processCalcCostosGroups(variables)
 
 
 function showDataCostosToDisplayLeft(data) {
+
+    data = data.costos;
+
     let costo_total = 0;
     let toneladas = 0;
     let info_header = $("#info-header-left");
@@ -3043,13 +3118,14 @@ function openCentroCostos(button)
         centro_costo_input.val(centro_costo);
         costo_input.val(costo);
 
-        console.log(data_info);
+        //data_info = data_info.costos;
+        //console.log(data_info);
 
         for (let i = 0; i < data_info['centros'].length; i++){
 
             if(id.toString() === data_info['centros'][i].idcentros_costos.toString()){
 
-                console.log(data_info['centros'][i]);
+                //console.log(data_info['centros'][i]);
 
                 for (let j = 0; j < data_info['centros'][i].maquinas.length; j++){
 

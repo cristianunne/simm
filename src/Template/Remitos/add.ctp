@@ -91,7 +91,7 @@
                                 <div class="form-group">
                                     <?= $this->Form->control('parcelas_idparcelas', ['options' => null,
                                         'empty' => '(Elija una Parcela)', 'type' => 'select',
-                                        'class' => 'form-control', 'placeholder' => 'Parcela',
+                                        'class' => 'form-control', 'placeholder' => 'Parcela','onchange' => 'parcelaInputChanged(this)',
                                         'label' => 'Parcela:', 'id' => 'parcela']) ?>
                                 </div>
 

@@ -129,6 +129,24 @@ class CostosMai
     }
 
 
+    public function calculateMAIEconomico($costo, $precio_servicio)
+    {
+        return $precio_servicio - $costo;
+    }
+
+    public function calculateMAIFinanciero($precio_Servicio, $costo_variable, $costo_mantenimiento, $costo_administracion)
+    {
+
+        return $precio_Servicio - $costo_variable - $costo_mantenimiento - $costo_administracion;
+
+    }
+
+
+    public function calculateMAIElaboracionTransporte($costo, $precio_servicio)
+    {
+        return $precio_servicio - $costo;
+    }
+
 
 
 

@@ -85,7 +85,7 @@
                             <?=  $this->Form->label('Parcela: ') ?>
                             <?= $this->Form->control('parcelas_idparcelas', ['options' => [0 => 'Todos'],
                                 'empty' => '(Elija una Parcela)', 'type' => 'select',
-                                'class' => 'form-control', 'placeholder' => 'Parcela',
+                                'class' => 'form-control', 'placeholder' => 'Parcela', 'onchange' => 'parcelaInputChanged(this)',
                                 'label' => false, 'required', 'id' => 'parcela']) ?>
                         </div>
 

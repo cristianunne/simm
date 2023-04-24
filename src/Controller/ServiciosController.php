@@ -90,22 +90,26 @@ class ServiciosController extends AppController
                 //Consulto si por el mes y el tipo de servicio ya esta cargado
                 $data = $this->request->getData();
 
-
-
-                $servicios = $this->Servicios->patchEntity($servicios, $this->request->getData());
-                //AGrego lo datos falantes
-                $servicios->created = date("Y-m-d");
-                $servicios->empresas_idempresas = $id_empresa;
-                $servicios->users_idusers = $user_id;
-
-                if($this->Servicios->save($servicios)){
-                    $this->Flash->success(__('El servicio se ha almacenado correctamente'));
-                    //traigo los datos nuevamente y actualizo el current user
-
-                    return $this->redirect(['controller' => 'Servicios' , 'action' => 'index']);
+                if ($this->evaluateDataExist($data))
+                {
+                    $this->Flash->error(__('El Servicio ya fue cargado para la Fecha y Categoria seleccionada.'));
                 } else {
-                    $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
+                    $servicios = $this->Servicios->patchEntity($servicios, $this->request->getData());
+                    //AGrego lo datos falantes
+                    $servicios->created = date("Y-m-d");
+                    $servicios->empresas_idempresas = $id_empresa;
+                    $servicios->users_idusers = $user_id;
+
+                    if($this->Servicios->save($servicios)){
+                        $this->Flash->success(__('El servicio se ha almacenado correctamente'));
+                        //traigo los datos nuevamente y actualizo el current user
+
+                        return $this->redirect(['controller' => 'Servicios' , 'action' => 'index']);
+                    } else {
+                        $this->Flash->error(__('Error al almacenar. Intenta nuevamente'));
+                    }
                 }
+
             }
         }
         $this->set(compact('servicios'));
@@ -114,6 +118,31 @@ class ServiciosController extends AppController
 
     private function evaluateDataExist($data)
     {
+
+        $fecha = $data['fecha'];
+        $categoria = $data['categoria'];
+
+        $time = strtotime($fecha);
+
+        $mes = date('m',$time);
+        $year = date('Y',$time);
+
+        $conditions['MONTH(fecha) ='] = $mes;
+        $conditions['YEAR(fecha) ='] = $year;
+
+        $conditions['categoria LIKE'] = $categoria;
+
+
+
+        $result = $this->Servicios->find('all', [])
+            ->where($conditions);
+
+        if(count($result->toArray()) > 0){
+            return true;
+        } else {
+            return false;
+        }
+
 
     }
 

@@ -9,6 +9,8 @@ use Cake\Validation\Validator;
 /**
  * Informes Model
  *
+ * @property &\Cake\ORM\Association\BelongsToMany $Maquinas
+ *
  * @method \App\Model\Entity\Informe get($primaryKey, $options = [])
  * @method \App\Model\Entity\Informe newEntity($data = null, array $options = [])
  * @method \App\Model\Entity\Informe[] newEntities(array $data, array $options = [])
@@ -37,6 +39,12 @@ class InformesTable extends Table
         $this->setPrimaryKey('idinformes');
 
         $this->addBehavior('Timestamp');
+
+        $this->belongsToMany('Maquinas', [
+            'foreignKey' => 'informe_id',
+            'targetForeignKey' => 'maquina_id',
+            'joinTable' => 'informes_maquinas',
+        ]);
     }
 
     /**
@@ -52,14 +60,16 @@ class InformesTable extends Table
             ->allowEmptyString('idinformes', null, 'create');
 
         $validator
-            ->date('fecha_inicio')
+            ->scalar('fecha_inicio')
+            ->maxLength('fecha_inicio', 100)
             ->requirePresence('fecha_inicio', 'create')
-            ->notEmptyDate('fecha_inicio');
+            ->notEmptyString('fecha_inicio');
 
         $validator
-            ->date('fecha_fin')
+            ->scalar('fecha_fin')
+            ->maxLength('fecha_fin', 100)
             ->requirePresence('fecha_fin', 'create')
-            ->notEmptyDate('fecha_fin');
+            ->notEmptyString('fecha_fin');
 
         $validator
             ->scalar('worksgroups')

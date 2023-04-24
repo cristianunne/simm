@@ -17,8 +17,8 @@ class InformesFixture extends TestFixture
     public $fields = [
         'idinformes' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true, 'precision' => null],
         'created' => ['type' => 'datetime', 'length' => null, 'null' => false, 'default' => 'CURRENT_TIMESTAMP', 'comment' => '', 'precision' => null],
-        'fecha_inicio' => ['type' => 'date', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
-        'fecha_fin' => ['type' => 'date', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
+        'fecha_inicio' => ['type' => 'string', 'length' => 100, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'fecha_fin' => ['type' => 'string', 'length' => 100, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'worksgroups' => ['type' => 'string', 'length' => 100, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'lote' => ['type' => 'string', 'length' => 100, 'null' => true, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'parcela' => ['type' => 'string', 'length' => 100, 'null' => true, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
@@ -53,9 +53,9 @@ class InformesFixture extends TestFixture
         $this->records = [
             [
                 'idinformes' => 1,
-                'created' => '2023-02-16 23:01:13',
-                'fecha_inicio' => '2023-02-16',
-                'fecha_fin' => '2023-02-16',
+                'created' => '2023-04-24 02:57:06',
+                'fecha_inicio' => 'Lorem ipsum dolor sit amet',
+                'fecha_fin' => 'Lorem ipsum dolor sit amet',
                 'worksgroups' => 'Lorem ipsum dolor sit amet',
                 'lote' => 'Lorem ipsum dolor sit amet',
                 'parcela' => 'Lorem ipsum dolor sit amet',

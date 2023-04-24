@@ -8,8 +8,8 @@ use Cake\ORM\Entity;
  *
  * @property int $idinformes
  * @property \Cake\I18n\FrozenTime $created
- * @property \Cake\I18n\FrozenDate $fecha_inicio
- * @property \Cake\I18n\FrozenDate $fecha_fin
+ * @property string $fecha_inicio
+ * @property string $fecha_fin
  * @property string $worksgroups
  * @property string|null $lote
  * @property string|null $parcela

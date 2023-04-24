@@ -310,4 +310,44 @@ class ParcelasController extends AppController
 
     }
 
+
+
+    public function getPropietarioByParcela()
+    {
+        $this->autoRender = false;
+
+        $parcela = $_POST['id_parcela'];
+        $array_data = [];
+
+        if($this->request->is('ajax')) {
+
+            $parcelas = $this->Parcelas->get($parcela, ['contain' => ['Propietarios']]);
+
+            $result = null;
+
+
+                if($parcelas->propietario->tipo== 'Empresa')
+                {
+                    $result = [
+                        'idpropietarios' => $parcelas->propietario->idpropietarios,
+                        'name' => $parcelas->propietario->name
+                    ];
+                } else {
+
+
+                    $result = [
+                        'idpropietarios' => $parcelas->propietario->idpropietarios,
+                        'name' => $parcelas->propietario->firstname . ' ' . $parcelas->propietario->lastname
+                    ];
+
+            }
+
+
+            $array_data['propietario'] = $result;
+
+        }
+        return $this->json($array_data);
+
+    }
+
 }

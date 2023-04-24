@@ -54,7 +54,7 @@ class RemitosController extends AppController
 
             $today = date('Y-m-d');
 
-            $six_back_day = date('Y-m-d',strtotime($today."- 6 month"));
+            $six_back_day = date('Y-m-d',strtotime($today."- 2 Year"));
 
             $conditions = ['Remitos.fecha <=' => $today, 'Remitos.fecha >=' => $six_back_day];
 
