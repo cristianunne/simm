@@ -213,14 +213,30 @@ class AnalisisCostosController extends AppController
                 $metadata['users_idusers'] = $user_id;
                 $array_result = null;
 
-                //Llamo a excel processing
-                $excel_processing_class = new ExcelProcesssing();
-                $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
 
-                $array_result = [
-                    'costos' => $costos_maquinas,
-                    'informe' => $informe
-                ];
+
+                if($informe == 'true')
+                {
+
+                    //Llamo a excel processing
+                    $excel_processing_class = new ExcelProcesssing();
+                    $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
+
+                    $array_result = [
+                        'costos' => $costos_maquinas,
+                        'informe' => $informe
+                    ];
+                } else {
+
+
+
+                    $array_result = [
+                        'costos' => $costos_maquinas,
+                        'informe' => false
+                    ];
+                }
+
+
 
                 return $this->json($array_result);
 

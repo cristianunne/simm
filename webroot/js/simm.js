@@ -3543,7 +3543,28 @@ function checkMaquinaIsOk()
 
                     let l = setTimeout(function (){
                         let res = a.close();
+
+                        let is_not_ok = $.confirm({
+                            icon: 'fas fa-exclamation-circle',
+                            title: '¡Error!',
+                            content: 'La Máquina no puede ser analizada.',
+                            type: 'red',
+                            typeAnimated: true,
+                            buttons: {
+                                close:
+                                    {
+                                        text: 'Aceptar',
+                                        btnClass: 'btn-red',
+                                        function() {
+                                        }
+                                    }
+
+                            }
+                        });
                     }, 7000);
+
+
+
                 }
 
 

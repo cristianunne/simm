@@ -629,8 +629,6 @@ class ExcelProcesssing
 
     }
 
-
-
     private function createdSheetMaquinas($data_costos, $spreadsheet)
     {
 
@@ -856,6 +854,416 @@ class ExcelProcesssing
 
         }
         return $myWorkSheet_maq;
+    }
+
+
+
+    public function createInformesMaquinas($metadata, $costos_maquinas)
+    {
+        $informes_maquinas_model = TableRegistry::getTableLocator()->get('InformesMaquinas');
+        $infomes_maq_entity = $informes_maquinas_model->newEntity();
+
+        $result = $this->createMaquinasExcelInforme($metadata, $costos_maquinas);
+
+
+        if($result != false)
+        {
+            $metadata['path'] = $result['path'];
+            $metadata['name'] = $result['name'];
+
+
+            $entity_informe_ = $informes_maquinas_model->patchEntity($infomes_maq_entity, $metadata);
+
+            //DEvuelvo un arreglo con la operacion y el id
+
+            if ($informes_maquinas_model->save($entity_informe_)) {
+                return ['id' => $entity_informe_->idinformes, 'informe' => true, 'path' => $result['path']];
+            }
+            return ['id' => '', 'informe' => false];
+        } else {
+            return ['id' => '', 'informe' => false];
+        }
+
+
+
+
+    }
+
+
+    public function createMaquinasExcelInforme($metadata, $costos_maquinas)
+    {
+
+        $spreadsheet = new Spreadsheet();
+
+        $myWorkSheet_maq =  $this->createSheetMaquina($spreadsheet, $costos_maquinas, $metadata);
+
+
+        //utilizo el now, es mejor
+        $nombre = "informe_maq_" .hash('sha256' , (date("Y-m-d H:i:s")));
+
+        $path = EXCELS . $nombre .'.xlsx';
+        $path_short = EXCELS_SHORT . $nombre .'.xlsx';
+
+
+
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($path);
+
+        //consulto por el fileexist
+        $file_test = new File($path);
+        if($file_test->exists()){
+
+            return ['name' => $nombre, 'path' => $path_short];
+        } else {
+            return false;
+        }
+    }
+
+    private function createSheetMaquina($spreadsheet, $costos_maquinas, $metadata)
+    {
+        $font_bold = [
+            'font' => [
+                'bold' => true
+            ]
+        ];
+
+        $styleArray = [
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ,
+                    'color' => ['argb' => '00000000'],
+                ],
+            ],
+        ];
+
+        try {
+
+            $empresa_model = TableRegistry::getTableLocator()->get('Empresas');
+            $id_empresa = $metadata['empresas_idempresas'];
+            $empresas_data = $empresa_model->get($id_empresa);
+
+            //configuro el path y el file
+            $path = null;
+
+            if ($empresas_data->logo == null or empty($empresas_data->logo)) {
+                //logo default
+                $path = LOGOS . 'edificio.png';
+            } else {
+                $path = LOGOS . $empresas_data->logo;
+            }
+
+            $myWorkSheet_res = new Worksheet($spreadsheet, 'Resumen');
+
+            $spreadsheet->addSheet($myWorkSheet_res, 0);
+            $spreadsheet->getDefaultStyle()->getFont()->setName('Times New Roman');
+
+            //Combino la primer celda para porner el titulo y configuro una altura aceptable
+            $myWorkSheet_res->mergeCells('B1:J1');
+            $myWorkSheet_res->getRowDimension('1')->setRowHeight(75);
+
+            //EL titulo tiene que decir Informe de Costo - NOmbre de empresa
+            $empresa_name = $empresas_data->name;
+            $titulo = 'Informe de Costos - ' . $empresa_name;
+
+            $myWorkSheet_res->setCellValue('B1', $titulo);
+
+            $myWorkSheet_res->getStyle('B1')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getStyle('B1')->getFont()->setBold(true)->setName('Arial')
+                ->setSize(14);
+
+            //DIBUJO EL LOGO
+
+            $drawing = new Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath($path);
+            $drawing->setHeight(75);
+            $drawing->setWidth(75);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(45);
+            $drawing->setOffsetY(15);
+            $drawing->setWorksheet($myWorkSheet_res);
+
+            //Represento la primer tabla
+            $myWorkSheet_res->mergeCells('A2:J2');
+            $myWorkSheet_res->getRowDimension('2')->setRowHeight(45);
+
+
+            $myWorkSheet_res->mergeCells('A3:F3');
+            $myWorkSheet_res->setCellValue('A3', 'Datos considerados en el análisis');
+
+            $myWorkSheet_res->getStyle('A3')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setVertical('center');
+
+
+            $myWorkSheet_res->setCellValue('A4', 'Maquina:');
+            $myWorkSheet_res->setCellValue('B4', $costos_maquinas['name']);
+            $myWorkSheet_res->setCellValue('C4', 'Período:');
+            $myWorkSheet_res->setCellValue('D4', 'de: '. $metadata['fecha_inicio']. ' a '. $metadata['fecha_fin']);
+
+            $myWorkSheet_res->setCellValue('A5', 'Lote:');
+            $myWorkSheet_res->setCellValue('B5', $metadata['lote']);
+            $myWorkSheet_res->setCellValue('C5', 'Parcela:');
+            $myWorkSheet_res->setCellValue('D5', $metadata['parcela']);
+            $myWorkSheet_res->setCellValue('E5', 'Propietario:');
+            $myWorkSheet_res->setCellValue('F5', $metadata['propietario']);
+
+            $myWorkSheet_res->setCellValue('A6', 'Industria destino:');
+            $myWorkSheet_res->setCellValue('B6', $metadata['destino']);
+
+            $myWorkSheet_res->getRowDimension('3')->setRowHeight(25);
+            $myWorkSheet_res->getRowDimension('4')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('5')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('6')->setRowHeight(17);
+
+            $myWorkSheet_res->getStyle('A4')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A4')->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('A4')->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->getStyle('C4')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('C4')->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('c4')->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->getStyle('A5')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A5')->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('A5')->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->getStyle('C5')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('C5')->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('C5')->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->getStyle('E5')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('E5')->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('E5')->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->getStyle('A6')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A6')->getAlignment()->setHorizontal('left');
+            $myWorkSheet_res->getStyle('A6')->getAlignment()->setVertical('center');
+
+
+
+            $myWorkSheet_res->getStyle('B4')->getAlignment()->setIndent(1);
+            $myWorkSheet_res->getStyle('F5')->getAlignment()->setIndent(1);
+
+
+            foreach (range('A4:J4', $myWorkSheet_res->getHighestColumn()) as $col) {
+                $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
+            }
+            foreach (range('A5:J5', $myWorkSheet_res->getHighestColumn()) as $col) {
+                $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
+            }
+            foreach (range('A6:J6', $myWorkSheet_res->getHighestColumn()) as $col) {
+                $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
+            }
+
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////
+            //Segundo BOX, LO HAGO CON BORDES, Empiezo desde A8
+
+
+            $myWorkSheet_res->mergeCells('A7:J7');
+            $myWorkSheet_res->getRowDimension('7')->setRowHeight(45);
+
+            $myWorkSheet_res->getRowDimension('9')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('10')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('11')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('12')->setRowHeight(17);
+
+
+
+            $myWorkSheet_res->mergeCells('A8:B8');
+            $myWorkSheet_res->setCellValue('A8', 'Resumen de resultados');
+
+            $myWorkSheet_res->getStyle('A8')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A8')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A8')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getRowDimension('8')->setRowHeight(25);
+            $myWorkSheet_res->getStyle('A8:B8')->applyFromArray($styleArray);
+
+
+            $myWorkSheet_res->setCellValue('A9', 'Toneladas:');
+            $myWorkSheet_res->setCellValue('A10', 'Toneladas en el periodo:');
+            $myWorkSheet_res->setCellValue('A11', '% sobre total:');
+            $myWorkSheet_res->setCellValue('A12', 'Horas de trabajo (h):');
+
+
+
+            $toneladas = intval($costos_maquinas['costos']['toneladas']);
+            $myWorkSheet_res->getStyle('B9')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B9', $toneladas, DataType::TYPE_NUMERIC);
+
+            $toneladas_total_preriodo = intval(0);
+            $myWorkSheet_res->getStyle('B10')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B10', $toneladas_total_preriodo, DataType::TYPE_NUMERIC);
+
+            $porc_sobre_total = intval(0);
+            $myWorkSheet_res->getStyle('B11')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B11', $porc_sobre_total, DataType::TYPE_NUMERIC);
+
+            $horas_trabajo = intval( $costos_maquinas['costos']['horas']);
+            $myWorkSheet_res->getStyle('B12')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B12', $horas_trabajo, DataType::TYPE_NUMERIC);
+
+
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////
+            //Segundo BOX, LO HAGO CON BORDES, Empiezo desde A8
+
+            $myWorkSheet_res->mergeCells('A15:J15');
+            $myWorkSheet_res->getRowDimension('15')->setRowHeight(45);
+
+            $myWorkSheet_res->getRowDimension('17')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('18')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('19')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('20')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('21')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('22')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('23')->setRowHeight(17);
+
+            $myWorkSheet_res->mergeCells('A16:B16');
+            $myWorkSheet_res->setCellValue('A16', 'Resumen de Costos');
+
+            $myWorkSheet_res->getStyle('A16')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A16')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A16')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getRowDimension('16')->setRowHeight(25);
+            $myWorkSheet_res->getStyle('A16:B16')->applyFromArray($styleArray);
+
+
+            $myWorkSheet_res->setCellValue('A17', 'Costo Total ($/h):');
+            $myWorkSheet_res->setCellValue('A18', 'Costo de la Maquina ($/h):');
+            $myWorkSheet_res->setCellValue('A19', 'Costos Fijos ($/h):');
+            $myWorkSheet_res->setCellValue('A20', 'Costos Semifijos ($/h):');
+            $myWorkSheet_res->setCellValue('A21', 'Costos Variables ($/h)');
+            $myWorkSheet_res->setCellValue('A22', 'Costo horario de personal ($/h):');
+            $myWorkSheet_res->setCellValue('A23', 'Costo horario de administracion ($/h):');
+
+            $costo_total = intval( $costos_maquinas['costos']['costo_h']);
+            $myWorkSheet_res->getStyle('B17')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B17', $costo_total, DataType::TYPE_NUMERIC);
+
+            $costo_maq = intval( $costos_maquinas['costos_groups']['costo_maquina']);
+            $myWorkSheet_res->getStyle('B18')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B18', $costo_maq, DataType::TYPE_NUMERIC);
+
+            $costos_fijos = intval( $costos_maquinas['costos_groups']['costos_fijos']);
+            $myWorkSheet_res->getStyle('B19')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B19', $costos_fijos, DataType::TYPE_NUMERIC);
+
+            $costos_semifijos= intval( $costos_maquinas['costos_groups']['costos_semifijos']);
+            $myWorkSheet_res->getStyle('B20')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B20', $costos_semifijos, DataType::TYPE_NUMERIC);
+
+            $costos_variables = intval( $costos_maquinas['costos_groups']['costos_variables']);
+            $myWorkSheet_res->getStyle('B21')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B21', $costos_variables, DataType::TYPE_NUMERIC);
+
+            $costo_horario_personal = intval( $costos_maquinas['costos_groups']['costo_horario_personal']);
+            $myWorkSheet_res->getStyle('B22')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B22', $costo_horario_personal, DataType::TYPE_NUMERIC);
+
+            $costo_administracion= intval( $costos_maquinas['costos_groups']['costo_administracion']);
+            $myWorkSheet_res->getStyle('B23')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B23', $costo_administracion, DataType::TYPE_NUMERIC);
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////
+            //Tercero BOX, LO HAGO CON BORDES, Empiezo desde A26
+
+            $myWorkSheet_res->mergeCells('A26:J26');
+            $myWorkSheet_res->getRowDimension('26')->setRowHeight(45);
+
+
+            $myWorkSheet_res->getRowDimension('28')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('29')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('30')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('31')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('32')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('33')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('34')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('35')->setRowHeight(17);
+            $myWorkSheet_res->getRowDimension('36')->setRowHeight(17);
+
+
+            $myWorkSheet_res->mergeCells('A27:B27');
+            $myWorkSheet_res->setCellValue('A27', 'Costos detallados');
+
+            $myWorkSheet_res->getStyle('A27')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('A27')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A27')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getRowDimension('27')->setRowHeight(25);
+            $myWorkSheet_res->getStyle('A27:B27')->applyFromArray($styleArray);
+
+
+            $myWorkSheet_res->setCellValue('A28', 'Interés ($/h):');
+            $myWorkSheet_res->setCellValue('A29', 'Seguro ($/h):');
+            $myWorkSheet_res->setCellValue('A30', 'Depreciación de la máquina($/h):');
+            $myWorkSheet_res->setCellValue('A31', 'Depreciación de los neumáticos ($/h):');
+            $myWorkSheet_res->setCellValue('A32', 'Arreglos en la máquina ($/h)');
+            $myWorkSheet_res->setCellValue('A33', 'Consumo de combustible ($/h):');
+            $myWorkSheet_res->setCellValue('A34', 'Consumo de lubricantes ($/h):');
+            $myWorkSheet_res->setCellValue('A35', 'Operador ($/h)');
+            $myWorkSheet_res->setCellValue('A36', 'Mantenimiento ($/h):');
+
+
+            $interes = intval( $costos_maquinas['result_metod']['interes']);
+            $myWorkSheet_res->getStyle('B28')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B28', $interes, DataType::TYPE_NUMERIC);
+
+            $seguro = intval( $costos_maquinas['result_metod']['seguro']);
+            $myWorkSheet_res->getStyle('B29')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B29', $seguro, DataType::TYPE_NUMERIC);
+
+            $dep_maq = intval( $costos_maquinas['result_metod']['dep_maq']);
+            $myWorkSheet_res->getStyle('B30')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B30', $dep_maq, DataType::TYPE_NUMERIC);
+
+            $dep_neum = intval( $costos_maquinas['result_metod']['dep_neum']);
+            $myWorkSheet_res->getStyle('B31')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B31', $dep_neum, DataType::TYPE_NUMERIC);
+
+            $arreglos_maq = intval( $costos_maquinas['result_metod']['arreglos_maq']);
+            $myWorkSheet_res->getStyle('B32')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B32', $arreglos_maq, DataType::TYPE_NUMERIC);
+
+            $cons_comb= intval( $costos_maquinas['result_metod']['cons_comb']);
+            $myWorkSheet_res->getStyle('B33')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B33', $cons_comb, DataType::TYPE_NUMERIC);
+
+            $cons_lub = intval( $costos_maquinas['result_metod']['cons_lub']);
+            $myWorkSheet_res->getStyle('B34')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B34', $cons_lub, DataType::TYPE_NUMERIC);
+
+            $operador = intval( $costos_maquinas['result_metod']['operador']);
+            $myWorkSheet_res->getStyle('B35')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B35', $operador, DataType::TYPE_NUMERIC);
+
+            $mantenimiento = intval( $costos_maquinas['result_metod']['mantenimiento']);
+            $myWorkSheet_res->getStyle('B36')->getNumberFormat()->setFormatCode('#,##0');
+            $myWorkSheet_res->setCellValueExplicit('B36', $mantenimiento, DataType::TYPE_NUMERIC);
+
+
+            return $myWorkSheet_res;
+
+
+
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+        }
+
+
+
+        return null;
     }
 
 

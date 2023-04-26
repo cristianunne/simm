@@ -52,14 +52,16 @@ class InformesMaquinasTable extends Table
             ->allowEmptyString('idinformes_maquinas', null, 'create');
 
         $validator
-            ->date('fecha_inicio')
+            ->scalar('fecha_inicio')
+            ->maxLength('fecha_inicio', 10)
             ->requirePresence('fecha_inicio', 'create')
-            ->notEmptyDate('fecha_inicio');
+            ->notEmptyString('fecha_inicio');
 
         $validator
-            ->date('fecha_fin')
+            ->scalar('fecha_fin')
+            ->maxLength('fecha_fin', 10)
             ->requirePresence('fecha_fin', 'create')
-            ->notEmptyDate('fecha_fin');
+            ->notEmptyString('fecha_fin');
 
         $validator
             ->integer('users_idusers')

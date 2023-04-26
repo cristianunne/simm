@@ -136,11 +136,7 @@ class ArreglosMecanicosTable extends Table
         //Cuando en las condiciones viene el 0, significa que tiene que traer todos
         $conditions = [];
 
-        if(isset($options['worksgroup'])){
-            if($options['worksgroup'] != 0 ){
-                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
-            }
-        }
+
         if(isset($options['lotes_idlotes'])){
             if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
                 $conditions['lotes_idlotes'] = $options['lotes_idlotes'];
@@ -151,18 +147,6 @@ class ArreglosMecanicosTable extends Table
                 $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
             }
         }
-        if(isset($options['propietarios_idpropietarios'])){
-            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
-                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
-            }
-        }
-
-        if(isset($options['destinos_iddestinos'])){
-            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
-                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
-            }
-        }
-
 
         $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
 

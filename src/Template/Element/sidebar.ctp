@@ -145,6 +145,11 @@
                                 '<i class="fas fa-greater-than nav-icon"></i> Inicio',
                                 ['controller' => 'ArreglosMecanicos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
                                 'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Informe por Maquina',
+                                ['controller' => 'ArreglosMecanicos', 'action' => 'resumenArreglosByMaquina'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-arreglos_mecanicos-Resumen']) ?>
                         </li>
 
                     </ul>

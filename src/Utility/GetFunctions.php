@@ -210,6 +210,14 @@ class GetFunctions
 
     }
 
+    public function getMaquinaDataById($array_options)
+    {
+        $maquinas_model = TableRegistry::getTableLocator()->get('Maquinas');
+
+
+
+
+    }
 
     public function getMaquinaById($maquina)
     {
@@ -769,6 +777,11 @@ class GetFunctions
 
         return $suma;
     }
+
+    /**
+     * Metodos para la maquina
+     */
+
 
 
 

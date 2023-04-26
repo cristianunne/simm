@@ -291,7 +291,7 @@ class AnalisisCostosGrupos
     }
 
 
-    private function appliedCostosMetodology($maquina_with_data, $id_empresa)
+    public function appliedCostosMetodology($maquina_with_data, $id_empresa)
     {
 
         $get_functions_class = new GetFunctions();
@@ -491,7 +491,7 @@ class AnalisisCostosGrupos
 
     }
 
-    private function calculateCostosByHours($maquina_with_data)
+    public function calculateCostosByHours($maquina_with_data)
     {
 
         $costo_hora = null;
@@ -829,7 +829,7 @@ class AnalisisCostosGrupos
 
 
 
-    private function calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos, $uso_maquinaria,
+    public function calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos, $uso_maquinaria,
                                                             $operarios_maquina_data)
     {
 
@@ -1550,7 +1550,7 @@ class AnalisisCostosGrupos
      * COmo las maquinas pueden repetirse mes a mes, utilizo este metodo para resumir
      * utilizo las horas del mes HME como elemento de ponderacion
      */
-    private function resumeCostosHorariosByMaquina($new_lista_maquinas_with_data, $maquinas_distinct)
+    public function resumeCostosHorariosByMaquina($new_lista_maquinas_with_data, $maquinas_distinct)
     {
 
         $maquinas_result_new = null;
@@ -1561,6 +1561,7 @@ class AnalisisCostosGrupos
         {
 
             $maquina_ = $get_function_class->getMaquinaById($maquina_distinct);
+
 
             $result = null;
             $maquina = null;
@@ -1588,7 +1589,7 @@ class AnalisisCostosGrupos
 
                     foreach ($data_month['maquinas'] as $maq)
                     {
-                        // debug($maq);
+
 
                         //COnsulto si las maquinas son las mismas
                         if($maq['idmaquinas'] == $maquina_distinct)

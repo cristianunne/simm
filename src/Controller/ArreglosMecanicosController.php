@@ -17,12 +17,14 @@ class ArreglosMecanicosController extends AppController
     {
         if (isset($user['role']) and $user['role'] === 'user') {
             if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'showInactive',
-                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos', 'remove'])) {
+                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos', 'remove',
+                'resumenArreglosByMaquina'])) {
                 return true;
             }
         } else if (isset($user['role']) and $user['role'] === 'supervisor') {
             if (in_array($this->request->getParam('action'), ['index', 'add', 'edit', 'delete', 'showInactive',
-                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos', 'remove'])) {
+                'view', 'getGroups', 'getMaquinas', 'getParcelas', 'getUsuarios', 'getDataFromArreglosMecanicos', 'remove',
+                'resumenArreglosByMaquina'])) {
                 return true;
             }
         }
@@ -314,6 +316,34 @@ class ArreglosMecanicosController extends AppController
         }
     }
 
+
+    public function resumenArreglosByMaquina()
+    {
+        $seccion = 'arreglos_mecanicos';
+        $sub_seccion = 'Resumen';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
+
+        //Traigo los datos de la sesion
+        $session = $this->request->getSession();
+        $user_id = $session->read('Auth.User.idusers');
+        $user_role = $session->read('Auth.User.role');
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        $maquinas_model = $this->loadModel('Maquinas');
+        $maquinas_data = $maquinas_model->find('list',
+            [
+                'keyField' => 'idmaquinas',
+                'valueField' => 'name',
+                'order' => ['name' => 'ASC']
+            ])->where(['empresas_idempresas' => $id_empresa, 'active' => true])
+            ->toArray();
+
+        $this->set(compact('maquinas_data'));
+
+    }
 
     public function getGroups()
     {

@@ -7,8 +7,8 @@ use Cake\ORM\Entity;
  * InformesMaquina Entity
  *
  * @property int $idinformes_maquinas
- * @property \Cake\I18n\FrozenDate $fecha_inicio
- * @property \Cake\I18n\FrozenDate $fecha_fin
+ * @property string $fecha_inicio
+ * @property string $fecha_fin
  * @property int $users_idusers
  * @property int $empresas_idempresas
  * @property \Cake\I18n\FrozenTime|null $created

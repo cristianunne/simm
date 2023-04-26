@@ -16,8 +16,8 @@ class InformesMaquinasFixture extends TestFixture
     // @codingStandardsIgnoreStart
     public $fields = [
         'idinformes_maquinas' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true, 'precision' => null],
-        'fecha_inicio' => ['type' => 'date', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
-        'fecha_fin' => ['type' => 'date', 'length' => null, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null],
+        'fecha_inicio' => ['type' => 'string', 'length' => 10, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'fecha_fin' => ['type' => 'string', 'length' => 10, 'null' => false, 'default' => null, 'collate' => 'utf8mb4_unicode_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'users_idusers' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'empresas_idempresas' => ['type' => 'integer', 'length' => null, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'created' => ['type' => 'timestamp', 'length' => null, 'null' => true, 'default' => 'CURRENT_TIMESTAMP', 'comment' => '', 'precision' => null],
@@ -56,12 +56,12 @@ class InformesMaquinasFixture extends TestFixture
         $this->records = [
             [
                 'idinformes_maquinas' => 1,
-                'fecha_inicio' => '2023-03-06',
-                'fecha_fin' => '2023-03-06',
+                'fecha_inicio' => 'Lorem ip',
+                'fecha_fin' => 'Lorem ip',
                 'users_idusers' => 1,
                 'empresas_idempresas' => 1,
-                'created' => 1678082760,
-                'modified' => 1678082760,
+                'created' => 1682460377,
+                'modified' => 1682460377,
                 'name' => 'Lorem ipsum dolor sit amet',
                 'path' => 'Lorem ipsum dolor sit amet',
                 'maquinas_idmaquinas' => 1,

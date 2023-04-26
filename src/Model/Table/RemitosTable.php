@@ -347,17 +347,11 @@ class RemitosTable extends Table
 
 
 
+
         $result = $query
             ->distinct(['idremitos'])
             ->innerJoinWith('RemitosMaquinas')
             ->where($conditions);
-
-        $array_result = [];
-
-        foreach ($result as $rem){
-
-            $array_result[] = $rem->idremitos;
-        }
 
 
         return $result;
