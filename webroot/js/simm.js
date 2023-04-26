@@ -3626,9 +3626,166 @@ function checkAllInpustOk(maquina, fecha_inicio, fecha_final, lotes, parcelas, p
     return true;
 }
 
+function checkAllInpustOkResumen(maquina, fecha_inicio, fecha_final)
+{
+
+    if(maquina === '' || fecha_inicio === '' || fecha_final === '' ||
+        maquina == null || fecha_inicio == null || fecha_final == null ||
+        maquina === 'null' || fecha_inicio === 'null' || fecha_final === 'null' ||
+        maquina === 'undefined' || fecha_inicio === 'undefined' || fecha_final === 'undefined'){
+
+        return false;
+    }
+    return true;
+}
+
 function changeStyleBtns() {
     //Habilito el boton POST
     $("#div_accept_btn").css("display", "block");
     $("#div_btn_check").css("display", "none");
+}
+
+
+
+function resumeArreglos()
+{
+    let fecha_inicio_control = $("#fecha_inicio");
+    let fecha_final_control = $("#fecha_final");
+    let maquinas_idmaquinas_control = $("#maquinas_idmaquinas");
+
+
+
+
+    //OBtengo los valores
+    //Creo las variables
+    let maquina = maquinas_idmaquinas_control.val();
+    let fecha_inicio = fecha_inicio_control.val();
+    let fecha_final = fecha_final_control.val();
+
+
+    if(!checkAllInpustOkResumen(maquina, fecha_inicio, fecha_final))
+    {
+        $.confirm({
+            icon: 'fas fa-exclamation-circle',
+            title: '¡Advertencia!',
+            content: 'Debe completar todos los campos para proceder!',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                close:
+                    {
+                        text: 'Aceptar',
+                        btnClass: 'btn-red',
+                        actions: function () {
+                        }}
+            }
+        });
+    } else {
+
+        var a = $.confirm({
+            theme: 'supervan',
+            lazyOpen: true,
+            closeIcon: false,
+            type: 'blue',
+            typeAnimated: true,
+            icon: 'fa fa-spinner fa-spin',
+            title: 'Procesando!',
+            content: 'Obteniendo resumen de arreglos mecanicos!',
+            buttons:false
+
+        });
+
+
+        //Proceso a informacion
+        let variables = {
+          "maquina" : maquina,
+          "fecha_inicio" : fecha_inicio,
+          "fecha_fin" : fecha_final
+        };
+
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: 'getResumenByMaquina',
+            data: variables,
+
+            beforeSend: function (xhr) { // Add this line
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                //Debo mostrar un loading
+
+                a.open();
+
+            },
+            success: function(data, textStatus){
+
+                //console.log(data);
+
+                if(data.result != false)
+                {
+
+                    let l = setTimeout(function () {
+                        let res = a.close();
+                        addElementoToTableResumen(data.result.mano_obra, data.result.total_repuestos,
+                            data.result.total);
+                    },  5000);
+
+
+                }
+
+            },
+            error: function (data, textStatus) {
+
+                let l = setTimeout(function (){
+                    let res = a.close();
+
+                    if(res) {
+                        let is_not_ok = $.confirm({
+                            icon: 'fas fa-exclamation-circle',
+                            title: '¡Error!',
+                            content: 'La Máquina no puede ser analizada.',
+                            type: 'red',
+                            typeAnimated: true,
+                            buttons: {
+                                close:
+                                    {
+                                        text: 'Aceptar',
+                                        btnClass: 'btn-red',
+                                        function() {
+                                        }
+                                    }
+
+                            }
+                        });
+                    }
+
+                }, 7000);
+            },
+            complete: function (data) {
+            }
+
+        });
+
+    }
+
+}
+
+function addElementoToTableResumen(mano_obra, repuesto, total)
+{
+    let table = $('#tabladata').DataTable();
+    let number_count = table.rows().count();
+    //console.log(number_count);
+
+    table.row(0)
+        .remove()
+        .draw();
+    /*if(number_count > 0){
+        table.row(1)
+            .remove()
+            .draw();
+    }*/
+
+    let trDOM = table.row.add([mano_obra, repuesto, total] ).draw().node();
+    $( trDOM ).addClass('dt-center');
+
 }
 

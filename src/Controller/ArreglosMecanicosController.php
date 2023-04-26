@@ -343,7 +343,134 @@ class ArreglosMecanicosController extends AppController
 
         $this->set(compact('maquinas_data'));
 
+        if ($this->request->is('post')) {
+
+
+            $data = $this->request->getData();
+            debug($this->request->getData());
+
+            $maquina = $data['maquinas_idmaquinas'];
+            $fecha_inicio = $data['fecha_inicio'];
+            $fecha_fin = $data['fecha_fin'];
+
+            $fechai = strtotime($fecha_inicio);
+            $fechai2 = strtotime($fecha_fin);
+
+            $mes_inicio = date('m',$fechai);
+            $year_inicio = date('Y',$fechai);
+
+            $mes_final = date('m',$fechai2);
+            $year_final = date('Y',$fechai2);
+
+            $fech_ini = date("Y-m-t", $fechai);
+            $fech_fin = date("Y-m-t", $fechai2);
+
+
+            $cond1['fecha >='] = $fech_ini;
+            $cond1['fecha <='] = $fech_fin;
+
+            $arr1[] = $cond1;
+
+            //$cond2['MONTH(fecha) <='] = $mes_final;
+            //$cond2['YEAR(fecha) <='] = $year_final;
+
+            //$arr1[] = $cond2;
+            $arr1['maquinas_idmaquinas'] = $maquina;
+
+            $sumas = $this->ArreglosMecanicos->find('all',
+            [
+                'fields' => [
+                    'maquinas_idmaquinas' => 'maquinas_idmaquinas',
+                    'total_mano_obra' => 'SUM(mano_obra)',
+                    'total_repuestos' => 'SUM(repuestos)',
+                    'total_total' => 'SUM(total)'
+                ]
+            ])->where($arr1);
+
+            $array_result = null;
+
+            if(isset($sumas->toArray()[0]))
+            {
+                $array_result = [
+                    'mano_obra' => $sumas->toArray()[0]['total_mano_obra'],
+                    'total_repuestos' => $sumas->toArray()[0]['total_repuestos'],
+                    'total' => $sumas->toArray()[0]['total_total'],
+                ];
+
+                 debug($this->json(['result' => $array_result]));
+            }
+
+            debug($this->json(['result' => false]));
+
+        }
+
+
+
+        //hago la prueba de traida de datos
+
+
+
     }
+
+    public function getResumenByMaquina()
+    {
+
+        $this->autoRender = false;
+
+        $maquina = $_POST['maquina'];
+        $fecha_inicio = $_POST['fecha_inicio'];
+        $fecha_fin = $_POST['fecha_fin'];
+
+
+        if($this->request->is('ajax'))
+        {
+
+            $fechai = strtotime($fecha_inicio);
+            $fechai2 = strtotime($fecha_fin);
+
+            $fech_ini = date("Y-m-01", $fechai);
+            $fech_fin = date("Y-m-t", $fechai2);
+
+
+            $cond1['fecha >='] = $fech_ini;
+            $cond1['fecha <='] = $fech_fin;
+
+            $arr1[] = $cond1;
+
+            $arr1['maquinas_idmaquinas'] = $maquina;
+
+            $sumas = $this->ArreglosMecanicos->find('all',
+                [
+                    'fields' => [
+                        'maquinas_idmaquinas' => 'maquinas_idmaquinas',
+                        'total_mano_obra' => 'SUM(mano_obra)',
+                        'total_repuestos' => 'SUM(repuestos)',
+                        'total_total' => 'SUM(total)'
+                    ]
+                ])->where($arr1);
+            $array_result = null;
+
+            if(isset($sumas->toArray()[0]))
+            {
+                $mano_obra = $sumas->toArray()[0]['total_mano_obra'];
+                $total_repuestos = $sumas->toArray()[0]['total_repuestos'];
+                $total = $sumas->toArray()[0]['total_total'];
+                $array_result = [
+                    'mano_obra' => $mano_obra == null ? 0 : $mano_obra,
+                    'total_repuestos' => $total_repuestos == null ? 0 : $total_repuestos,
+                    'total' => $total == null ? 0 : $total
+                ];
+
+                return $this->json(['result' => $array_result]);
+            }
+
+            return $this->json(['result' => false]);
+
+        }
+
+
+    }
+
 
     public function getGroups()
     {

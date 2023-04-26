@@ -396,6 +396,22 @@ class GetFunctions
 
     }
 
+    public function getMonth($fecha)
+    {
+        $fechai = strtotime($fecha);
+
+        return date('m',$fechai);
+
+    }
+
+    public function getYear($fecha)
+    {
+        $fechai = strtotime($fecha);
+
+        return date('Y',$fechai);
+    }
+
+
     public function getDateSixMonthsBack($fecha)
     {
         $fec_in = new Date($fecha);
