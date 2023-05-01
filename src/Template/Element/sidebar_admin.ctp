@@ -1,5 +1,5 @@
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-light elevation-4">
+<aside class="main-sidebar sidebar-light elevation-4" style="position: fixed !important; background-color: white;">
     <!-- TRaigo los datos de la sesion-->
 
     <?php

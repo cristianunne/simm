@@ -13,7 +13,7 @@ $email = $session->read('Auth.User.email');
 ?>
 
 <!-- Navbar -->
-<nav class="main-header navbar navbar-expand bg-navy">
+<nav class="main-header navbar navbar-expand bg-navy fixed-top" >
 
     <!-- Left navbar links -->
     <ul class="navbar-nav">

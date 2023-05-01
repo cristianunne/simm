@@ -2578,7 +2578,7 @@ function getPropietarioByParcela(id_parcela, context)
 
             },
             error: function (data) {
-                console.log('error ' + data);
+                console.log(data);
             }
         });
 
@@ -2959,7 +2959,7 @@ function processCalcCostosGroups(variables)
           {
 
               data_info = data.costos;
-             // console.log(data);
+              console.log(data);
 
               $.when(showDataCostosToDisplayLeft(data)).then(
                   function () {
@@ -3402,6 +3402,36 @@ function downloadInforme(button)
 
     if(path !== undefined && path !== null && path !== ''){
         window.open("../" + path , '_blank');
+    } else {
+
+        //Mensaje de error
+        $.confirm({
+            icon: 'fas fa-exclamation-circle',
+            title: '¡Error!',
+            content: 'El Informe que desea descargar no existe!',
+            type: 'red',
+            typeAnimated: true,
+            buttons: {
+                close:
+                    {
+                        text: 'Aceptar',
+                        btnClass: 'btn-red',
+                        function () {
+                        }}
+            }
+        });
+
+    }
+
+}
+
+function downloadInformeVariacion(button)
+{
+
+    let path = $(button).attr('attr');
+
+    if(path !== undefined && path !== null && path !== ''){
+        window.open(path , '_blank');
     } else {
 
         //Mensaje de error

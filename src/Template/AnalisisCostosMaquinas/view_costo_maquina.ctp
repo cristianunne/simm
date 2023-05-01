@@ -128,7 +128,7 @@
 
                                         <tr>
                                             <td><strong>% sobre el total extraído en el periodo: </strong></td>
-                                            <td><?= h('') ?></td>
+                                            <td><?= h(number_format($data_result['costos']['porc_ton'], 2)) ?></td>
                                         </tr>
                                         <tr></tr>
                                         <tr>
@@ -138,7 +138,7 @@
 
                                         <tr>
                                             <td><strong>% sobre el total extraído en el periodo: </strong></td>
-                                            <td></td>
+                                            <td><?= h(number_format($data_result['costos']['porc_horas'], 2)) ?></td>
                                         </tr>
 
                                         <tr>

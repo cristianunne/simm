@@ -111,7 +111,6 @@ class PagesController extends AppController
         {
 
 
-
             return $this->redirect(['controller' => 'Pages', 'action' => 'indexAdmin']);
 
         } else {
@@ -133,6 +132,9 @@ class PagesController extends AppController
 
     public function indexAdmin()
     {
+        $flags_footer = true;
+        $this->set(compact('flags_footer'));
+
         $session = $this->request->getSession();
         //Seteo la session id empresa a null
         $session->write('Auth.User.Empresa.idempresas', null);

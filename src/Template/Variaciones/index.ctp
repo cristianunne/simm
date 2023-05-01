@@ -128,8 +128,10 @@
                         <div style="margin-top: 25%;">
                             <button type="button" class="btn btn-block bg-gradient-primary"
                                     onclick="graficarVariacion()">Gráficar</button>
-                            <button type="button" class="btn btn-block bg-gradient-primary"
-                                    onclick="graficar()">dededede</button>
+
+                            <button type="button" class="btn btn-block bg-gradient-success" id="down_informe"
+                                    style="display: none;" onclick="downloadInformeVariacion(this)">
+                                <span class="glyphicon far fa-file-excel"></span> Descargar Informe</button>
                         </div>
 
 
@@ -141,7 +143,7 @@
 
                 <div class="row">
                     <div class="col-md-12" style="margin-left: 5px; padding-bottom: 10px;">
-                        <h5 style="text-align: center;">Variación: </h5>
+                        <h5 id="title_graphic" style="text-align: center;">Variación: </h5>
 
                         <div>
                             <canvas id="myChart"></canvas>
@@ -269,6 +271,7 @@
     </div>
 
 </div>
+
 
 
 <!-- you need to include the ShieldUI CSS and JS assets in order for the TreeView widget to work -->

@@ -21,7 +21,7 @@
                 <h3 class="card-title">
                     <?php echo $this->Html->image('arreglos_mecanicos_white.png' , ["alt" => 'User Image' ,
                         "class" => 'img-circle img-header', 'pathPrefix' => '/webroot/img/icons/']) ?>
-                    Nuevo Arreglo Mecánico
+                    Resumen -  Arreglo Mecánico
                 </h3>
             </div>
 

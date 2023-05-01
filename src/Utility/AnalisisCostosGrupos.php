@@ -25,14 +25,11 @@ class AnalisisCostosGrupos
             $year = $meses_year['year'];
             //devuelve los resultados globales y las constantes para las maquinas
             $maquinas_with_general_constantes = $this->calculateCostosByMonth($mes, $year, $array_options, $id_empresa);
-
-            //debug($maquinas_with_general_constantes);
             $data_organized_by_month[] = $maquinas_with_general_constantes;
 
         }
 
         //debug($data_organized_by_month);
-
         if(empty($data_organized_by_month[0]['maquinas']) == false)
         {
             //debug($data_organized_by_month);
@@ -84,6 +81,9 @@ class AnalisisCostosGrupos
 
             $maquinas_by_centros_costos['general']['categorias']['mai']['transporte'] = $this->calculateMAIElaboracionTransporte($maquinas_by_centros_costos, 'Transporte');
 
+
+            //debug($maquinas_by_centros_costos);
+
             return $maquinas_by_centros_costos;
         }
 
@@ -92,7 +92,88 @@ class AnalisisCostosGrupos
 
     }
 
+    public function analisisDeCostosGruposVariacion($array_options, $id_empresa)
+    {
 
+        //este tengo que limitar a 1 mes por worksgroup
+
+        //Instancio la clase GetFUnctions
+        $get_functions = new GetFunctions();
+
+        $mes = $array_options['mes'];
+        $year = $array_options['year'];
+
+
+
+        $data_organized_by_month = [];
+        $maquinas_with_general_constantes = $this->calculateCostosByMonth($mes, $year, $array_options, $id_empresa);
+        $data_organized_by_month[] = $maquinas_with_general_constantes;
+
+
+        //debug($data_organized_by_month);
+            //Obtengo las maquinas distinct
+
+        if(empty($data_organized_by_month[0]['maquinas']) == false)
+        {
+            //debug($data_organized_by_month);
+            //Obtengo las maquinas distinct
+            $maquinas_distinct = $get_functions->getMaquinasDistinct($data_organized_by_month);
+
+
+            //utilizando la media ponderada
+            $maquinas_resume = $this->resumeCostosHorariosByMaquina($data_organized_by_month, $maquinas_distinct);
+            //debug($maquinas_resume);
+
+            $maquinas_resume_new =  $this->calculateCostosFijosYVariables($maquinas_resume);
+
+
+            $centros_costos_array = $get_functions->getCentroCostosDistinct($maquinas_resume_new);
+
+            $centros_costos = $get_functions->getCentrosCostrosByArray($centros_costos_array);
+
+
+
+            $maquinas_by_centros_costos['general'] = $this->resumeGeneralData($data_organized_by_month, $maquinas_distinct);
+
+            $maquinas_by_centros_costos['general']['precio_servicio'] = $this->precioServicioGeneral($data_organized_by_month);
+            //debug($maquinas_by_centros_costos);
+
+            //AGrego la informaci[on de costos a resumen
+            $maquinas_by_centros_costos['general']['costos_suma'] = $this->resumeGeneralDataCostos($maquinas_resume_new);
+
+
+
+            $maquinas_by_centros_costos['centros'] = $this->resumeDataMaquinasByCentroCostos($maquinas_resume_new, $centros_costos, $maquinas_by_centros_costos['general']);
+            //debug($maquinas_by_centros_costos);
+            //ACa deberia mandarlo a que calcule el costo total
+            $maquinas_by_centros_costos = $this->calculateCostoTotal($maquinas_by_centros_costos);
+
+            $maquinas_by_centros_costos['general']['mai']['economico'] = $this->calculateMAIEconomico($maquinas_by_centros_costos);
+            $maquinas_by_centros_costos['general']['mai']['financiero'] = $this->calculateMAIFinanciero($maquinas_by_centros_costos);
+
+            $maquinas_by_centros_costos['general']['categorias']['costos'] = $this->calculateCostosByCategoria($maquinas_by_centros_costos);
+
+            //ordeno los datos por elaboracion y transporte
+            $maquinas_by_centros_costos['general']['categorias']['precio']['elaboracion'] = $this->precioServicioByCategory($data_organized_by_month,
+                'Elaboracion');
+
+            $maquinas_by_centros_costos['general']['categorias']['precio']['transporte'] = $this->precioServicioByCategory($data_organized_by_month,
+                'Transporte');
+
+            $maquinas_by_centros_costos['general']['categorias']['mai']['elaboracion'] = $this->calculateMAIElaboracionTransporte($maquinas_by_centros_costos, 'Elaboracion');
+
+            $maquinas_by_centros_costos['general']['categorias']['mai']['transporte'] = $this->calculateMAIElaboracionTransporte($maquinas_by_centros_costos, 'Transporte');
+
+
+            //debug($maquinas_by_centros_costos);
+
+            return $maquinas_by_centros_costos;
+        }
+
+        //return $maquinas_by_centros_costos;
+        return null;
+
+    }
     public function appliedCostosMetodologyEval($maquina_with_data, $id_empresa)
     {
         //Traigo las constantes
@@ -406,20 +487,23 @@ class AnalisisCostosGrupos
         //INstancio la clase getfunction
         $get_functions_class = new GetFunctions();
 
+        //debug($array_options);
+
 
         //Arreglo no vaio, proceso
         if(count($array_options) > 0) {
             $array_options['mes'] = $mes;
             $array_options['year'] = $year;
 
+            //debug($array_options);
             //OBtengo los remitos disponibles
             $array_remitos = $get_functions_class->getRemitosByConditions($array_options);
+
             $general_data['total_remitos'] = count($array_remitos);
 
 
-
-
             if(count($array_remitos) > 0){
+
 
                 //Calculo los resultados globales, TONELADAS
                 $tabla_remitos = TableRegistry::getTableLocator()->get('Remitos');

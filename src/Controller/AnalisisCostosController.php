@@ -142,7 +142,6 @@ class AnalisisCostosController extends AppController
             $array_options['destinos_iddestinos'] = $destinos;
             $array_options['empresas_idempresas'] = $id_empresa;
 
-
             $array_options_['worksgroup'] = $worksgroup;
             $array_options_['fecha_inicio'] = $fecha_inicio;
             $array_options_['fecha_fin'] = $fecha_final;
@@ -179,7 +178,7 @@ class AnalisisCostosController extends AppController
 
             }
 
-
+            $result = true;
             if($result) {
                 //Utilizo la clase para calcular los costos
                 //devuelve un arreglos con los datos de la maquina
@@ -281,8 +280,8 @@ class AnalisisCostosController extends AppController
         //$fecha_final = '2020-02-20';
 
         $worksgroup = 0;
-        $fecha_inicio = '2022-09';
-        $fecha_final = '2022-09';
+        $fecha_inicio = '2022-05';
+        $fecha_final = '2022-12';
         $lotes = 0;
         $parcelas = 0;
         $propietarios = 0;
@@ -343,7 +342,7 @@ class AnalisisCostosController extends AppController
         //$metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
 
 
-        foreach ($meses_years as $meses_year)
+        /*foreach ($meses_years as $meses_year)
         {
             $mes = $meses_year['mes'];
             $year = $meses_year['year'];
@@ -355,60 +354,58 @@ class AnalisisCostosController extends AppController
                 break;
             }
 
-        }
-
+        }*/
+        $result = true;
         //INstancio las clases getfunction y costos
         if($result) {
             //Utilizo la clase para calcular los costos
             //devuelve un arreglos con los datos de la maquina
-            $costos_maquinas = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
+            $costos_maquinas = $analisis_costos_class->analisisDeCostosGruposVariacion($array_options, $id_empresa);
 
-            //debug($costos_maquinas);
-
-
+            debug($costos_maquinas);
 
             //$costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
 
             //Calculo los costos seis meses atras
 
             //Tengo que calcular los costos backtime
-            $date_six_inicio_back = $get_function_class->getDateSixMonthsBack($fecha_inicio);
-            $date_six_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
+            //$date_six_inicio_back = $get_function_class->getDateSixMonthsBack($fecha_inicio);
+           // $date_six_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
 
             //remplazo el array options
-            $array_options_['fecha_inicio'] = $date_six_inicio_back;
-            $array_options_['fecha_fin'] = $date_six_final_back;
+           // $array_options_['fecha_inicio'] = $date_six_inicio_back;
+           // $array_options_['fecha_fin'] = $date_six_final_back;
 
-            $costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+          //  $costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
 
             //debug($costos_maquinas_six_back);
 
-            $date_year_inicio_back = $get_function_class->getDateOneYearBack($fecha_inicio);
-            $date_year_final_back = $get_function_class->getDateOneYearBack($fecha_final);
+         //   $date_year_inicio_back = $get_function_class->getDateOneYearBack($fecha_inicio);
+          //  $date_year_final_back = $get_function_class->getDateOneYearBack($fecha_final);
 
             //remplazo el array options
-            $array_options_['fecha_inicio'] = $date_year_inicio_back;
-            $array_options_['fecha_fin'] = $date_year_final_back;
+           // $array_options_['fecha_inicio'] = $date_year_inicio_back;
+           // $array_options_['fecha_fin'] = $date_year_final_back;
 
             //debug("UN ANO ATRAS");
-            $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+           // $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
 
-
+//
             $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
-            $metadata['users_idusers'] = $user_id;
+          //  $metadata['users_idusers'] = $user_id;
 
 
             //Llamo a excel processing
-            $excel_processing_class = new ExcelProcesssing();
-            $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
+           // $excel_processing_class = new ExcelProcesssing();
+           // $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
 
             $array_result = [
                 'costos' => $costos_maquinas,
                 'informe' => $informe
             ];
-            debug($array_result);
+            //debug($array_result);
 
-            return $this->json($array_result);
+            //return $this->json($array_result);
 
         }
 
@@ -489,5 +486,28 @@ class AnalisisCostosController extends AppController
     }
 
 
+    public function getCostosByWorksgroups($array_options = [])
+    {
+
+        //INstancio la clase GetFunction
+        $get_function_class = New GetFunctions();
+
+        //instancio la clase AalisisCostos
+        $analisis_costos_class =  new AnalisisCostosGrupos();
+
+
+
+        $costos_maquinas = $analisis_costos_class->analisisDeCostosGruposVariacion($array_options,  $array_options['empresas_idempresas']);
+
+
+        //debug($array_options);
+        if($costos_maquinas != null)
+        {
+            //debug($costos_maquinas['general']['costo_total']);
+            return $costos_maquinas['general']['costo_total'];
+        }
+        return 0;
+
+    }
 
 }

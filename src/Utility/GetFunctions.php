@@ -189,6 +189,24 @@ class GetFunctions
         return $arrar_result;
     }
 
+    public function getHorasTrabajadas($data_organized_by_month)
+    {
+
+        $horas = null;
+
+        foreach ($data_organized_by_month as $data)
+        {
+
+            $horas = $horas + $data['maquinas']['constantes']['HME'];
+
+
+        }
+
+        return $horas;
+
+    }
+
+
     public function getLoteById($id_lote)
     {
         try{
@@ -250,7 +268,7 @@ class GetFunctions
 
 
         if(isset($options['maquina'])){
-            if($options['maquina'] != 0 ){
+            if($options['maquina'] != 0 and $options['maquina'] != '0'){
                 $conditions['idmaquinas'] = intval($options['maquina']);
             }
         }
@@ -543,6 +561,7 @@ class GetFunctions
     {
         $this->autoRender = false;
 
+        //debug($array_options);
 
         $remitos_table = TableRegistry::getTableLocator()->get('Remitos');
         //$this->loadModel('Remitos');
@@ -678,6 +697,66 @@ class GetFunctions
         return $toneladas;
     }
 
+
+    public function getTotalToneladasPeriodo($array_options)
+    {
+        //TRaigo los remitos, pero no filtro por maquina
+        $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
+
+        //le cabio el formato a array options
+
+        $fechai = strtotime($array_options['fecha_inicio']);
+        $fechai2 = strtotime($array_options['fecha_fin']);
+        $fech_ini = date("Y-m-01", $fechai);
+        $fech_fin = date("Y-m-t", $fechai2);
+
+        $array_options['fecha_inicio'] = $fech_ini;
+        $array_options['fecha_fin'] = $fech_fin;
+
+
+        $remitos_array = $remitos_model->find('RemitosByConditionsAllData', $array_options);
+
+        $toneladas = null;
+
+        foreach ($remitos_array as $item) {
+
+            $toneladas = $toneladas + $item->ton;
+        }
+
+        return $toneladas;
+    }
+
+    public function getHorasTotalPeriodo($array_options)
+    {
+        //TRaigo los remitos, pero no filtro por maquina
+        $remitos_model = TableRegistry::getTableLocator()->get('Remitos');
+
+        //le cabio el formato a array options
+
+        $fechai = strtotime($array_options['fecha_inicio']);
+        $fechai2 = strtotime($array_options['fecha_fin']);
+        $fech_ini = date("Y-m-01", $fechai);
+        $fech_fin = date("Y-m-t", $fechai2);
+
+        $array_options['fecha_inicio'] = $fech_ini;
+        $array_options['fecha_fin'] = $fech_fin;
+
+
+        $remitos_array = $remitos_model->find('RemitosByConditionsAllData', $array_options);
+
+        $horas = null;
+
+        foreach ($remitos_array as $item) {
+
+            $toneladas = $toneladas + $item->ton;
+        }
+
+        return $toneladas;
+
+    }
+
+
+
     public function getUsoMaquinariaByMaquina($maquina, $array_options)
     {
         $array_options['maquina'] = $maquina;
@@ -698,6 +777,27 @@ class GetFunctions
         return $uso_maq_comb;
     }
 
+
+    public function getWorksgroups($options)
+    {
+        $conditions = [];
+
+
+        if(isset($options['idworksgroups'])){
+            if($options['idworksgroups'] != 0 and $options['idworksgroups'] != '0'){
+                $conditions['idworksgroups'] = intval($options['idworksgroups']);
+            }
+        }
+        $conditions['empresas_idempresas'] = $options['empresas_idempresas'];
+
+
+        $worksgroup_model = TableRegistry::getTableLocator()->get('Worksgroups');
+        $worksgroup = $worksgroup_model->find('all', [])
+            ->where($conditions);
+
+        return $worksgroup;
+
+    }
 
     public function getWorksgroupById($id_worksgroup)
     {
@@ -740,6 +840,10 @@ class GetFunctions
 
     }
 
+    public function getCostoByWorksgrups($array_options)
+    {
+
+    }
 
     public function getSumaToneladasByWorksgroups($array_options)
     {

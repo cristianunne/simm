@@ -866,6 +866,7 @@ class ExcelProcesssing
         $result = $this->createMaquinasExcelInforme($metadata, $costos_maquinas);
 
 
+
         if($result != false)
         {
             $metadata['path'] = $result['path'];
@@ -897,6 +898,8 @@ class ExcelProcesssing
 
         $myWorkSheet_maq =  $this->createSheetMaquina($spreadsheet, $costos_maquinas, $metadata);
 
+
+        $spreadsheet->removeSheetByIndex(2);
 
         //utilizo el now, es mejor
         $nombre = "informe_maq_" .hash('sha256' , (date("Y-m-d H:i:s")));
@@ -1098,11 +1101,11 @@ class ExcelProcesssing
             $myWorkSheet_res->getStyle('B9')->getNumberFormat()->setFormatCode('#,##0');
             $myWorkSheet_res->setCellValueExplicit('B9', $toneladas, DataType::TYPE_NUMERIC);
 
-            $toneladas_total_preriodo = intval(0);
+            $toneladas_total_preriodo = intval($costos_maquinas['costos']['toneladas_total_preriodo']);
             $myWorkSheet_res->getStyle('B10')->getNumberFormat()->setFormatCode('#,##0');
             $myWorkSheet_res->setCellValueExplicit('B10', $toneladas_total_preriodo, DataType::TYPE_NUMERIC);
 
-            $porc_sobre_total = intval(0);
+            $porc_sobre_total = intval($costos_maquinas['costos']['porc_ton']);
             $myWorkSheet_res->getStyle('B11')->getNumberFormat()->setFormatCode('#,##0');
             $myWorkSheet_res->setCellValueExplicit('B11', $porc_sobre_total, DataType::TYPE_NUMERIC);
 
@@ -1264,6 +1267,218 @@ class ExcelProcesssing
 
 
         return null;
+    }
+
+
+
+    public function createInformeVariaciones($metadata, $costos_maquinas)
+    {
+        $informes_maquinas_model = TableRegistry::getTableLocator()->get('InformesVariaciones');
+        $infomes_maq_entity = $informes_maquinas_model->newEntity();
+
+        $result = $this->createVariacionesExcelInforme($metadata, $costos_maquinas);
+
+        if($result != false)
+        {
+            $metadata['path'] = $result['path'];
+            $metadata['name'] = $result['name'];
+
+
+            $entity_informe_ = $informes_maquinas_model->patchEntity($infomes_maq_entity, $metadata);
+
+            //DEvuelvo un arreglo con la operacion y el id
+
+            if ($informes_maquinas_model->save($entity_informe_)) {
+
+                return ['id' => $entity_informe_->idinformes_variaciones, 'informe' => true, 'path' => $result['path']];
+            }
+            return ['id' => '', 'informe' => false];
+        } else {
+            return ['id' => '', 'informe' => false];
+        }
+
+
+
+    }
+
+    public function createVariacionesExcelInforme($metadata, $costos_maquinas)
+    {
+
+
+        $spreadsheet = new Spreadsheet();
+
+        $myWorkSheet_maq =  $this->createSheetVariaciones($spreadsheet, $metadata, $costos_maquinas);
+
+
+        //$spreadsheet->removeSheetByIndex(2);
+
+        //utilizo el now, es mejor
+        $nombre = "informe_variaciones_" .hash('sha256' , (date("Y-m-d H:i:s")));
+
+        $path = EXCELS . $nombre .'.xlsx';
+        $path_short = EXCELS_SHORT . $nombre .'.xlsx';
+
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($path);
+
+        //consulto por el fileexist
+        $file_test = new File($path);
+        if($file_test->exists()){
+
+            return ['name' => $nombre, 'path' => $path_short];
+        } else {
+            return false;
+        }
+    }
+
+    private function createSheetVariaciones($spreadsheet, $metadata, $costos_maquinas)
+    {
+
+        $font_bold = [
+            'font' => [
+                'bold' => true
+            ]
+        ];
+
+        $styleArray = [
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ,
+                    'color' => ['argb' => '00000000'],
+                ],
+            ],
+        ];
+
+        try {
+
+            $empresa_model = TableRegistry::getTableLocator()->get('Empresas');
+            $id_empresa = $metadata['empresas_idempresas'];
+            $empresas_data = $empresa_model->get($id_empresa);
+
+            //configuro el path y el file
+            $path = null;
+
+            if ($empresas_data->logo == null or empty($empresas_data->logo)) {
+                //logo default
+                $path = LOGOS . 'edificio.png';
+            } else {
+                $path = LOGOS . $empresas_data->logo;
+            }
+
+            $myWorkSheet_res = new Worksheet($spreadsheet, 'Resumen');
+
+            $spreadsheet->addSheet($myWorkSheet_res, 0);
+            $spreadsheet->getDefaultStyle()->getFont()->setName('Times New Roman');
+
+
+            //EL titulo tiene que decir Informe de Costo - NOmbre de empresa
+            $empresa_name = $empresas_data->name;
+            $titulo = 'Informe de Variaciones - ' . $empresa_name;
+
+            $myWorkSheet_res->setCellValue('B1', $titulo);
+
+            $myWorkSheet_res->getStyle('B1')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getStyle('B1')->getFont()->setBold(true)->setName('Arial')
+                ->setSize(14);
+
+            //DIBUJO EL LOGO
+
+            $drawing = new Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath($path);
+            $drawing->setHeight(75);
+            $drawing->setWidth(75);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(45);
+            $drawing->setOffsetY(15);
+            $drawing->setWorksheet($myWorkSheet_res);
+
+
+            //empiezo a partir del row 2
+            $index = 3;
+
+
+            $index_column = 'B';
+            //$count_column =count($costos_maquinas);
+
+            //$count_row = count($costos_maquinas[0]) - 1;
+            $index_aux = 0;
+
+            foreach ($costos_maquinas as $data)
+            {
+                $index_row_aux = $index;
+                //si es la primera vez creo los titulos
+                if($index_aux == 0)
+                {
+                    foreach ($data as $key => $value)
+                    {
+                        if($key != 'x')
+                        {
+                            //cargo
+                            $cell_name = 'A' . $index_row_aux;
+                            $myWorkSheet_res->setCellValue($cell_name, $key);
+                        }
+                        $index_row_aux++;
+                    }
+                    $index_aux++;
+
+                    //cargo el nombre de las columnas
+
+
+                } else {
+
+
+                    foreach ($data as $key => $value)
+                    {
+                        if($key != 'x')
+                        {
+                            //cargo
+                            $cell_name = $index_column . $index_row_aux;
+                            $myWorkSheet_res->setCellValue($cell_name, $value);
+                        } else {
+                            $cell_name = $index_column . 3;
+                            $myWorkSheet_res->setCellValue($cell_name, $value);
+                        }
+                        $index_row_aux++;
+
+                    }
+
+                    $index_column++;
+
+                }
+
+            }
+
+
+            $index_column = $this->decrement($index_column);
+            //Combino la primer celda para porner el titulo y configuro una altura aceptable
+            $rango = 'B1:' . $index_column . 1;
+            $myWorkSheet_res->mergeCells($rango);
+            $myWorkSheet_res->getRowDimension('1')->setRowHeight(75);
+
+
+            return $myWorkSheet_res;
+
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
+        }
+
+
+        return null;
+
+    }
+
+    private function decrement($index)
+    {
+        return chr(ord($index) - 1);
     }
 
 

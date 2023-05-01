@@ -38,6 +38,10 @@ class UsersController extends AppController
 
     public function login()
     {
+
+        $flags_footer = true;
+        $this->set(compact('flags_footer'));
+
         if($this->request->is('post'))
         {
             //vALIDA LOS DATOS DEL USUARIO

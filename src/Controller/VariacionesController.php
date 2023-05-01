@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use App\Utility\AnalisisMaquinas;
+use App\Utility\ExcelProcesssing;
 use App\Utility\GetFunctions;
 use Cake\I18n\Date;
 
@@ -12,6 +14,8 @@ use Cake\I18n\Date;
 class VariacionesController extends AppController
 {
 
+   const TYPE_MAQUINA = 'maquina';
+   const TYPE_GROUP = 'grupo';
     public function isAuthorized($user)
     {
         if (isset($user['role']) and $user['role'] === 'user') {
@@ -89,14 +93,17 @@ class VariacionesController extends AppController
     }
 
 
-    public function getToneladasExtraidasGrupos()
+    public function getCostosToneladasGrupos()
     {
+
         $this->autoRender = false;
         $array_result = null;
 
         //Traigo los datos de la sesioN
         $session = $this->request->getSession();
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+        $user_id = $session->read('Auth.User.idusers');
+
 
 
         //COnsulto que los indices esten definidos
@@ -107,6 +114,185 @@ class VariacionesController extends AppController
         $parcelas = $_POST['parcelas'];
         $destinos = $_POST['destinos'];
 
+        $informe = $_POST['informe'];
+
+        $array_options['worksgroup'] = $grupo;
+        $array_options['idworksgroups'] = $grupo;
+        $array_options['fecha_inicio'] = $fecha_inicio;
+        $array_options['fecha_fin'] = $fecha_final;
+        $array_options['lotes_idlotes'] = $lotes;
+        $array_options['parcelas_idparcelas'] = $parcelas;
+        $array_options['destinos_iddestinos'] = $destinos;
+        $array_options['empresas_idempresas'] = $id_empresa;
+
+        $array_options_['worksgroup'] = $grupo;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
+
+        /*$worksgroup = 0;
+        $fecha_inicio = '2022-01';
+        $fecha_final = '2022-12';
+        $lotes = 0;
+        $parcelas = 0;
+        $propietarios = 0;
+        $destinos = 0;
+
+        $informe = true;
+
+        $array_options['worksgroup'] = $worksgroup;
+        $array_options['fecha_inicio'] = $fecha_inicio;
+        $array_options['fecha_fin'] = $fecha_final;
+        $array_options['lotes_idlotes'] = $lotes;
+        $array_options['parcelas_idparcelas'] = $parcelas;
+        $array_options['propietarios_idpropietarios'] = $propietarios;
+        $array_options['destinos_iddestinos'] = $destinos;
+        $array_options['empresas_idempresas'] = $id_empresa;
+
+        $array_options_['worksgroup'] = $worksgroup;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['propietarios_idpropietarios'] = $propietarios;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;*/
+
+
+        if($this->request->is('ajax')) {
+
+            //INstancio la clase GetFunction
+            $get_function_class = New GetFunctions();
+
+            //EL recorrido de los meses los hago aqui
+            $meses_years = $get_function_class->getMonthsAndYearsWithLast($array_options);
+
+
+
+            //costos
+            $analisis_costos_grupos = new AnalisisCostosController();
+
+
+            //TRaigo los worksgroups
+
+            $worksgroups = $get_function_class->getWorksgroups($array_options);
+
+
+
+            $array_result = [];
+            $array_data = [];
+
+            $datasets = [];
+
+            $labels = [];
+
+            //Reccoro los grupos
+            foreach ($meses_years as $mes_year)
+            {
+                $array_options['mes'] = $mes_year['mes'];
+                $array_options['year'] = $mes_year['year'];
+                //debug($array_options);
+
+                $array_group_month = [];
+                $array_group_month['x'] = $mes_year['mes'] . '-' . $mes_year['year'];
+
+                foreach ($worksgroups as $group)
+                {
+
+                    $array_options['idworksgroups'] = $group->idworksgroups;
+                    $array_options['worksgroup'] = $group->idworksgroups;
+                    $array_group_month[$group->name] =
+                        $analisis_costos_grupos->getCostosByWorksgroups($array_options);
+
+                }
+                $array_data[] = $array_group_month;
+
+                $labels[] = $mes_year['mes'] . '-' . $mes_year['year'];
+
+            }
+
+            $item_Dataset = [];
+            foreach ($worksgroups as $group)
+            {
+                $color = '#'.str_pad(dechex(rand(0x000000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+                $item_Dataset[] = [
+                    'label' => $group->name,
+                    'data' => $array_data,
+                    'parsing' => ['yAxisKey' => $group->name],
+                    'backgroundColor' => $color,
+                    'borderColor' => $color
+                ];
+
+            }
+
+            $datasets[] = $item_Dataset;
+            $array_result[] = [
+                'labels' => $labels,
+                'datasets' => $datasets[0]
+
+            ];
+
+            $array_result_compete = null;
+
+
+            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options_);
+            if(!empty($array_result[0]['datasets'][0]['data']))
+            {
+                $data_for_excel = $array_result[0]['datasets'][0]['data'];
+
+                //cargo los datos al metadatsa
+                $metadata['users_idusers'] = $user_id;
+                $metadata['tipo'] = self::TYPE_GROUP;
+
+                if($informe == 'true'){
+                    $excel_processing_class = new ExcelProcesssing();
+
+                    $informe = $excel_processing_class->createInformeVariaciones($metadata, $data_for_excel);
+
+                    $array_result_compete[] = [
+                        'costos' => $array_result,
+                        'informe' => $informe
+                    ];
+                } else {
+                    $array_result_compete = [
+                        'costos' => $array_result,
+                        'informe' => false
+                    ];
+                }
+
+            }
+
+           return $this->json($array_result_compete);
+
+        }
+
+    }
+
+
+    public function getToneladasExtraidasGrupos()
+    {
+        $this->autoRender = false;
+        $array_result = null;
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+        $user_id = $session->read('Auth.User.idusers');
+
+
+        //COnsulto que los indices esten definidos
+        $grupo = $_POST['groups'];
+        $fecha_inicio = $_POST['fecha_inicio'];
+        $fecha_final = $_POST['fecha_final'];
+        $lotes = $_POST['lotes'];
+        $parcelas = $_POST['parcelas'];
+        $destinos = $_POST['destinos'];
+        $informe = $_POST['informe'];
+
         $array_options['worksgroup'] = $grupo;
         $array_options['fecha_inicio'] = $fecha_inicio;
         $array_options['fecha_fin'] = $fecha_final;
@@ -114,6 +300,14 @@ class VariacionesController extends AppController
         $array_options['parcelas_idparcelas'] = $parcelas;
         $array_options['destinos_iddestinos'] = $destinos;
         $array_options['empresas_idempresas'] = $id_empresa;
+
+        $array_options_['worksgroup'] = $grupo;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
 
         //INstancio la clase GetFunction
         $get_function_class = New GetFunctions();
@@ -170,9 +364,41 @@ class VariacionesController extends AppController
 
         ];
 
+        $array_result_compete = null;
+
+
+        $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options_);
+        if(!empty($array_result[0]['datasets'][0]['data']))
+        {
+            $data_for_excel = $array_result[0]['datasets'][0]['data'];
+
+            //cargo los datos al metadatsa
+            $metadata['users_idusers'] = $user_id;
+            $metadata['tipo'] = self::TYPE_GROUP;
+
+            if($informe == 'true'){
+                $excel_processing_class = new ExcelProcesssing();
+
+                $informe = $excel_processing_class->createInformeVariaciones($metadata, $data_for_excel);
+
+                $array_result_compete[] = [
+                    'costos' => $array_result,
+                    'informe' => $informe
+                ];
+            } else {
+                $array_result_compete = [
+                    'costos' => $array_result,
+                    'informe' => false
+                ];
+            }
+
+        }
+
+
+
 
         if($this->request->is('ajax')) {
-            return $this->json($array_result);
+            return $this->json($array_result_compete);
         }
 
 
@@ -184,10 +410,12 @@ class VariacionesController extends AppController
         $this->autoRender = false;
         $array_result = null;
 
+        $get_function_class = New GetFunctions();
+
         //Traigo los datos de la sesioN
         $session = $this->request->getSession();
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
-
+        $user_id = $session->read('Auth.User.idusers');
 
         //COnsulto que los indices esten definidos
         $maquina = $_POST['maquinas'];
@@ -197,6 +425,8 @@ class VariacionesController extends AppController
         $parcelas = $_POST['parcelas'];
         $destinos = $_POST['destinos'];
 
+        $informe = $_POST['informe'];
+
         $array_options['maquina'] = $maquina;
         $array_options['fecha_inicio'] = $fecha_inicio;
         $array_options['fecha_fin'] = $fecha_final;
@@ -205,6 +435,13 @@ class VariacionesController extends AppController
         $array_options['destinos_iddestinos'] = $destinos;
         $array_options['empresas_idempresas'] = $id_empresa;
 
+        $array_options_['maquinas'] = $maquina;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
 
 
         //INstancio la clase GetFunction
@@ -270,9 +507,40 @@ class VariacionesController extends AppController
 
         ];
 
+        $array_result_compete = null;
 
         if($this->request->is('ajax')) {
-            return $this->json($array_result);
+            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options_);
+            if(!empty($array_result[0]['datasets'][0]['data']))
+            {
+                $data_for_excel = $array_result[0]['datasets'][0]['data'];
+
+                //cargo los datos al metadatsa
+                $metadata['users_idusers'] = $user_id;
+                $metadata['tipo'] = self::TYPE_MAQUINA;
+                $metadata['maquina'] = $get_function_class->getMaquinaById($maquina)->toArray()['name'];
+
+                if($informe == 'true'){
+                    $excel_processing_class = new ExcelProcesssing();
+
+                    $informe = $excel_processing_class->createInformeVariaciones($metadata, $data_for_excel);
+
+                    $array_result_compete[] = [
+                        'costos' => $array_result,
+                        'informe' => $informe
+                    ];
+                } else {
+                    $array_result_compete = [
+                        'costos' => $array_result,
+                        'informe' => false
+                    ];
+                }
+
+            }
+
+
+
+            return $this->json($array_result_compete);
         }
 
 
@@ -285,9 +553,12 @@ class VariacionesController extends AppController
         $this->autoRender = false;
         $array_result = null;
 
+        $get_function_class = New GetFunctions();
+
         //Traigo los datos de la sesioN
         $session = $this->request->getSession();
         $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+        $user_id = $session->read('Auth.User.idusers');
 
 
         //COnsulto que los indices esten definidos
@@ -297,6 +568,7 @@ class VariacionesController extends AppController
         $lotes = $_POST['lotes'];
         $parcelas = $_POST['parcelas'];
         $destinos = $_POST['destinos'];
+        $informe = $_POST['informe'];
 
         $array_options['maquina'] = $maquina;
         $array_options['fecha_inicio'] = $fecha_inicio;
@@ -306,7 +578,13 @@ class VariacionesController extends AppController
         $array_options['destinos_iddestinos'] = $destinos;
         $array_options['empresas_idempresas'] = $id_empresa;
 
-
+        $array_options_['maquinas'] = $maquina;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
 
         //INstancio la clase GetFunction
         $get_function_class = New GetFunctions();
@@ -370,7 +648,40 @@ class VariacionesController extends AppController
 
 
         if($this->request->is('ajax')) {
-            return $this->json($array_result);
+
+
+            $array_result_compete = null;
+
+
+            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options_);
+            if(!empty($array_result[0]['datasets'][0]['data']))
+            {
+                $data_for_excel = $array_result[0]['datasets'][0]['data'];
+
+                //cargo los datos al metadatsa
+                $metadata['users_idusers'] = $user_id;
+                $metadata['tipo'] = self::TYPE_MAQUINA;
+                $metadata['maquina'] = $get_function_class->getMaquinaById($maquina)->toArray()['name'];
+
+                if($informe == 'true'){
+                    $excel_processing_class = new ExcelProcesssing();
+
+                    $informe = $excel_processing_class->createInformeVariaciones($metadata, $data_for_excel);
+
+                    $array_result_compete[] = [
+                        'costos' => $array_result,
+                        'informe' => $informe
+                    ];
+                } else {
+                    $array_result_compete = [
+                        'costos' => $array_result,
+                        'informe' => false
+                    ];
+                }
+
+            }
+
+            return $this->json($array_result_compete);
         }
 
 
@@ -590,6 +901,488 @@ class VariacionesController extends AppController
 
         //debug($array_result);
 
+
+    }
+
+    public function getCostoMaquinaHora()
+    {
+        $this->autoRender = false;
+        $array_result = null;
+
+        $get_function_class = New GetFunctions();
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+        $user_id = $session->read('Auth.User.idusers');
+
+        //COnsulto que los indices esten definidos
+        $maquina = $_POST['maquinas'];
+        $fecha_inicio = $_POST['fecha_inicio'];
+        $fecha_final = $_POST['fecha_final'];
+        $lotes = $_POST['lotes'];
+        $parcelas = $_POST['parcelas'];
+        $destinos = $_POST['destinos'];
+        $informe = $_POST['informe'];
+
+
+        $array_options['fecha_inicio'] = $fecha_inicio;
+        $array_options['fecha_fin'] = $fecha_final;
+        $array_options['lotes_idlotes'] = $lotes;
+        $array_options['parcelas_idparcelas'] = $parcelas;
+        $array_options['destinos_iddestinos'] = $destinos;
+        $array_options['empresas_idempresas'] = $id_empresa;
+        $array_options['maquina'] = $maquina;
+
+        $array_options_['maquinas'] = $maquina;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
+
+
+        if($this->request->is('ajax')) {
+
+
+            $analisis_maquinas = new AnalisisMaquinas();
+
+            //Instancio la clase GetFUnctions
+            $get_functions = new GetFunctions();
+            $meses_years = $get_functions->getMonthsAndYearsWithLast($array_options);
+
+            //TRaemos las maquinas
+            $maquinas = $get_functions->getMaquinas($array_options);
+
+            $array_data = [];
+            $datasets = [];
+            $labels = [];
+
+            //Reccoro los grupos
+            foreach ($meses_years as $mes_year)
+            {
+                $options['mes'] = $mes_year['mes'];
+                $options['year'] = $mes_year['year'];
+                $array_group_month = [];
+                $array_group_month['x'] = $mes_year['mes'] . '-' . $mes_year['year'];
+
+                foreach ($maquinas as $maq)
+                {
+                    $array_group_month[$maq->name] =
+                        $analisis_maquinas->costosHorasMaquinaByMonths($mes_year['mes'], $mes_year['year'],
+                            $array_options, $id_empresa, $maq->idmaquinas);
+                }
+
+                $array_data[] = $array_group_month;
+
+                $labels[] = $mes_year['mes'] . '-' . $mes_year['year'];
+            }
+
+
+            $item_Dataset = [];
+            foreach ($maquinas as $maq)
+            {
+                $color = '#'.str_pad(dechex(rand(0x000000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+
+                $item_Dataset[] = [
+                    'label' => $maq->name,
+                    'data' => $array_data,
+                    'parsing' => ['yAxisKey' => $maq->name],
+                    'backgroundColor' => $color,
+                    'borderColor' => $color
+                ];
+
+            }
+
+            $datasets[] = $item_Dataset;
+            $array_result[] = [
+                'labels' => $labels,
+                'datasets' => $datasets[0]
+
+            ];
+
+            $array_result_compete = null;
+            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options_);
+            if(!empty($array_result[0]['datasets'][0]['data']))
+            {
+                $data_for_excel = $array_result[0]['datasets'][0]['data'];
+
+                //cargo los datos al metadatsa
+                $metadata['users_idusers'] = $user_id;
+                $metadata['tipo'] = self::TYPE_MAQUINA;
+                $metadata['maquina'] = $get_function_class->getMaquinaById($maquina)->toArray()['name'];
+
+                if($informe == 'true'){
+                    $excel_processing_class = new ExcelProcesssing();
+
+                    $informe = $excel_processing_class->createInformeVariaciones($metadata, $data_for_excel);
+
+                    $array_result_compete[] = [
+                        'costos' => $array_result,
+                        'informe' => $informe
+                    ];
+                } else {
+                    $array_result_compete = [
+                        'costos' => $array_result,
+                        'informe' => false
+                    ];
+                }
+
+            }
+
+            return $this->json($array_result_compete);
+        }
+
+
+    }
+    public function getCostoMaquinaTonelada()
+    {
+        $this->autoRender = false;
+        $array_result = null;
+        //INstancio la clase GetFunction
+        $get_function_class = New GetFunctions();
+
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+        $user_id = $session->read('Auth.User.idusers');
+
+        //COnsulto que los indices esten definidos
+        $maquina = $_POST['maquinas'];
+        $fecha_inicio = $_POST['fecha_inicio'];
+        $fecha_final = $_POST['fecha_final'];
+        $lotes = $_POST['lotes'];
+        $parcelas = $_POST['parcelas'];
+        $destinos = $_POST['destinos'];
+
+        $informe = $_POST['informe'];
+
+
+        $array_options['fecha_inicio'] = $fecha_inicio;
+        $array_options['fecha_fin'] = $fecha_final;
+        $array_options['lotes_idlotes'] = $lotes;
+        $array_options['parcelas_idparcelas'] = $parcelas;
+        $array_options['destinos_iddestinos'] = $destinos;
+        $array_options['empresas_idempresas'] = $id_empresa;
+        $array_options['maquina'] = $maquina;
+
+        $array_options_['maquinas'] = $maquina;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
+
+        if($this->request->is('ajax')) {
+
+
+            $analisis_maquinas = new AnalisisMaquinas();
+
+            //Instancio la clase GetFUnctions
+            $get_functions = new GetFunctions();
+            $meses_years = $get_functions->getMonthsAndYearsWithLast($array_options);
+
+            //TRaemos las maquinas
+            $maquinas = $get_functions->getMaquinas($array_options);
+
+            $array_data = [];
+            $datasets = [];
+            $labels = [];
+
+            //Reccoro los grupos
+            foreach ($meses_years as $mes_year)
+            {
+                $options['mes'] = $mes_year['mes'];
+                $options['year'] = $mes_year['year'];
+                $array_group_month = [];
+                $array_group_month['x'] = $mes_year['mes'] . '-' . $mes_year['year'];
+
+                foreach ($maquinas as $maq)
+                {
+                    $array_group_month[$maq->name] =
+                        $analisis_maquinas->costosToneladasMaquinaByMonths($mes_year['mes'], $mes_year['year'],
+                            $array_options, $id_empresa, $maq->idmaquinas);
+                }
+
+                $array_data[] = $array_group_month;
+
+                $labels[] = $mes_year['mes'] . '-' . $mes_year['year'];
+            }
+
+
+            $item_Dataset = [];
+            foreach ($maquinas as $maq)
+            {
+                $color = '#'.str_pad(dechex(rand(0x000000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+
+                $item_Dataset[] = [
+                    'label' => $maq->name,
+                    'data' => $array_data,
+                    'parsing' => ['yAxisKey' => $maq->name],
+                    'backgroundColor' => $color,
+                    'borderColor' => $color
+                ];
+
+            }
+
+            $datasets[] = $item_Dataset;
+            $array_result[] = [
+                'labels' => $labels,
+                'datasets' => $datasets[0]
+
+            ];
+
+            $array_result_compete = null;
+
+
+            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options_);
+            if(!empty($array_result[0]['datasets'][0]['data']))
+            {
+                $data_for_excel = $array_result[0]['datasets'][0]['data'];
+
+                //cargo los datos al metadatsa
+                $metadata['users_idusers'] = $user_id;
+                $metadata['tipo'] = self::TYPE_MAQUINA;
+                $metadata['maquina'] = $get_function_class->getMaquinaById($maquina)->toArray()['name'];
+
+                if($informe == 'true'){
+                    $excel_processing_class = new ExcelProcesssing();
+
+                    $informe = $excel_processing_class->createInformeVariaciones($metadata, $data_for_excel);
+
+                    $array_result_compete[] = [
+                        'costos' => $array_result,
+                        'informe' => $informe
+                    ];
+                } else {
+                    $array_result_compete = [
+                        'costos' => $array_result,
+                        'informe' => false
+                    ];
+                }
+
+            }
+
+            return $this->json($array_result_compete);
+        }
+
+
+    }
+
+    public function getCostoMaquinaRendimiento()
+    {
+        $this->autoRender = false;
+        $array_result = null;
+
+        $get_function_class = New GetFunctions();
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+        $user_id = $session->read('Auth.User.idusers');
+
+        //COnsulto que los indices esten definidos
+        $maquina = $_POST['maquinas'];
+        $fecha_inicio = $_POST['fecha_inicio'];
+        $fecha_final = $_POST['fecha_final'];
+        $lotes = $_POST['lotes'];
+        $parcelas = $_POST['parcelas'];
+        $destinos = $_POST['destinos'];
+        $informe = $_POST['informe'];
+
+        $array_options['fecha_inicio'] = $fecha_inicio;
+        $array_options['fecha_fin'] = $fecha_final;
+        $array_options['lotes_idlotes'] = $lotes;
+        $array_options['parcelas_idparcelas'] = $parcelas;
+        $array_options['destinos_iddestinos'] = $destinos;
+        $array_options['empresas_idempresas'] = $id_empresa;
+        $array_options['maquina'] = $maquina;
+
+        $array_options_['maquinas'] = $maquina;
+        $array_options_['fecha_inicio'] = $fecha_inicio;
+        $array_options_['fecha_fin'] = $fecha_final;
+        $array_options_['lotes_idlotes'] = $lotes;
+        $array_options_['parcelas_idparcelas'] = $parcelas;
+        $array_options_['destinos_iddestinos'] = $destinos;
+        $array_options_['empresas_idempresas'] = $id_empresa;
+
+        if($this->request->is('ajax')) {
+
+
+            $analisis_maquinas = new AnalisisMaquinas();
+
+            //Instancio la clase GetFUnctions
+            $get_functions = new GetFunctions();
+            $meses_years = $get_functions->getMonthsAndYearsWithLast($array_options);
+
+            //TRaemos las maquinas
+            $maquinas = $get_functions->getMaquinas($array_options);
+
+            $array_data = [];
+            $datasets = [];
+            $labels = [];
+
+            //Reccoro los grupos
+            foreach ($meses_years as $mes_year)
+            {
+                $options['mes'] = $mes_year['mes'];
+                $options['year'] = $mes_year['year'];
+                $array_group_month = [];
+                $array_group_month['x'] = $mes_year['mes'] . '-' . $mes_year['year'];
+
+                foreach ($maquinas as $maq)
+                {
+                    $array_group_month[$maq->name] =
+                        $analisis_maquinas->costosRendimientoMaquinaByMonths($mes_year['mes'], $mes_year['year'],
+                            $array_options, $id_empresa, $maq->idmaquinas);
+                }
+
+                $array_data[] = $array_group_month;
+
+                $labels[] = $mes_year['mes'] . '-' . $mes_year['year'];
+            }
+
+
+            $item_Dataset = [];
+            foreach ($maquinas as $maq)
+            {
+                $color = '#'.str_pad(dechex(rand(0x000000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+
+                $item_Dataset[] = [
+                    'label' => $maq->name,
+                    'data' => $array_data,
+                    'parsing' => ['yAxisKey' => $maq->name],
+                    'backgroundColor' => $color,
+                    'borderColor' => $color
+                ];
+
+            }
+
+            $datasets[] = $item_Dataset;
+            $array_result[] = [
+                'labels' => $labels,
+                'datasets' => $datasets[0]
+
+            ];
+
+            $array_result_compete = null;
+
+            $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options_);
+            if(!empty($array_result[0]['datasets'][0]['data']))
+            {
+                $data_for_excel = $array_result[0]['datasets'][0]['data'];
+
+                //cargo los datos al metadatsa
+                $metadata['users_idusers'] = $user_id;
+                $metadata['tipo'] = self::TYPE_MAQUINA;
+                $metadata['maquina'] = $get_function_class->getMaquinaById($maquina)->toArray()['name'];
+
+                if($informe == 'true'){
+                    $excel_processing_class = new ExcelProcesssing();
+
+                    $informe = $excel_processing_class->createInformeVariaciones($metadata, $data_for_excel);
+
+                    $array_result_compete[] = [
+                        'costos' => $array_result,
+                        'informe' => $informe
+                    ];
+                } else {
+                    $array_result_compete = [
+                        'costos' => $array_result,
+                        'informe' => false
+                    ];
+                }
+
+            }
+
+            return $this->json($array_result_compete);
+        }
+
+
+    }
+
+    public function getCostoMaquinaToneladaCopy()
+    {
+        //COnsulto que los indices esten definidos
+        $grupo = '0';
+        $fecha_inicio = '2022-09';
+        $fecha_final = '2022-12';
+        $lotes = '0';
+        $parcelas = '0';
+        $destinos = '0';
+
+        $maquinas = '0';
+
+
+        $session = $this->request->getSession();
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+        $array_options['worksgroup'] = $grupo;
+        $array_options['fecha_inicio'] = $fecha_inicio;
+        $array_options['fecha_fin'] = $fecha_final;
+        $array_options['lotes_idlotes'] = $lotes;
+        $array_options['parcelas_idparcelas'] = $parcelas;
+        $array_options['destinos_iddestinos'] = $destinos;
+        $array_options['empresas_idempresas'] = $id_empresa;
+
+        $array_options['maquina'] = $maquinas;
+
+        $analisis_maquinas = new AnalisisMaquinas();
+
+        //Instancio la clase GetFUnctions
+        $get_functions = new GetFunctions();
+        $meses_years = $get_functions->getMonthsAndYearsWithLast($array_options);
+
+        //TRaemos las maquinas
+        $maquinas = $get_functions->getMaquinas($array_options);
+
+        $array_data = [];
+        $datasets = [];
+        $labels = [];
+
+        //Reccoro los grupos
+        foreach ($meses_years as $mes_year)
+        {
+            $options['mes'] = $mes_year['mes'];
+            $options['year'] = $mes_year['year'];
+            $array_group_month = [];
+            $array_group_month['x'] = $mes_year['mes'] . '-' . $mes_year['year'];
+
+            foreach ($maquinas as $maq)
+            {
+                $array_group_month[$maq->name] =
+                    $analisis_maquinas->costosToneladasMaquinaByMonths($mes_year['mes'], $mes_year['year'],
+                        $array_options, $id_empresa, $maq->idmaquinas);
+            }
+
+            $array_data[] = $array_group_month;
+
+            $labels[] = $mes_year['mes'] . '-' . $mes_year['year'];
+        }
+
+
+        $item_Dataset = [];
+        foreach ($maquinas as $maq)
+        {
+            $item_Dataset[] = [
+                'label' => $maq->name,
+                'data' => $array_data,
+                'parsing' => ['yAxisKey' => $maq->name]
+            ];
+
+        }
+
+        $datasets[] = $item_Dataset;
+        $array_result[] = [
+            'labels' => $labels,
+            'datasets' => $datasets[0]
+
+        ];
+
+        debug($array_result);
 
     }
 

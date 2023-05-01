@@ -106,7 +106,7 @@
                     <div class="btn-group flex-vertical" role="group" aria-label="Third group">
                         <div>
                             <?= $this->Html->link('',
-                                ['controller' => 'Informes', 'action' => 'index'], ['class' => 'btn-simm btn-remito btn btn-default',
+                                ['controller' => 'InformesVariaciones', 'action' => 'index'], ['class' => 'btn-simm btn-remito btn btn-default',
                                     'escape' => false]) ?>
                         </div>
                         <div class="div_content">

@@ -27,18 +27,40 @@ class AnalisisMaquinas
             $data_organized_by_month[] = $maquinas_with_general_constantes;
 
         }
-        //debug($data_organized_by_month);
+
         $maquinas_distinct = [$id_maquina => $id_maquina];
+        //debug($data_organized_by_month);
 
         $analisis_costos_grupos = new AnalisisCostosGrupos();
 
         //utilizando la media ponderada
         $maquinas_resume = $this->resumeCostosHorariosByMaquina($data_organized_by_month, $maquinas_distinct);
 
+
+
+
         //Calculo los costos fijos etc etc
         if(isset($maquinas_resume[0]))
         {
+            //cargo los resumenes generales
+            $maquinas_resume[0]['costos']['horas'] = $get_functions->getHorasTrabajadas($data_organized_by_month);
+
+            $maquinas_resume[0]['costos']['toneladas_total_preriodo'] = $get_functions->getTotalToneladasPeriodo($array_options);
+
+            $ton_per = $maquinas_resume[0]['costos']['toneladas_total_preriodo'];
+
+            $maquinas_resume[0]['costos']['porc_ton'] = $ton_per == 0 ? 0 : ($maquinas_resume[0]['costos']['toneladas'] * 100 / $ton_per);
+
+            //Cargo las horas totales del periodo que se basa en los remitos del periodo
+            $maquinas_resume[0]['costos']['porc_horas'] = 100;
+
+
             $maquinas_resume[0]['costos_groups'] = $this->calculateCostosFijosYVariables($maquinas_resume[0]);
+
+            //CARGO LOS VALORES de %
+
+
+
         }
 
 
@@ -74,40 +96,46 @@ class AnalisisMaquinas
         $remitos_by_maquina = $get_functions_class->getRemitosByMaquina($maquina, $array_options);
         $remitos_array_distinct = $get_functions_class->getRemitosAsArrayDistinct($remitos_by_maquina);
 
-        //traigo los costos
-        $costos = $get_functions_class->getCostosByMaquina($maquina, $mes, $year)->toArray();
+        if(count($remitos_array_distinct) > 0)
+        {
+            //traigo los costos
+            $costos = $get_functions_class->getCostosByMaquina($maquina, $mes, $year)->toArray();
 
-        //Arreglos
-        $arreglos = $get_functions_class->getArreglosByMaquina($maquina, $array_options);
+            //Arreglos
+            $arreglos = $get_functions_class->getArreglosByMaquina($maquina, $array_options);
 
-        //Usos  EL uso tiene solo la parcela para filtrar
-        $uso_maquinaria = $get_functions_class->getUsoMaquinariaByMaquina($maquina, $array_options);
+            //Usos  EL uso tiene solo la parcela para filtrar
+            $uso_maquinaria = $get_functions_class->getUsoMaquinariaByMaquina($maquina, $array_options);
 
-        //TRaigo operarios
-        $operario_maq =  $get_functions_class->getOperarioByMaquina($maquina, $remitos_array_distinct);
+            //TRaigo operarios
+            $operario_maq =  $get_functions_class->getOperarioByMaquina($maquina, $remitos_array_distinct);
 
-        //Traigo los operarios maquinas donde se encuentra los datos de sueldos
-        $operarios_maquina_data =  $get_functions_class->getOperariosMaquinasByOperAndRemito($operario_maq, $mes, $year);
-
-
-        $analisis_costos_grupos_class = new AnalisisCostosGrupos();
-
-
-        $maquina_with_data = $analisis_costos_grupos_class->calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos,
-            $uso_maquinaria, $operarios_maquina_data);
+            //Traigo los operarios maquinas donde se encuentra los datos de sueldos
+            $operarios_maquina_data =  $get_functions_class->getOperariosMaquinasByOperAndRemito($operario_maq, $mes, $year);
 
 
-        //Aplico la metodologia de costos aqui y devuelvo ya con eso
-        $maquina_with_data['result_metod'] = $analisis_costos_grupos_class->appliedCostosMetodology($maquina_with_data, $id_empresa);
-        $maquina_with_data['costos'] = $analisis_costos_grupos_class->calculateCostosByHours($maquina_with_data);
+            $analisis_costos_grupos_class = new AnalisisCostosGrupos();
+
+
+            $maquina_with_data = $analisis_costos_grupos_class->calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos,
+                $uso_maquinaria, $operarios_maquina_data);
+
+
+            //Aplico la metodologia de costos aqui y devuelvo ya con eso
+            $maquina_with_data['result_metod'] = $analisis_costos_grupos_class->appliedCostosMetodology($maquina_with_data, $id_empresa);
+            $maquina_with_data['costos'] = $analisis_costos_grupos_class->calculateCostosByHours($maquina_with_data);
 
 
 
-        $result_by_month['general'] = $general_data;
-        $result_by_month['maquinas'] = $maquina_with_data;
+            $result_by_month['general'] = $general_data;
+            $result_by_month['maquinas'] = $maquina_with_data;
+            return $result_by_month;
+        }
 
 
-        return $result_by_month;
+
+
+        return null;
 
     }
 
@@ -274,6 +302,10 @@ class AnalisisMaquinas
                     'administracion' => null
                 ];
 
+
+
+
+
                 $maquina['costos'] = [
                     'horas' => null,
                     'toneladas' => $toneladas,
@@ -333,6 +365,58 @@ class AnalisisMaquinas
 
 
         return $costos_gruoup;
+
+    }
+
+
+    public function costosToneladasMaquinaByMonths($mes, $year, $array_options, $id_empresa, $maquina)
+    {
+
+        $result = $this->calculateCostosByMonth($mes, $year, $array_options, $id_empresa, $maquina);
+        $costos_ton = 0;
+        //debug($result['maquinas']['costos']['costo_ton']);
+        if($result != null)
+        {
+
+           return $result['maquinas']['costos']['costo_ton'];
+
+        }
+        return 0;
+
+
+    }
+
+    public function costosHorasMaquinaByMonths($mes, $year, $array_options, $id_empresa, $maquina)
+    {
+
+        $result = $this->calculateCostosByMonth($mes, $year, $array_options, $id_empresa, $maquina);
+        $costos_ton = 0;
+        //debug($result['maquinas']['costos']['costo_ton']);
+        if($result != null)
+        {
+
+            return $result['maquinas']['costos']['costo_h'];
+
+        }
+        return 0;
+
+
+    }
+
+    public function costosRendimientoMaquinaByMonths($mes, $year, $array_options, $id_empresa, $maquina)
+    {
+
+        $result = $this->calculateCostosByMonth($mes, $year, $array_options, $id_empresa, $maquina);
+        $costos_ton = 0;
+        //debug($result['maquinas']['costos']['costo_ton']);
+        if($result != null)
+        {
+
+            return $result['maquinas']['costos']['prod_rend_h'];
+
+        }
+        return 0;
+
 
     }
 

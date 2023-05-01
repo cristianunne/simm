@@ -60,7 +60,14 @@ $cakeDescription = 'SIMM - Sistema Integrado de Manejo de Maquinarias';
     <div class="wrapper">
 
         <?= $this->fetch('content') ?>
+
+        <?php if (!isset($flags_footer)) : ?>
+            <?= $this->element('footer')?>
+        <?php else: ?>
+            <?= $this->element('footer_login')?>
+        <?php endif; ?>
     </div>
+
 
 </body>
 

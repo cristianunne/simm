@@ -109,6 +109,9 @@ class AnalisisCostosMaquinasController extends AppController
             $analisis_maquinas_class = new AnalisisMaquinas();
 
             $costo_maquina = $analisis_maquinas_class->analisisMaquina($array_options, $id_empresa, $maquina);
+
+            //debug($costo_maquina);
+
             $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
 
             //debug($costo_maquina[0]);
@@ -489,8 +492,8 @@ class AnalisisCostosMaquinasController extends AppController
         $maquina = 1;
 
         $worksgroup = 'Todos';
-        $fecha_inicio = '2022-09';
-        $fecha_final = '2022-12';
+        $fecha_inicio = '2022-10';
+        $fecha_final = '2022-10';
         //$fecha_inicio = '2020-09-20';
         //$fecha_final = '2020-02-20';
         $lotes = 'Todos';
@@ -532,7 +535,7 @@ class AnalisisCostosMaquinasController extends AppController
         $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
 
         debug($costo_maquina[0]);
-        if(isset($costo_maquina[0])){
+        /*if(isset($costo_maquina[0])){
 
             //cargo los datos al metadatsa
             $metadata['users_idusers'] = $user_id;
@@ -546,7 +549,7 @@ class AnalisisCostosMaquinasController extends AppController
                 $this->prepareDataToShowView($maquina_data, $costo_maquina[0], $session, $array_options);
             }
 
-        }
+        }*/
 
 
 
