@@ -183,18 +183,13 @@
 
                             <?=  $this->Html->link(
                                 '<i class="fas fa-greater-than nav-icon"></i> Análisis Máquinas',
-                                ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
-                                'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
-
-                            <?=  $this->Html->link(
-                                '<i class="fas fa-greater-than nav-icon"></i> Informes',
-                                ['controller' => 'AnalisisCostos', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
-                                'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
+                                ['controller' => 'AnalisisCostosMaquinas', 'action' => 'calculateCostosMaquina'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-analisis_costos-Analisis_maquinas']) ?>
 
                             <?=  $this->Html->link(
                                 '<i class="fas fa-greater-than nav-icon"></i> Variaciones',
                                 ['controller' => 'Variaciones', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
-                                'id' => 'nav-icon-arreglos_mecanicos-Inicio']) ?>
+                                'id' => 'nav-icon-analisis_costos-Variaciones']) ?>
                         </li>
 
                     </ul>

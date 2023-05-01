@@ -398,7 +398,7 @@ function getGroupsCostosExtraidas(variables_grupos)
         },
         error: function (data, textStatus) {
 
-
+            a.close();
             console.log(data);
         }
     });
@@ -464,7 +464,7 @@ function getGroupsToneladasExtraidas(variables_grupos)
         },
         error: function (data, textStatus) {
 
-
+            a.close();
             console.log(data);
         }
     });
@@ -530,7 +530,7 @@ function getCostoRendimientoMaquinas(maquina)
         },
         error: function (data, textStatus) {
 
-
+            a.close();
             console.log(data);
         }
     });
@@ -596,7 +596,7 @@ function getCostoToneladasMaquinas(maquina)
         },
         error: function (data, textStatus) {
 
-
+            a.close();
             console.log(data);
         }
     });
@@ -662,7 +662,7 @@ function getCostoHorasMaquinas(maquina)
         },
         error: function (data, textStatus) {
 
-
+            a.close();
             console.log(data);
         }
     });
@@ -732,7 +732,7 @@ function getToneladasExtraidasMaquinas(maquina)
         },
         error: function (data, textStatus) {
 
-
+            a.close();
             console.log(data);
         }
     });
@@ -800,7 +800,7 @@ function getHorasTrabajadasMaquinas(maquina)
         },
         error: function (data, textStatus) {
 
-
+            a.close();
             console.log(data);
         }
     });
