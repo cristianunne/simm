@@ -1917,7 +1917,7 @@ class ExcelProcesssing
 
                             $destino =  $item['destino'];
                             $myWorkSheet_res->setCellValue('A'.$index, $rem['idremitos']);
-                            $myWorkSheet_res->setCellValue('B'.$index, $rem['fecha']);
+                            $myWorkSheet_res->setCellValue('B' . $index, date("d-m-Y", strtotime($rem['fecha'])));
                             $myWorkSheet_res->setCellValue('C'.$index, $dat_lote['lote']);
                             $myWorkSheet_res->setCellValue('D'.$index, $rem['parcela']);
                             $myWorkSheet_res->setCellValue('E'.$index, $item['destino']);
