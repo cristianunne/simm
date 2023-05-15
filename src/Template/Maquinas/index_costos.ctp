@@ -24,11 +24,15 @@
 
 
             <div class="card-body table-responsive">
+
+                <?php if(!$has_costos): ?>
                 <div>
                     <?= $this->Html->link($this->Html->tag('span', ' Agregar Datos Teóricos', ['class' => 'fas fa-plus', 'aria-hidden' => 'true']),
                         ['controller' => 'Maquinas', 'action' => 'addCostos', $id], ['class' => 'btn bg-navy', 'escape' => false]) ?>
                 </div>
                 <br>
+                <?php endif; ?>
+
                 <div>
                     <?= $this->Html->link($this->Html->tag('span', ' Ver Todos los Registros', ['class' => 'fas fa-eye', 'aria-hidden' => 'true']),
                         ['controller' => 'Maquinas', 'action' => 'viewAllCostosMaquinas', $id], ['class' => 'btn btn-warning', 'escape' => false]) ?>
@@ -45,7 +49,6 @@
                         <th scope="col"><?= $this->Paginator->sort('Met. de Costos') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Fecha') ?></th>
                         <th scope="col"><?= $this->Paginator->sort('Usuario') ?></th>
-                        <th scope="col" class="actions"><?= __('Actualizar') ?></th>
                         <th scope="col" class="actions"><?= __('Acciones') ?></th>
                         <th scope="col" class="actions"><?= __('Ver Histórico') ?></th>
 
@@ -80,12 +83,6 @@
                             <td class="dt-center"><?= h($maq->created->format('d-m-Y')) ?></td>
 
                             <td class="dt-center"><?= h($maq->user->lastname . ' ' . $maq->user->firstname) ?></td>
-
-                            <td class="actions" style="text-align: center">
-                                <?= $this->Html->link($this->Html->tag('span', '', ['class' => 'fas fa-sync', 'aria-hidden' => 'true']),
-                                    ['action' => 'updateCostos', $maq->idcostos_maquinas, $maq->maquina->idmaquinas], ['class' => 'btn bg-yellow', 'escape' => false]) ?>
-                            </td>
-
 
                             <td class="actions" style="text-align: center">
 

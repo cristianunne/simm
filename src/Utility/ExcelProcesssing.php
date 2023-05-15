@@ -15,7 +15,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class ExcelProcesssing
 {
 
-    public function createInformeGrupos($metadata, $data_costos, $data_year_back, $data_six_month_back)
+    public function createInformeGrupos($metadata, $data_costos, $data_year_back, $data_six_month_back, $maquinas_data_back)
     {
 
 
@@ -24,7 +24,7 @@ class ExcelProcesssing
         $informes_model = TableRegistry::getTableLocator()->get('Informes');
         $entity_informe = $informes_model->newEntity();
 
-        $result = $this->CostosGruposExcelInforme($metadata, $data_costos, $data_year_back, $data_six_month_back);
+        $result = $this->CostosGruposExcelInforme($metadata, $data_costos, $data_year_back, $data_six_month_back, $maquinas_data_back);
 
 
 
@@ -48,7 +48,7 @@ class ExcelProcesssing
 
     }
 
-    public function CostosGruposExcelInforme($metadata, $data_costos, $data_year_back, $data_six_month_back)
+    public function CostosGruposExcelInforme($metadata, $data_costos, $data_year_back, $data_six_month_back, $maquinas_data_back)
     {
 
         $spreadsheet = new Spreadsheet();
@@ -59,7 +59,9 @@ class ExcelProcesssing
         //$myWorkSheet_res =  $this->createdSheetResumen($data, $spreadsheet, $data_resumen, $data_year_back, $data_six_month_back);
         $myWorkSheet_maq =  $this->createdSheetMaquinas($data_costos, $spreadsheet);
 
-        $spreadsheet->removeSheetByIndex(2);
+        $myWorkSheet_eficiencia = $this->createSheetRendimiento($spreadsheet, $data_costos, $maquinas_data_back);
+
+        $spreadsheet->removeSheetByIndex(3);
 
         //utilizo el now, es mejor
         $nombre = "informe_" .hash('sha256' , (date("Y-m-d H:i:s")));
@@ -337,7 +339,7 @@ class ExcelProcesssing
 
         //titulo
         $myWorkSheet_res->mergeCells($cell_a. ':' . $cell_b);
-        $myWorkSheet_res->setCellValue($cell_a, 'Resumen de Resultados / 1 año');
+        $myWorkSheet_res->setCellValue($cell_a, 'Resumen de Resultados / 1 año (Toneladas)');
 
         $myWorkSheet_res->getStyle($cell_a)->applyFromArray($font_bold);
         $myWorkSheet_res->getStyle($cell_a)->getAlignment()->setHorizontal('center');
@@ -398,7 +400,7 @@ class ExcelProcesssing
 
         //titulo
         $myWorkSheet_res->mergeCells($cell_a. ':' . $cell_b);
-        $myWorkSheet_res->setCellValue($cell_a, 'Resumen de Resultados / 6 meses');
+        $myWorkSheet_res->setCellValue($cell_a, 'Resumen de Resultados / 6 meses (Toneladas)');
 
         $myWorkSheet_res->getStyle($cell_a)->applyFromArray($font_bold);
         $myWorkSheet_res->getStyle($cell_a)->getAlignment()->setHorizontal('center');
@@ -462,7 +464,7 @@ class ExcelProcesssing
 
         //titulo
         $myWorkSheet_res->mergeCells('A23:B23');
-        $myWorkSheet_res->setCellValue('A23', 'Resumen por Centro de Costos');
+        $myWorkSheet_res->setCellValue('A23', 'Resumen por Centro de Costos (Toneladas)');
 
         $myWorkSheet_res->getStyle('A23')->applyFromArray($font_bold);
         $myWorkSheet_res->getStyle('A23')->getAlignment()->setHorizontal('center');
@@ -664,7 +666,7 @@ class ExcelProcesssing
 
         $spreadsheet->addSheet($myWorkSheet_maq, 1);
 
-        $myWorkSheet_maq->setCellValue('A1', 'Distribución por Centro de Costos');
+        $myWorkSheet_maq->setCellValue('A1', 'Distribución por Centro de Costos (Toneladas)');
         $myWorkSheet_maq->mergeCells('A1:G1');
 
         $myWorkSheet_maq->getStyle('A1')->applyFromArray($font_bold);
@@ -856,6 +858,206 @@ class ExcelProcesssing
         return $myWorkSheet_maq;
     }
 
+    public function createSheetRendimiento($spreadsheet, $data_costos, $maquinas_data_back)
+    {
+
+        $font_bold = [
+            'font' => [
+                'bold' => true
+            ]
+        ];
+
+        $styleArray = [
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ,
+                    'color' => ['argb' => '00000000'],
+                ],
+            ],
+        ];
+
+
+        $myWorkSheet_maq = new Worksheet($spreadsheet, 'Eficiencia');
+
+        $spreadsheet->addSheet($myWorkSheet_maq, 2);
+
+        $myWorkSheet_maq->setCellValue('A1', 'Indicadores');
+        $myWorkSheet_maq->mergeCells('A1:I1');
+
+        $myWorkSheet_maq->getStyle('A1')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('A1')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('A1')->getAlignment()->setVertical('center');
+        $myWorkSheet_maq->getRowDimension('1')->setRowHeight(35);
+        $myWorkSheet_maq->getStyle('A1:G1')->applyFromArray($styleArray);
+
+        $myWorkSheet_maq->setCellValue('B2', 'Toneladas');
+        $myWorkSheet_maq->setCellValue('C2', 'Litros Combustibles');
+        $myWorkSheet_maq->setCellValue('D2', 'l/t');
+        $myWorkSheet_maq->setCellValue('E2', 'Horas');
+        $myWorkSheet_maq->setCellValue('F2', 'l/h');
+        $myWorkSheet_maq->setCellValue('G2', 'l/h -t');
+        $myWorkSheet_maq->setCellValue('H2', 'Hora Plan');
+        $myWorkSheet_maq->setCellValue('I2', 'Eficiencia');
+
+        $myWorkSheet_maq->getStyle('B2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('B2')->getAlignment()->setVertical('center');
+
+        $myWorkSheet_maq->getStyle('C2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('C2')->getAlignment()->setVertical('center');
+
+        $myWorkSheet_maq->getStyle('D2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('D2')->getAlignment()->setVertical('center');
+
+        $myWorkSheet_maq->getStyle('E2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('E2')->getAlignment()->setVertical('center');
+
+        $myWorkSheet_maq->getStyle('F2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('F2')->getAlignment()->setVertical('center');
+
+        $myWorkSheet_maq->getStyle('G2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('G2')->getAlignment()->setVertical('center');
+        $myWorkSheet_maq->getStyle('H2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('H2')->getAlignment()->setVertical('center');
+        $myWorkSheet_maq->getStyle('I2')->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('I2')->getAlignment()->setVertical('center');
+
+        $myWorkSheet_maq->getStyle('B2')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('C2')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('D2')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('E2')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('F2')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('G2')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('H2')->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('I2')->applyFromArray($font_bold);
+
+        $suma_combustible = 0;
+
+        $i = 3;
+
+        foreach ($data_costos['centros'] as $centro) {
+
+
+            $myWorkSheet_maq->setCellValue('A' . $i, $centro['name']);
+
+
+            foreach ($centro['maquinas'] as $maq)
+            {
+                if(isset($maq['eficiencia']))
+                {
+                    $i++;
+                    $myWorkSheet_maq->setCellValue('A'.$i, $maq['name']);
+                    $myWorkSheet_maq->setCellValue('B'.$i, $maq['costos']['toneladas']);
+
+                    $myWorkSheet_maq->setCellValueExplicit('B'.$i, $maq['costos']['toneladas'], DataType::TYPE_NUMERIC);
+
+                    $suma_combustible = $suma_combustible + $maq['eficiencia']['litros_comb'];
+
+
+
+                    $myWorkSheet_maq->setCellValueExplicit('C'.$i, $maq['eficiencia']['litros_comb'], DataType::TYPE_NUMERIC);
+
+
+                    $lit_ton = $maq['costos']['toneladas'] == 0 ? 0 : ($maq['eficiencia']['litros_comb'] / $maq['costos']['toneladas']);
+
+
+                    $myWorkSheet_maq->setCellValueExplicit('D'.$i, number_format($lit_ton, 2, '.', ','), DataType::TYPE_NUMERIC);
+
+
+                    $myWorkSheet_maq->setCellValue('E'.$i,  $maq['costos']['horas']);
+
+                    $lit_h = $maq['costos']['horas'] == 0 ? 0 : ($maq['eficiencia']['litros_comb'] / $maq['costos']['horas']);
+
+                    $myWorkSheet_maq->getStyle('F'.$i)->getNumberFormat()->setFormatCode('#.##0');
+                    $myWorkSheet_maq->setCellValueExplicit('F'.$i, $lit_h, DataType::TYPE_NUMERIC);
+
+
+                    //Litros de -t
+
+                    $litros_comb = 0;
+                    foreach ($maquinas_data_back as $data)
+                    {
+                        if($data['idmaquina'] == $maq['idmaquinas'])
+                        {
+                            $litros_comb =  $data['litros_combustible'];
+                        }
+
+                    }
+
+                    $litro_minus_t = $maq['costos']['horas'] == 0 ? 0 : ($litros_comb / $maq['costos']['horas']);
+
+                    $myWorkSheet_maq->getStyle('G'.$i)->getNumberFormat()->setFormatCode('#.##0');
+                    $myWorkSheet_maq->setCellValueExplicit('G'.$i, $litro_minus_t, DataType::TYPE_NUMERIC);
+                    //HOra plan
+                    $HMU = $maq['eficiencia']['HMU'];
+
+                    $myWorkSheet_maq->setCellValueExplicit('H'.$i, $HMU, DataType::TYPE_NUMERIC);
+
+                    $eficiencia = $HMU == 0 ? 0 : ($maq['costos']['horas'] / $HMU);
+                    $myWorkSheet_maq->getStyle('I'.$i)->getNumberFormat()->setFormatCode('#.##0');
+                    $myWorkSheet_maq->setCellValue('I'.$i,  number_format($eficiencia, 2, ',', '.') . '%');
+
+                    $myWorkSheet_maq->setCellValueExplicit('I'.$i, $eficiencia, DataType::TYPE_NUMERIC);
+                    //Cargo el calculo de un mes respecto del otro
+                    $porc_mes_minus_mes = $litros_comb == 0 ? 0 : ((($lit_h / $litro_minus_t) - 1) * 100);
+                    $myWorkSheet_maq->setCellValue('F'. ($i + 1),  number_format($porc_mes_minus_mes, 2, ',', '.') . '%');
+
+
+
+                    $myWorkSheet_maq->getStyle('B' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('B' . $i)->getAlignment()->setVertical('center');
+
+                    $myWorkSheet_maq->getStyle('C' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('C' . $i)->getAlignment()->setVertical('center');
+
+                    $myWorkSheet_maq->getStyle('D' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('D' . $i)->getAlignment()->setVertical('center');
+
+                    $myWorkSheet_maq->getStyle('E' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('E' . $i)->getAlignment()->setVertical('center');
+
+                    $myWorkSheet_maq->getStyle('F' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('F' . $i)->getAlignment()->setVertical('center');
+
+                    $myWorkSheet_maq->getStyle('F' . ($i + 1))->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('F' . ($i + 1))->getAlignment()->setVertical('center');
+
+                    $myWorkSheet_maq->getStyle('G' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('G' . $i)->getAlignment()->setVertical('center');
+                    $myWorkSheet_maq->getStyle('H' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('H' . $i)->getAlignment()->setVertical('center');
+                    $myWorkSheet_maq->getStyle('I' . $i)->getAlignment()->setHorizontal('center');
+                    $myWorkSheet_maq->getStyle('I' . $i)->getAlignment()->setVertical('center');
+
+
+                    $i++;
+
+                }
+
+
+
+            }
+            $i++;
+
+
+        }
+
+        foreach (range('A1:A1', $myWorkSheet_maq->getHighestColumn()) as $col) {
+            $myWorkSheet_maq->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $myWorkSheet_maq->getStyle('A' . $i)->applyFromArray($font_bold);
+        $myWorkSheet_maq->getStyle('C' . $i)->applyFromArray($font_bold);
+
+        $myWorkSheet_maq->setCellValue('A'.$i,  'Totales: ');
+        $myWorkSheet_maq->setCellValue('C'.$i,  $suma_combustible);
+
+        $myWorkSheet_maq->getStyle('C' . $i)->getAlignment()->setHorizontal('center');
+        $myWorkSheet_maq->getStyle('C' . $i)->getAlignment()->setVertical('center');
+
+        return $myWorkSheet_maq;
+
+    }
 
 
     public function createInformesMaquinas($metadata, $costos_maquinas)
@@ -899,7 +1101,7 @@ class ExcelProcesssing
         $myWorkSheet_maq =  $this->createSheetMaquina($spreadsheet, $costos_maquinas, $metadata);
 
 
-        $spreadsheet->removeSheetByIndex(2);
+        //$spreadsheet->removeSheetByIndex(2);
 
         //utilizo el now, es mejor
         $nombre = "informe_maq_" .hash('sha256' , (date("Y-m-d H:i:s")));
@@ -1480,6 +1682,300 @@ class ExcelProcesssing
     {
         return chr(ord($index) - 1);
     }
+
+
+    public function createInformeCamiones($metadata, $data_camiones_rentados)
+    {
+
+
+        return $this->CamionesRentadosExcelInforme($metadata, $data_camiones_rentados);
+    }
+
+
+    public function CamionesRentadosExcelInforme($metadata, $data_camiones_rentados)
+    {
+
+        $spreadsheet = new Spreadsheet();
+
+
+        $this->createSheetTransporte($spreadsheet, $metadata, $data_camiones_rentados);
+
+        $spreadsheet->removeSheetByIndex(1);
+
+        //utilizo el now, es mejor
+        $nombre = "informe_transporte_" .hash('sha256' , (date("Y-m-d H:i:s")));
+
+        $path = EXCELS . $nombre .'.xlsx';
+        $path_short = EXCELS_SHORT . $nombre .'.xlsx';
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($path);
+
+        //consulto por el fileexist
+        $file_test = new File($path);
+        if($file_test->exists()){
+
+            return ['name' => $nombre, 'path' => $path_short];
+        } else {
+            return false;
+        }
+
+    }
+
+    public function createSheetTransporte($spreadsheet, $metadata, $data_camiones_rentados)
+    {
+        $font_bold = [
+            'font' => [
+                'bold' => true
+            ]
+        ];
+
+        $styleArray = [
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ,
+                    'color' => ['argb' => '00000000'],
+                ],
+            ],
+        ];
+
+        //obtengo el id de la empresa desde el metadata
+        $id_empresa = $metadata['empresas_idempresas'];
+
+        //Primero creo el worksheet antes de hacer la llamada al metodo que crea su header
+        $myWorkSheet_res = new Worksheet($spreadsheet, 'Resumen');
+        $spreadsheet->addSheet($myWorkSheet_res, 0);
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Times New Roman');
+
+
+
+        $this->createInfoHeaderSheetTransporte($id_empresa, $myWorkSheet_res, $font_bold);
+
+        $index = $this->createInfoMetadataSheetTransporte($myWorkSheet_res, 1, $metadata, $font_bold);
+
+        //en toeria devuelve la posicion para empezar a escribir los datos
+        $this->writeDataTransporteToSheet($index, $myWorkSheet_res, $data_camiones_rentados, $font_bold, $styleArray);
+
+
+    }
+
+    private function createInfoHeaderSheetTransporte($id_empresa, $myWorkSheet_res, $font_bold)
+    {
+        try{
+
+            //TRigo el logo de la empresa
+            $empresa_model = TableRegistry::getTableLocator()->get('Empresas');
+            $empresas_data = $empresa_model->get($id_empresa);
+
+            //configuro el path y el file
+            $path = null;
+
+            if($empresas_data->logo == null or empty($empresas_data->logo))
+            {
+                //logo default
+                $path = LOGOS . 'edificio.png';
+            }  else {
+                $path = LOGOS . $empresas_data->logo;
+            }
+
+
+            //Combino la primer celda para porner el titulo y configuro una altura aceptable
+            $myWorkSheet_res->mergeCells('B1:J1');
+            $myWorkSheet_res->getRowDimension('1')->setRowHeight(75);
+
+            //EL titulo tiene que decir Informe de Costo - NOmbre de empresa
+            $empresa_name = $empresas_data->name;
+            $titulo = 'Informe: viajes de Camiones Rentados - ' . $empresa_name;
+
+            $myWorkSheet_res->setCellValue('B1', $titulo);
+
+            $myWorkSheet_res->getStyle('B1')->applyFromArray($font_bold);
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('B1')->getAlignment()->setVertical('center');
+            $myWorkSheet_res->getStyle('B1')->getFont()->setBold(true)->setName('Arial')
+                ->setSize(14);
+
+            //DIBUJO EL LOGO
+
+            $drawing = new Drawing();
+            $drawing->setName('Logo');
+            $drawing->setDescription('Logo');
+            $drawing->setPath( $path);
+            $drawing->setHeight(75);
+            $drawing->setWidth(75);
+            $drawing->setCoordinates('A1');
+            $drawing->setOffsetX(45);
+            $drawing->setOffsetY(15);
+            $drawing->setWorksheet($myWorkSheet_res);
+
+            return $myWorkSheet_res;
+
+        } catch (InvalidPrimaryKeyException $e){
+            return $e;
+
+        } catch (RecordNotFoundException $e){
+            return $e;
+        }
+
+    }
+
+
+    private function createInfoMetadataSheetTransporte($myWorkSheet_res, $type, $metadata, $font_bold)
+    {
+
+        $myWorkSheet_res->mergeCells('A2:J2');
+        $myWorkSheet_res->getRowDimension('2')->setRowHeight(45);
+
+
+        //Si el type es 1, solo va el periodo
+        if($type == 1)
+        {
+            $myWorkSheet_res->mergeCells('A3:J3');
+            $myWorkSheet_res->setCellValue('A3', 'Datos considerados en el análisis');
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A3')->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->mergeCells('A4:J4');
+
+            $text = 'Periodo: '. $metadata['fecha_inicio']. ' a '. $metadata['fecha_fin'];
+            $myWorkSheet_res->setCellValue('A4', $text);
+
+            //Seteo el estilo de los datos
+            $myWorkSheet_res->getRowDimension('3')->setRowHeight(25);
+
+
+            $myWorkSheet_res->getStyle('A4')->getAlignment()->setHorizontal('center');
+            $myWorkSheet_res->getStyle('A4')->getAlignment()->setVertical('center');
+
+            $myWorkSheet_res->getStyle('A4')->getAlignment()->setIndent(1);
+
+
+
+            foreach (range('A4:J4', $myWorkSheet_res->getHighestColumn()) as $col) {
+                $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
+            }
+
+
+            return 5;
+        }
+
+
+
+
+    }
+
+
+
+    private function writeDataTransporteToSheet($index, $myWorkSheet_res, $data_camiones_rentados, $font_bold, $styleArray)
+    {
+
+        //empezamos desde el index
+        $index++;
+        //Cargo la cabecera
+
+
+
+
+        foreach ($data_camiones_rentados as $maq)
+        {
+
+            $myWorkSheet_res->setCellValue('A'.$index, $maq['maquina']['name']);
+            $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
+            $index++;
+
+            //cargo la cabecera
+            $myWorkSheet_res->setCellValue('A'.$index, 'N° Remito');
+            $myWorkSheet_res->setCellValue('B'.$index, 'Fecha');
+            $myWorkSheet_res->setCellValue('C'.$index, 'Lote');
+            $myWorkSheet_res->setCellValue('D'.$index, 'Parcela');
+            $myWorkSheet_res->setCellValue('E'.$index, 'Destino');
+            $myWorkSheet_res->setCellValue('F'.$index, 'Producto');
+            $myWorkSheet_res->setCellValue('G'.$index, 'Toneladas');
+            $myWorkSheet_res->setCellValue('H'.$index, 'Costo/t');
+            $myWorkSheet_res->setCellValue('I'.$index, 'Total');
+            $index++;
+
+
+
+            foreach ($maq['data'] as $dat_lote)
+            {
+
+                //tengo que hacer otro foreach para recorrer los remitos
+
+                foreach ($dat_lote['data'] as $data_destino){
+
+                    foreach ($data_destino as $item)
+                    {
+                        $destino = null;
+                        $sum_ton = 0;
+                        $sum_costos = 0;
+                        $costo_ton = 0;
+
+                        foreach ($item['data'] as $rem)
+                        {
+
+                            $destino =  $item['destino'];
+                            $myWorkSheet_res->setCellValue('A'.$index, $rem['idremitos']);
+                            $myWorkSheet_res->setCellValue('B'.$index, $rem['fecha']);
+                            $myWorkSheet_res->setCellValue('C'.$index, $dat_lote['lote']);
+                            $myWorkSheet_res->setCellValue('D'.$index, $rem['parcela']);
+                            $myWorkSheet_res->setCellValue('E'.$index, $item['destino']);
+                            $myWorkSheet_res->setCellValue('F'.$index, $rem['producto']);
+                            $myWorkSheet_res->setCellValue('G'.$index, $rem['toneladas']);
+                            $myWorkSheet_res->setCellValue('H'.$index, $rem['precio']);
+                            $myWorkSheet_res->setCellValue('I'.$index, $rem['total']);
+
+                            $sum_ton = $sum_ton + $rem['toneladas'];
+                            $sum_costos = $sum_costos + $rem['total'];
+
+                            $range = 'A'.$index.  ':J' . $index;
+                            foreach (range($range, $myWorkSheet_res->getHighestColumn()) as $col) {
+                                $myWorkSheet_res->getColumnDimension($col)->setAutoSize(true);
+                            }
+
+                            $index++;
+
+                        }
+
+                        $costo_ton = $sum_costos / $sum_ton;
+
+                        $index_row = 'A'.$index.':F'.$index;
+                        $myWorkSheet_res->mergeCells($index_row);
+                        //del lote
+                        $texto = 'Subtotal viajes lote ' . $dat_lote['lote'] . ' => '  .$destino;
+
+                        $myWorkSheet_res->setCellValue('A'.$index, $texto);
+                        $myWorkSheet_res->setCellValue('G'.$index, $sum_ton);
+
+                        $costo_ton = floatval($costo_ton);
+                        $myWorkSheet_res->getStyle('H'.$index)->getNumberFormat()->setFormatCode('#,##0.##');
+                        $myWorkSheet_res->setCellValueExplicit('H'.$index, $costo_ton, DataType::TYPE_NUMERIC);
+                        $myWorkSheet_res->setCellValue('I'.$index, $sum_costos);
+
+                        $myWorkSheet_res->getStyle('A'.$index)->applyFromArray($font_bold);
+                        $myWorkSheet_res->getStyle('G'.$index)->applyFromArray($font_bold);
+                        $myWorkSheet_res->getStyle('H'.$index)->applyFromArray($font_bold);
+                        $myWorkSheet_res->getStyle('I'.$index)->applyFromArray($font_bold);
+
+
+                        $index++;
+                    }
+
+                }
+
+
+            }
+
+            $index++;
+
+        }
+
+
+
+
+    }
+
 
 
 }

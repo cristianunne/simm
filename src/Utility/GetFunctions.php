@@ -6,6 +6,7 @@ use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\I18n\Date;
 use Cake\ORM\TableRegistry;
+use DateTime;
 use Exception;
 
 class GetFunctions
@@ -448,6 +449,35 @@ class GetFunctions
         return $date_year_inicio_back;
     }
 
+
+    public function getTimeBackInicio($fecha_inicio, $fecha_fin)
+    {
+        $fec_in=new Date($fecha_inicio);
+        $datetime2=new Date($fecha_fin);
+
+        $interval=$datetime2->diff($fec_in);
+
+        # obtenemos la diferencia en meses
+        $intervalMeses = $interval->format("%m") + 1;
+
+
+        $text = '- ' . $intervalMeses . ' months';
+
+        $date_year_inicio_back = date("Y-m-01", strtotime($fec_in . $text));
+
+        return $date_year_inicio_back;
+    }
+
+    public function getTimeBackFin($fecha)
+    {
+        $fec_in = new Date($fecha);
+        $date_year_inicio_back = date("Y-m-t", strtotime($fec_in . "- 1 month"));
+
+
+        return $date_year_inicio_back;
+
+    }
+
     public function getOperarioByMaquina($maquina, $remitos_distinc)
     {
 
@@ -885,9 +915,10 @@ class GetFunctions
         //findGetSumaToneladasByWorksgroup
         $uso_maquinaria = TableRegistry::getTableLocator()->get('UsoMaquinaria');
 
-        $uso_maquinaria_ = $uso_maquinaria->find('GetUsoMaquinariaByConditionsVariacion', $array_options);
+        $uso_maquinaria_ = $uso_maquinaria->find('findGetUsoMaquinariaByConditions', $array_options);
 
-        //debug($uso_maquinaria_->toArray());
+        debug($uso_maquinaria_->toArray());
+
         $suma = 0;
         foreach ($uso_maquinaria_ as $uso)
         {
@@ -902,6 +933,33 @@ class GetFunctions
      * Metodos para la maquina
      */
 
+    public function getLitrosCombustibleTimeBack($array_options)
+    {
+
+
+
+        $uso_maquinaria = TableRegistry::getTableLocator()->get('UsoMaquinaria');
+
+        $uso_maquinaria_ = $uso_maquinaria->find('GetUsoMaquinariaByConditionsBack', $array_options);
+
+        //debug($uso_maquinaria_->toArray());
+        $suma = 0;
+
+        foreach ($uso_maquinaria_ as $uso)
+        {
+
+            if($uso['uso_comb_lub'][0]->categoria == 'Combustible')
+            {
+
+                $suma = $suma + $uso['uso_comb_lub'][0]->litros;
+            }
+
+
+
+        }
+
+        return $suma;
+    }
 
 
 

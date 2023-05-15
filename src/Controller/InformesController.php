@@ -23,11 +23,11 @@ class InformesController extends AppController
     public function isAuthorized($user)
     {
         if (isset($user['role']) and $user['role'] === 'user') {
-            if (in_array($this->request->getParam('action'), ['index', 'generateExcel', 'edit', 'delete', 'downloadAsExcel'])) {
+            if (in_array($this->request->getParam('action'), ['index', 'view', 'generateExcel', 'edit', 'delete', 'downloadAsExcel'])) {
                 return true;
             }
         } else if (isset($user['role']) and $user['role'] === 'supervisor') {
-            if (in_array($this->request->getParam('action'), ['index', 'generateExcel', 'edit', 'delete', 'downloadAsExcel'])) {
+            if (in_array($this->request->getParam('action'), ['index', 'view', 'generateExcel', 'edit', 'delete', 'downloadAsExcel'])) {
                 return true;
             }
         }
@@ -60,6 +60,11 @@ class InformesController extends AppController
 
             //debug($informes->toArray());
         }
+    }
+
+    public function view()
+    {
+
     }
 
 

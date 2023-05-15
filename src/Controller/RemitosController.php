@@ -5,6 +5,7 @@ use App\Controller\AppController;
 use Cake\Cache\Cache;
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\ORM\Query;
 
 /**
  * Remitos Controller
@@ -268,13 +269,21 @@ class RemitosController extends AppController
             //debug($remitos);
 
             $this->set(compact('remitos'));
-
+            $worksgroup = $remitos->worksgroups_idworksgroups;
 
             $remitos_maq_model = $this->loadModel('RemitosMaquinas');
 
             $remitos_maq_data = $remitos_maq_model->find('all', [
-                'contain' => ['Maquinas', 'Operarios']
+                'contain' => ['Maquinas' => ['CostosMaquinas' => function (Query $q) use ($worksgroup) {
+
+                    return $q->contain(['Worksgroups'])
+                        ->where(['CostosMaquinas.active' => true]);
+
+                }], 'Operarios']
             ])->where(['remitos_idremitos' => $id]);
+
+
+
 
             //ESte retorna
             $this->set(compact('remitos_maq_data'));
@@ -282,7 +291,12 @@ class RemitosController extends AppController
             //ACa voy a hacer una busqueda de las maquinas agregadas sin operarios
 
             $remitos_maq_data_alquilada = $remitos_maq_model->find('all', [
-                'contain' => ['Maquinas']
+                'contain' => ['Maquinas' => ['CostosMaquinas' => function (Query $q) use ($worksgroup) {
+
+                    return $q->contain(['Worksgroups'])
+                        ->where(['CostosMaquinas.active' => true]);
+
+                }]]
             ])->where(['remitos_idremitos' => $id, 'operarios_idoperarios IS' => null]);
 
             //ESte retorna
@@ -301,13 +315,37 @@ class RemitosController extends AppController
 
             //Para traer las MAquinas verifico que tenga cargado los DATOS TEORICOS
             //El problema radica cuando la maquina es alquilada, no tiene ninguno de esos datos
+            //Tengo que pasarle el WORKSGROUPS a COstos Maquinas
 
-            //Traigo las maquinas de la tabla operariosmaquinas
+            /*
+             * ->innerJoinWith('CostosMaquinas')
+                    ->where(['CostosMaquinas.worksgroups_idworksgroups' => $worksgroup,
+                        'CostosMaquinas.active' => true])
+             */
+
+
+
+            //Traigo las maquinas de la tabla operariosmaquinas ['CostosMaquinas' =>
             $model_operario_maq = $this->loadModel('OperariosMaquinas');
             $oper_maq_data = $model_operario_maq->find('all',[
-                'contain' => ['Maquinas' => ['CostosMaquinas'], 'Operarios']
+                'contain' => ['Maquinas' => function (Query $q) use ($worksgroup) {
+
+                $result = $q->contain(['CostosMaquinas' => function(Query $q) use ($worksgroup) {
+
+                        return $q->contain(['Worksgroups'])
+                            ->where(['CostosMaquinas.active' => true, 'CostosMaquinas.worksgroups_idworksgroups' => $worksgroup]);
+                }])  ->innerJoinWith('CostosMaquinas', function(Query $q) use ($worksgroup){
+                    return $q->where(['CostosMaquinas.worksgroups_idworksgroups' => $worksgroup, 'CostosMaquinas.active' => true]);
+                });
+
+                    return $result;
+
+                }, 'Operarios']
             ])->where(['Maquinas.empresas_idempresas' => $id_empresa, 'OperariosMaquinas.active' => true,
                 '(idmaquinas, idoperarios) NOT IN' => $remitos_maq_aux]);
+
+
+            //debug($oper_maq_data->toArray());
 
             $this->set(compact('oper_maq_data'));
 
@@ -323,10 +361,16 @@ class RemitosController extends AppController
 
             $maquinas_model = $this->loadModel('Maquinas');
 
-            $maquinas_alquiladas = $maquinas_model->find('all', [])
-                ->where(['empresas_idempresas' => $id_empresa, 'propia' => false, 'active' => true,
+            $maquinas_alquiladas = $maquinas_model->find('all', [
+                'contain' => ['CostosMaquinas' => ['Worksgroups']]
+            ])
+                ->innerJoinWith('CostosMaquinas', function(Query $q) use ($worksgroup){
+                    return $q->where(['CostosMaquinas.worksgroups_idworksgroups' => $worksgroup, 'CostosMaquinas.active' => true]);
+                })
+                ->where(['empresas_idempresas' => $id_empresa, 'Maquinas.propia' => false, 'Maquinas.active' => true,
                     'idmaquinas NOT IN' => $remitos_maq_alq_array]);
 
+            //debug($maquinas_alquiladas->toArray());
             $this->set(compact('maquinas_alquiladas'));
 
 

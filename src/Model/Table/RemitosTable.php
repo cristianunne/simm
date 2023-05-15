@@ -358,6 +358,71 @@ class RemitosTable extends Table
         return $result;
     }
 
+    public function findRemitosByConditionsQueryMaquinaTransporte(Query $query, $options)
+    {
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0 ){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
+        }
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
+        }
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+
+
+        //$conditions['empresas_idempresas'] = $options['empresas_idempresas'];
+
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+        $conditions['fecha >='] = $date_start;
+        $conditions['fecha <='] = $date_end;
+
+        $conditions['maquinas_idmaquinas'] = $options['maquina'];
+
+
+
+
+        $result = $query
+            ->distinct(['idremitos'])
+            ->innerJoinWith('RemitosMaquinas')
+            ->where($conditions);
+
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->idremitos;
+        }
+
+        return $array_result;
+
+    }
+
+
 
 
     public function findDestinosByRemitos(Query $query, $remitos)
@@ -413,6 +478,37 @@ class RemitosTable extends Table
 
         return $array_result;
     }
+
+    public function findGetLotesDistinctByRemitos(Query $query, $array_remitos)
+    {
+        $result = $query->select(['lotes_idlotes'])
+            ->distinct(['lotes_idlotes'])
+            ->where(['idremitos IN ' => $array_remitos]);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+            $array_result[$rem->lotes_idlotes] = $rem->lotes_idlotes;
+        }
+
+        return $array_result;
+    }
+
+    public function findGetDestinosDistinctByRemitos(Query $query, $array_remitos)
+    {
+        $result = $query->select(['destinos_iddestinos'])
+            ->distinct(['destinos_iddestinos'])
+            ->where(['idremitos IN ' => $array_remitos]);
+
+        $array_result = [];
+
+        foreach ($result as $rem){
+            $array_result[$rem->destinos_iddestinos] = $rem->destinos_iddestinos;
+        }
+
+        return $array_result;
+    }
+
 
     public function findGetParcelasDistinctByRemitos(Query $query, $array_remitos)
     {
@@ -665,9 +761,97 @@ class RemitosTable extends Table
             ->innerJoinWith('RemitosMaquinas')
             ->where($conditions)->distinct(['RemitosMaquinas.maquinas_idmaquinas']);*/
 
-        debug($result->toArray());
+        //debug($result->toArray());
 
         return $result;
+
+    }
+
+
+    public function findGetRemitosByConditionsByMaquinaTransporte(Query $query, $options = null)
+    {
+
+        $conditions = [];
+
+        if(isset($options['worksgroup'])){
+            if($options['worksgroup'] != 0 ){
+                $conditions['worksgroups_idworksgroups'] = $options['worksgroup'];
+            }
+        }
+        if(isset($options['lotes_idlotes'])){
+            if($options['lotes_idlotes'] != 0 && $options['lotes_idlotes'] != null) {
+                $conditions['Remitos.lotes_idlotes'] = $options['lotes_idlotes'];
+            }
+        }
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+        if(isset($options['propietarios_idpropietarios'])){
+            if($options['propietarios_idpropietarios'] != 0 && $options['propietarios_idpropietarios'] != null) {
+                $conditions['propietarios_idpropietarios'] = $options['propietarios_idpropietarios'];
+            }
+        }
+
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+        if(isset($options['destinos_iddestinos'])){
+            if($options['destinos_iddestinos'] != 0 && $options['destinos_iddestinos'] != null){
+                $conditions['destinos_iddestinos'] = $options['destinos_iddestinos'];
+            }
+        }
+
+        if(isset($options['productos_idproductos'])){
+            if($options['productos_idproductos'] != 0 && $options['productos_idproductos'] != null){
+                $conditions['productos_idproductos'] = $options['productos_idproductos'];
+            }
+        }
+        $conditions['Remitos.empresas_idempresas'] = $options['empresas_idempresas'];
+
+
+
+
+        if($conditions['Remitos.empresas_idempresas'] == null){
+            return false;
+        }
+
+
+        $date_start = $options['fecha_inicio'];
+        $date_end = $options['fecha_fin'];
+
+        $conditions['fecha >='] = $date_start;
+        $conditions['fecha <='] = $date_end;
+
+
+
+
+        $result = $query
+            ->innerJoinWith('RemitosMaquinas', function (Query $q2){
+                return $q2->innerJoinWith('Maquinas', function (Query $q3){
+                    return $q3->innerJoinWith('CostosMaquinas', function (Query $q4){
+
+                        return $q4->innerJoinWith('CentrosCostos', function (Query $q5){
+                            return $q5->where(['CentrosCostos.categoria LIKE' => 'Transporte']);
+                        });
+
+                    });
+                });
+            })
+
+            ->where($conditions);
+
+        $array_result = [];
+        foreach ($result as $rem){
+
+            $array_result[] = $rem->idremitos;
+        }
+
+
+        return $array_result;
 
     }
 

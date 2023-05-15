@@ -153,6 +153,7 @@
                                             <th scope="col"><?= $this->Paginator->sort('ID') ?></th>
                                             <th scope="col"><?= $this->Paginator->sort('Máquina') ?></th>
                                             <th scope="col"><?= $this->Paginator->sort('Operario') ?></th>
+                                            <th scope="col"><?= $this->Paginator->sort('Grupo') ?></th>
                                             <th scope="col" class="actions"><?= __('Acciones') ?></th>
                                         </tr>
                                         </thead>
@@ -164,6 +165,7 @@
                                                 <td class="dt-center"><?= h($i) ?></td>
                                                 <td class="dt-center"><?= h($maq->maquina->marca . ': ' . $maq->maquina->name) ?></td>
                                                 <td class="dt-center"><?= h($maq->operario->firstname . ' ' . $maq->operario->lastname) ?></td>
+                                                <td class="dt-center"><?= h($maq->maquina->costos_maquinas[0]->worksgroup->name) ?></td>
                                                 <td class="actions" style="text-align: center">
                                                     <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
 
@@ -188,6 +190,7 @@
                                                 <td class="dt-center"><?= h($i) ?></td>
                                                 <td class="dt-center"><?= h($maq->maquina->marca . ': ' . $maq->maquina->name) ?></td>
                                                 <td class="dt-center"></td>
+                                                <td class="dt-center"><?= h($maq->maquina->costos_maquinas[0]->worksgroup->name) ?></td>
                                                 <td class="actions" style="text-align: center">
                                                     <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
 
@@ -252,6 +255,7 @@
                             <tr>
                                 <th scope="col"><?= $this->Paginator->sort('Maquina') ?></th>
                                 <th scope="col"><?= $this->Paginator->sort('Operario') ?></th>
+                                <th scope="col"><?= $this->Paginator->sort('Grupo') ?></th>
                                 <th scope="col" class="actions"><?= __('Acciones') ?></th>
                             </tr>
                             </thead>
@@ -265,6 +269,7 @@
                                         <tr>
                                             <td class="dt-center"><?= h($maq->maquina->marca . ': ' . $maq->maquina->name) ?></td>
                                             <td class="dt-center"><?= h($maq->operario->firstname . ' ' . $maq->operario->lastname) ?></td>
+                                            <td class="dt-center"><?=h($maq->maquina->costos_maquinas[0]->worksgroup->name) ?></td>
                                             <td class="actions" style="text-align: center">
                                                 <?= $this->Form->button($this->Html->tag('span', '', ['class' => 'fas fa-check', 'aria-hidden' => 'true']),
                                                     ['type' => 'button', 'class' => 'btn btn-success', 'escape' => false,
@@ -284,6 +289,7 @@
                                 <tr>
                                     <td class="dt-center"><?= h($maq->marca . ': ' . $maq->name) ?></td>
                                     <td class="dt-center">Alquilada</td>
+                                    <td class="dt-center"><?=h($maq->costos_maquinas[0]->worksgroup->name) ?></td>
                                     <td class="actions" style="text-align: center">
                                         <?= $this->Form->button($this->Html->tag('span', '', ['class' => 'fas fa-check', 'aria-hidden' => 'true']),
                                             ['type' => 'button', 'class' => 'btn btn-success', 'escape' => false,

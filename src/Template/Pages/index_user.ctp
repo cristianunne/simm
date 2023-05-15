@@ -113,7 +113,7 @@
 
 
                                 <?= $this->Html->link('',
-                                    ['controller' => 'Informes', 'action' => 'index'],
+                                    ['controller' => 'Informes', 'action' => 'view'],
                                        ['class' => 'btn-simm btn-informes btn btn-default', 'escape' => false ]) ?>
                             </div>
                             <div class="div_content">

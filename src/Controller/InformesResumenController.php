@@ -2,11 +2,14 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use App\Utility\ExcelProcesssing;
+use App\Utility\GetFunctions;
 use Cake\Datasource\Exception\InvalidPrimaryKeyException;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Event\Event;
 use Cake\Filesystem\File;
 use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\TableRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -201,8 +204,6 @@ class InformesResumenController extends AppController
 
     }
 
-
-
     public function destinosReportIndex($id = null)
     {
         $seccion = 'Informes';
@@ -225,6 +226,178 @@ class InformesResumenController extends AppController
 
             $this->set(compact('id_informe'));
         }
+
+    }
+
+
+    public function camionesReport()
+    {
+        $seccion = 'Informes';
+        $sub_seccion = 'Informes';
+
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
+
+        //Traigo los datos de la sesioN
+        $session = $this->request->getSession();
+        $user_id = $session->read('Auth.User.idusers');
+        $user_role = $session->read('Auth.User.role');
+        $id_empresa = $session->read('Auth.User.Empresa.idempresas');
+
+
+        $get_functions_class = new GetFunctions();
+
+
+        if ($this->request->is('post')) {
+            $fecha_inicio = $this->request->getData()['fecha_inicio'];
+            $fecha_fin = $this->request->getData()['fecha_final'];
+
+            //Tengo que agregar el ultimo dia y el primero a las fechas
+
+
+
+
+            $array_options = [
+                'fecha_inicio' => $fecha_inicio,
+                'fecha_fin' => $fecha_fin,
+                'empresas_idempresas' => $id_empresa
+            ];
+
+            //debug($array_options);
+            //Llamo a la tabla remitos
+            $remitos_model = $this->loadModel('Remitos');
+            //$array_remitos = $remitos_model->find('RemitosByConditions', $array_options);
+
+            $array_remitos = $remitos_model->find('GetRemitosByConditionsByMaquinaTransporte', $array_options);
+
+            $tabla_maquinas = TableRegistry::getTableLocator()->get('Maquinas');
+
+            //A partir de los remitos traigo os camiones que pertenecen al centro de costo transporte
+
+            $tabla_remitosmaq = TableRegistry::getTableLocator()->get('RemitosMaquinas');
+            $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $array_remitos);
+            $maquinas_transporte = $tabla_maquinas->find('GetMaquinasTransporte', $maquinas_array);
+
+            //traer los remitos de estas maquinas
+            //debug($maquinas_transporte);
+
+            //TRaigo los datos de los remitos
+            $rem_with_data = $remitos_model->find('all', [])
+                ->where(['idremitos IN' => $array_remitos]);
+
+            //debug($rem_with_data->toArray());
+
+            $array_result = [];
+
+
+            //recoroo las maquinas y traigo los remitos
+            foreach ($maquinas_transporte as $maq)
+            {
+                //agrego al array options
+                $array_options['maquina'] = $maq->idmaquinas;
+               // debug($maq->name);
+
+                $array_data = [];
+
+
+                $remitos = $remitos_model->find('RemitosByConditionsQueryMaquinaTransporte', $array_options);
+
+
+                //traigo los lotes distinct y destinos distinc
+
+                $lotes_distinc = $remitos_model->find('GetLotesDistinctByRemitos', $remitos);
+                $destinos_distinc = $remitos_model->find('GetDestinosDistinctByRemitos', $remitos);
+
+                //debug($lotes_distinc);
+                //debug($destinos_distinc);
+
+
+                $array_data['maquina'] = [
+                    'id' => $maq->idmaquinas,
+                    'name' => $maq->name];
+
+
+                foreach ($lotes_distinc as $lote)
+                {
+                    $array_lote['lote'] = $this->getNameLoteById($lote);
+
+                    $array_destino = null;
+
+                    $array_destino_ = null;
+
+                    foreach ($destinos_distinc as $destino)
+                    {
+                        $array_destino = null;
+
+                        foreach ($rem_with_data as $rem)
+                        {
+                            $data_remito = null;
+                            if($rem->lotes_idlotes == $lote && $destino == $rem->destinos_iddestinos)
+                            {
+
+                                $array_destino['destino'] = $this->getNameDestinoById($destino);
+                                $data_remito = [
+                                    'idremitos' => $rem->idremitos,
+                                    'fecha' => $rem->fecha,
+                                    'destino' => $this->getNameDestinoById($destino),
+                                    'parcela' => $this->getNameParcelaById($rem->parcelas_idparcelas),
+                                    'producto' => $this->getNameProductoById($rem->productos_idproductos),
+                                    'toneladas' => $rem->ton,
+                                    'precio' =>  $rem->precio_ton,
+                                    'total' => ($rem->ton * $rem->precio_ton)
+                                ];
+
+                                //debug($data_remito);
+
+                                $array_destino['data'][] = $data_remito;
+                                $data_remito = null;
+
+
+                            }
+
+
+                        }
+                        if(!empty($array_destino)){
+                            $array_destino_[] = $array_destino;
+                        }
+
+
+
+
+                    }
+
+                    $array_lote['data'][] = $array_destino_;
+                    $array_destino = null;
+
+                    $array_data['data'][] = $array_lote;
+                    $array_lote = null;
+
+                }
+                $array_result[] = $array_data;
+                $array_data = null;
+
+            }
+
+            //creo el metadato
+            $metadata = $array_options;
+
+            $excel_processing = new ExcelProcesssing();
+            $result = $excel_processing->createInformeCamiones($metadata, $array_result);
+
+
+            if(!$result)
+            {
+                $this->Flash->error(__('Error al generar el informe. Intente nuevamente!'));
+            } else {
+
+              $this->redirect(['action' => 'downloadAsExcelCamiones', $result['name']]);
+
+            }
+
+
+
+        }
+
 
     }
 
@@ -621,6 +794,27 @@ class InformesResumenController extends AppController
 
     }
 
+
+    private function getNameLoteById($id = null)
+    {
+
+        if($id != 0){
+
+            //TRaigo el nombre del remito
+            $lotes_model = $this->loadModel('Lotes');
+
+            $lotes_data = $lotes_model->find('all', [
+            ])->select(['name'])
+                ->where(['idlotes' => $id])->toArray();
+
+            return $lotes_data[0]->name;
+        }
+        $array = 'Todos';
+        return $array;
+
+    }
+
+
     private function getNameParcelaById($id = null)
     {
         if($id != 0){
@@ -659,6 +853,42 @@ class InformesResumenController extends AppController
 
         $array = 'Todos';
         return $array;
+    }
+
+    public function downloadAsExcelCamiones($name)
+    {
+        $this->autoRender = false;
+
+        //TRaigo el informe
+        try {
+
+
+            $path = WWW_ROOT.'files/excels/'. $name . '.xlsx';
+
+
+            $response = $this->response->withFile($path,
+                ['download' => true]
+            );
+
+            //debug($path);
+
+            return $response;
+
+        } catch (InvalidPrimaryKeyException $e){
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
+
+        } catch (RecordNotFoundException $e){
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
+        }
+        catch (NotFoundException $e){
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
+        }
+        catch (Exception $e){
+            $this->Flash->error(__('NO se ha localizado el archivo!'));
+        }
+
+        return $this->redirect(['action' => 'camionesReport']);
+
     }
 
     public function downloadAsExcel($id = null)
@@ -1377,4 +1607,8 @@ class InformesResumenController extends AppController
         }
         return false;
     }
+
+
+
+
 }

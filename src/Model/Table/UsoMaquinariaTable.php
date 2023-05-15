@@ -143,6 +143,35 @@ class UsoMaquinariaTable extends Table
         return $result;
     }
 
+    public function findGetUsoMaquinariaByConditionsBack(Query $query, $options = [])
+    {
+
+        //Cuando en las condiciones viene el 0, significa que tiene que traer todos
+        $conditions = [];
+
+
+
+        if(isset($options['parcelas_idparcelas'])){
+            if($options['parcelas_idparcelas'] != 0 && $options['parcelas_idparcelas'] != null){
+                $conditions['parcelas_idparcelas'] = $options['parcelas_idparcelas'];
+            }
+        }
+
+
+
+        $conditions['fecha >='] = $options['fecha_inicio'];
+        $conditions['fecha <='] = $options['fecha_fin'];
+
+        $conditions['maquinas_idmaquinas'] = $options['maquina'];
+
+        $result = $query
+            ->contain(['UsoCombLub'])
+            ->where($conditions);
+
+
+        return $result;
+    }
+
 
     public function findGetUsoMaquinariaByConditionsVariacion(Query $query, $options = [])
     {
@@ -178,6 +207,9 @@ class UsoMaquinariaTable extends Table
 
         return $result;
     }
+
+
+
 
 
 }

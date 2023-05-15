@@ -98,8 +98,6 @@ class AnalisisCostosController extends AppController
         ])->where(['Destinos.active' => true, 'Destinos.empresas_idempresas' => $id_empresa]);
         $this->set(compact('destinos'));
 
-
-
     }
 
 
@@ -172,13 +170,12 @@ class AnalisisCostosController extends AppController
                 $result = $analisis_costos_class->verifiedDataByMonth($array_options, $mes, $year);
 
                 //SI uno ya es false, cancelo la operacion
-                if(!$result){
+                if($result == false){
                     break;
                 }
 
             }
 
-            $result = true;
             if($result) {
                 //Utilizo la clase para calcular los costos
                 //devuelve un arreglos con los datos de la maquina
@@ -213,13 +210,24 @@ class AnalisisCostosController extends AppController
                 $array_result = null;
 
 
+                //DAta for  eficiencia
+                //datos del mes anterior o periodo
+                $fecha_inicio_ = $get_function_class->getTimeBackInicio($fecha_inicio, $fecha_final);
+                $fecha_final_ = $get_function_class->getTimeBackFin($fecha_inicio);
+
+                $array_options_['fecha_inicio'] = $fecha_inicio_;
+                $array_options_['fecha_fin'] = $fecha_final_;
+
+                $maquinas_data_back = $analisis_costos_class->calculateLitrosTimeBack($costos_maquinas, $array_options_);
+
 
                 if($informe == 'true')
                 {
 
                     //Llamo a excel processing
                     $excel_processing_class = new ExcelProcesssing();
-                    $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
+                    $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back,
+                        $maquinas_data_back);
 
                     $array_result = [
                         'costos' => $costos_maquinas,
@@ -280,8 +288,8 @@ class AnalisisCostosController extends AppController
         //$fecha_final = '2020-02-20';
 
         $worksgroup = 0;
-        $fecha_inicio = '2022-05';
-        $fecha_final = '2022-12';
+        $fecha_inicio = '2022-09';
+        $fecha_final = '2022-09';
         $lotes = 0;
         $parcelas = 0;
         $propietarios = 0;
@@ -342,53 +350,74 @@ class AnalisisCostosController extends AppController
         //$metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
 
 
-        /*foreach ($meses_years as $meses_year)
+        foreach ($meses_years as $meses_year)
         {
             $mes = $meses_year['mes'];
             $year = $meses_year['year'];
 
             $result = $analisis_costos_class->verifiedDataByMonth($array_options, $mes, $year);
 
+            //debug($result);
             //SI uno ya es false, cancelo la operacion
-            if(!$result){
+            if($result == false){
+                debug("fallo algo");
                 break;
             }
 
-        }*/
-        $result = true;
+        }
+        //$result = true;
         //INstancio las clases getfunction y costos
         if($result) {
+
+
+
+
+
             //Utilizo la clase para calcular los costos
             //devuelve un arreglos con los datos de la maquina
-            $costos_maquinas = $analisis_costos_class->analisisDeCostosGruposVariacion($array_options, $id_empresa);
+            $costos_maquinas = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
 
-            debug($costos_maquinas);
+
+            //debug($costos_maquinas);
+
+            //datos del mes anterior o periodo
+            $fecha_inicio_ = $get_function_class->getTimeBackInicio($fecha_inicio, $fecha_final);
+            $fecha_final_ = $get_function_class->getTimeBackFin($fecha_inicio);
+
+            $array_options['fecha_inicio'] = $fecha_inicio_;
+            $array_options['fecha_fin'] = $fecha_final_;
+
+
+
+            $maquinas_data_back = $analisis_costos_class->calculateLitrosTimeBack($costos_maquinas, $array_options);
+
+
 
             //$costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options, $id_empresa);
 
             //Calculo los costos seis meses atras
 
             //Tengo que calcular los costos backtime
-            //$date_six_inicio_back = $get_function_class->getDateSixMonthsBack($fecha_inicio);
-           // $date_six_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
+            $date_six_inicio_back = $get_function_class->getDateSixMonthsBack($fecha_inicio);
+            $date_six_final_back = $get_function_class->getDateSixMonthsBack($fecha_final);
 
             //remplazo el array options
-           // $array_options_['fecha_inicio'] = $date_six_inicio_back;
-           // $array_options_['fecha_fin'] = $date_six_final_back;
+            $array_options_['fecha_inicio'] = $date_six_inicio_back;
+            $array_options_['fecha_fin'] = $date_six_final_back;
 
-          //  $costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+            $costos_maquinas_six_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
 
             //debug($costos_maquinas_six_back);
 
-         //   $date_year_inicio_back = $get_function_class->getDateOneYearBack($fecha_inicio);
-          //  $date_year_final_back = $get_function_class->getDateOneYearBack($fecha_final);
+            $date_year_inicio_back = $get_function_class->getDateOneYearBack($fecha_inicio);
+            $date_year_final_back = $get_function_class->getDateOneYearBack($fecha_final);
 
             //remplazo el array options
-           // $array_options_['fecha_inicio'] = $date_year_inicio_back;
-           // $array_options_['fecha_fin'] = $date_year_final_back;
+            $array_options_['fecha_inicio'] = $date_year_inicio_back;
+            $array_options_['fecha_fin'] = $date_year_final_back;
 
             //debug("UN ANO ATRAS");
-           // $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
+            $costos_one_year_back = $analisis_costos_class->analisisDeCostosGrupos($array_options_, $id_empresa);
 
 //
             $metadata = $get_function_class->getMetadataResumenCostosGrupos($array_options);
@@ -396,8 +425,9 @@ class AnalisisCostosController extends AppController
 
 
             //Llamo a excel processing
-           // $excel_processing_class = new ExcelProcesssing();
-           // $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back, $costos_maquinas_six_back);
+            $excel_processing_class = new ExcelProcesssing();
+            $informe = $excel_processing_class->createInformeGrupos($metadata, $costos_maquinas, $costos_one_year_back,
+                $costos_maquinas_six_back, $maquinas_data_back);
 
             $array_result = [
                 'costos' => $costos_maquinas,

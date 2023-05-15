@@ -41,6 +41,8 @@ class AnalisisCostosGrupos
             $maquinas_resume = $this->resumeCostosHorariosByMaquina($data_organized_by_month, $maquinas_distinct);
             //debug($maquinas_resume);
 
+
+
             $maquinas_resume_new =  $this->calculateCostosFijosYVariables($maquinas_resume);
 
 
@@ -516,6 +518,8 @@ class AnalisisCostosGrupos
                 //Variable con las maquinas utilizadas en los remitos filtrados
                 $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $array_remitos);
 
+                //debug($maquinas_array);
+
                 $general_data['total_maquinas'] = count($maquinas_array);
                 $general_data['toneladas'] = $general_total_ton;
 
@@ -551,12 +555,9 @@ class AnalisisCostosGrupos
 
                     $maquina_with_data = $this->calculateVariablesyConstantesByMaquina($maquina_data, $remitos_by_maquina, $costos, $arreglos,
                         $uso_maquinaria, $operarios_maquina_data);
-
-
-
                     //Aplico la metodologia de costos aqui y devuelvo ya con eso
                     $maquina_with_data['result_metod'] = $this->appliedCostosMetodology($maquina_with_data, $id_empresa);
-
+                    //debug($maquina_with_data);
 
                     $maquina_with_data['costos'] = $this->calculateCostosByHours($maquina_with_data);
 
@@ -939,6 +940,9 @@ class AnalisisCostosGrupos
         $gastos_sueldos = null;
         $gastos_arreglos = null;
 
+        $litros_comb = null;
+        $litros_lub = null;
+
         $toneladas = null;
         $precio_ton = null;
 
@@ -967,6 +971,11 @@ class AnalisisCostosGrupos
             $gastos_sueldos = $variablesAndConstantesClass->getGastosSueldo();
             $gastos_comb = $variablesAndConstantesClass->getGastosCombustibles();
             $gastos_lub = $variablesAndConstantesClass->getGastosLubricantes();
+
+            //CArgo los litros de combustible y lubricante
+            $litros_comb = $variablesAndConstantesClass->getLitrosCombustible();
+            $litros_lub = $variablesAndConstantesClass->getLitrosLubricante();
+
 
 
             $toneladas = $variablesAndConstantesClass->getToneladas();
@@ -1019,7 +1028,10 @@ class AnalisisCostosGrupos
                 'gasto_combustible' => $gastos_comb,
                 'gasto_lubricante' => $gastos_lub,
                 'gasto_sueldo' => $gastos_sueldos,
-                'gastos_arreglos' => $gastos_arreglos
+                'gastos_arreglos' => $gastos_arreglos,
+                'litros_comb'=> $litros_comb,
+                'litros_lub' => $litros_lub,
+                'HTE' => $costos[0]->horas_mens_uso,
             ]
         ];
 
@@ -1268,7 +1280,9 @@ class AnalisisCostosGrupos
                     foreach ($maquinas_array as $maquina) {
 
 
+
                         $maquina_data = $get_functions->getMaquinaById($maquina);
+                        //debug($maquina_data);
 
                         //TRaigo para esta maquina en especifico los datos
                         $remitos_by_maquina = $get_functions->getRemitosByMaquina($maquina, $array_options);
@@ -1277,42 +1291,47 @@ class AnalisisCostosGrupos
 
                         if(count($remitos_array_distinc) > 0){
 
-                            //traigo los costos
-                            $costos = $get_functions->getCostosByMaquina($maquina, $mes, $year)->toArray();
+                            //si la maquina es propia
+                            if($maquina_data->propia)
+                            {
+                                //traigo los costos
+                                $costos = $get_functions->getCostosByMaquina($maquina, $mes, $year)->toArray();
+                                if(count($costos) > 0){
 
-                            if(count($costos) > 0){
-
-                                //Usos  EL uso tiene solo la parcela para filtrar
-                                $uso_maquinaria = $get_functions->getUsoMaquinariaByMaquina($maquina, $array_options);
-
-                                if(count($uso_maquinaria->toArray()) > 0)
-                                {
-
-                                    //TRaigo operarios
-                                    $operario_maq =  $get_functions->getOperarioByMaquina($maquina, $remitos_array_distinc);
-                                    //Traigo los operarios maquinas donde se encuentra los datos de sueldos
-                                    $operarios_maquina_data =  $get_functions->getOperariosMaquinasByOperAndRemito($operario_maq, $mes, $year);
-
-
-                                    if(count($operarios_maquina_data) > 0)
+                                    //Usos  EL uso tiene solo la parcela para filtrar
+                                    $uso_maquinaria = $get_functions->getUsoMaquinariaByMaquina($maquina, $array_options);
+                                    // debug($uso_maquinaria->toArray());
+                                    if(count($uso_maquinaria->toArray()) > 0)
                                     {
-                                        return true;
-                                    } else {
-                                        //debug("La Maquina no tiene Operarios con datos");
-                                        return false;
 
+
+                                        //TRaigo operarios
+                                        $operario_maq =  $get_functions->getOperarioByMaquina($maquina, $remitos_array_distinc);
+                                        //Traigo los operarios maquinas donde se encuentra los datos de sueldos
+                                        $operarios_maquina_data =  $get_functions->getOperariosMaquinasByOperAndRemito($operario_maq, $mes, $year);
+
+                                        //debug($operarios_maquina_data);
+                                        if(count($operarios_maquina_data) > 0)
+                                        {
+                                            //return true;
+                                        } else {
+                                            //debug("La Maquina no tiene Operarios con datos");
+                                            return false;
+
+                                        }
+
+                                    } else {
+                                        //debug("La Maquina no tiene Usos");
+                                        return false;
                                     }
 
                                 } else {
-                                    //debug("La Maquina no tiene Usos");
+                                    //debug("La Maquina no tiene costos");
                                     return false;
+
                                 }
-
-                            } else {
-                                //debug("La Maquina no tiene costos");
-                                return false;
-
                             }
+
 
                         } else {
                             //debug("La Maquina no tiene remitos distinct");
@@ -1338,6 +1357,7 @@ class AnalisisCostosGrupos
             return false;
             //debug("Revisar las opciones cargadas");
         }
+        return true;
 
     }
 
@@ -1665,6 +1685,14 @@ class AnalisisCostosGrupos
             $administracion = 0;
             $index_ = 0;
 
+            //ALmaceno las variables usadas en rendimiento
+            $litros_combustible = 0;
+            $litros_lubricante = 0;
+            $HMU = 0;
+
+
+
+
 
             if($maquina_->propia)
             {
@@ -1685,6 +1713,10 @@ class AnalisisCostosGrupos
                                 $maquina['marca'] = $maq['marca'];
                                 $maquina['centro_costos'] = $maq['centro_costos'];
                                 $maquina['alquiler'] = $maq['alquiler'];
+
+                                $HMU = $maq['gastos']['HTE'];
+
+                                //Traigo el mes anterio 1 sola vez
                                 $index_++;
 
                             }
@@ -1705,6 +1737,11 @@ class AnalisisCostosGrupos
                             $operador = $operador + ($maq['result_metod']['operador'] * $maq['constantes']['HME']);
                             $mantenimiento = $mantenimiento + ($maq['result_metod']['mantenimiento'] * $maq['constantes']['HME']);
                             $administracion = $administracion + ($maq['result_metod']['administracion'] * $maq['constantes']['HME']);
+
+
+                            //CArgo los litros de combustible
+                            $litros_combustible = $litros_combustible = $maq['gastos']['litros_comb'];
+                            $litros_lubricante = $litros_lubricante = $maq['gastos']['litros_lub'];
 
                         }
 
@@ -1751,6 +1788,14 @@ class AnalisisCostosGrupos
                     'prod_rend_h' => $prod_rend_h,
                     'costo_ton' => $costo_ton,
                 ];
+
+
+                $maquina['eficiencia'] = [
+                    'litros_comb' => $litros_combustible,
+                    'litros_lub' => $litros_lubricante,
+                    'HMU' => $HMU
+                ];
+
 
             } else {
                 //Maquina alquilada, recorro los meses y realizo suma producto
@@ -1806,6 +1851,7 @@ class AnalisisCostosGrupos
                     'prod_rend_h' => null,
                     'costo_ton' => $costo_ton
                 ];
+
 
 
             }
@@ -2019,5 +2065,34 @@ class AnalisisCostosGrupos
 
     }
 
+
+
+    public function calculateLitrosTimeBack($costos_maquinas, $array_options)
+    {
+        $get_function_class = new GetFunctions();
+
+        $maquinas_data_list = [];
+
+        //debug($costos_maquinas);
+        foreach ($costos_maquinas['centros'] as $centros)
+        {
+            foreach ($centros['maquinas'] as $maq)
+            {
+                $maquina = null;
+
+                $array_options['maquina'] = $maq['idmaquinas'];
+
+                $uso = $get_function_class->getLitrosCombustibleTimeBack($array_options);
+
+                $maquina['idmaquina'] = $maq['idmaquinas'];
+                $maquina['litros_combustible'] = $uso;
+
+                $maquinas_data_list[] = $maquina;
+
+            }
+        }
+        return $maquinas_data_list;
+
+    }
 
 }

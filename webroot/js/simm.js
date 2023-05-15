@@ -3334,25 +3334,25 @@ function showInfoMaquina(element) {
     //consulto si es alquilada
     if(alquiler_bool == false)
     {
-        let interes_li = '<li><strong>Alquiler: </strong>' + costo_t + ' $/t' + '</li>';
+        let interes_li = '<li><strong>Alquiler: </strong>' + costo_t + ' $/h' + '</li>';
 
         ul_detalles.append(interes_li);
         ul_detalles.append('<br/>');
 
     } else {
-        let interes_li = '<li><strong>Interés: </strong>' + interes + ' $/t' + '</li>';
-        let seguro_li = '<li><strong>Seguro: </strong>' + seguro + ' $/t' + '</li>';
+        let interes_li = '<li><strong>Interés: </strong>' + interes + ' $/h' + '</li>';
+        let seguro_li = '<li><strong>Seguro: </strong>' + seguro + ' $/h' + '</li>';
 
-        let dep_maq_li = '<li><strong>Dep. Máquina: </strong>' + dep_maq + ' $/t' + '</li>';
-        let dep_neum_li = '<li><strong>Dep. Neumáticos: </strong>' + dep_neum + ' $/t' + '</li>';
-        let arreglos_li = '<li><strong>Arreglos Mecánicos: </strong>' + arreglos + ' $/t' + '</li>';
+        let dep_maq_li = '<li><strong>Dep. Máquina: </strong>' + dep_maq + ' $/h' + '</li>';
+        let dep_neum_li = '<li><strong>Dep. Neumáticos: </strong>' + dep_neum + ' $/h' + '</li>';
+        let arreglos_li = '<li><strong>Arreglos Mecánicos: </strong>' + arreglos + ' $/h' + '</li>';
 
-        let combustibles_li = '<li><strong>Combustible: </strong>' + combustibles + ' $/t' + '</li>';
-        let lubricantes_li = '<li><strong>Lubricante: </strong>' + lubricantes + ' $/t' + '</li>';
+        let combustibles_li = '<li><strong>Combustible: </strong>' + combustibles + ' $/h' + '</li>';
+        let lubricantes_li = '<li><strong>Lubricante: </strong>' + lubricantes + ' $/h' + '</li>';
 
-        let operador_li = '<li><strong>Operador: </strong>' + operador + ' $/t' + '</li>';
-        let mantenimiento_li = '<li><strong>Mantenimiento: </strong>' + mantenimiento + ' $/t' + '</li>';
-        let administracion_li = '<li><strong>Administración: </strong>' + administracion + ' $/t' + '</li>';
+        let operador_li = '<li><strong>Operador: </strong>' + operador + ' $/h' + '</li>';
+        let mantenimiento_li = '<li><strong>Mantenimiento: </strong>' + mantenimiento + ' $/h' + '</li>';
+        let administracion_li = '<li><strong>Administración: </strong>' + administracion + ' $/h' + '</li>';
 
 
         ul_detalles.append(interes_li);

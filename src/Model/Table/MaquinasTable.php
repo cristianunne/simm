@@ -360,4 +360,41 @@ class MaquinasTable extends Table
     }
 
 
+    public function findGetMaquinasTransporte(Query $query, $maquinas_array = [])
+    {
+        $array_result = [];
+
+        if(!empty($maquinas_array))
+        {
+            $result = $query
+                ->contain(['CostosMaquinas' => function (Query $q){
+
+                    return $q->contain(['CentrosCostos'])
+                        ->where(['active' => true]);
+
+                }])
+                ->where(['idmaquinas IN' => $maquinas_array, 'propia' => false]);
+
+            //debug($result->toArray());
+
+
+            foreach ($result as $maq)
+            {
+
+
+                if($maq['costos_maquinas'][0]['centros_costos'][0]->categoria== 'Transporte')
+                {
+
+
+                    $array_result[$maq->idmaquinas] = $maq;
+                }
+
+            }
+
+            return $array_result;
+        }
+        return false;
+    }
+
+
 }

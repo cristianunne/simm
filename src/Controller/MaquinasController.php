@@ -262,7 +262,13 @@ class MaquinasController extends AppController
             $this->set(compact('maquinas_costos'));
             $this->set(compact('met_costos_tabla'));
 
-            //debug($maquinas_costos->toArray());
+            $has_costos = false;
+
+            if(count($maquinas_costos->toArray()) > 0)
+            {
+                $has_costos = true;
+            }
+            $this->set(compact('has_costos'));
 
         } catch (InvalidPrimaryKeyException $e) {
             $this->Flash->error(__('Error al almacenar los cambios. Intenta nuevamente'));
@@ -454,6 +460,7 @@ class MaquinasController extends AppController
 
                     //Tengo que verificar si hubo cambios de alquilada a no
 
+
                     if($maquinas_costos->alquilada){
                         $maquinas_costos->costo_alquiler = null;
                     }
@@ -472,10 +479,8 @@ class MaquinasController extends AppController
                 } else {
                     //SI esta alquilada, compruebo que el valor de alquiler haya sido modificado
 
-                    if($this->checkChangesOnEditAlquiler($this->request->getData()['costo_alquiler'], $maquinas_costos->costo_alquiler)){
 
                         //Creo una nueva entidad si o si
-
 
                         //SI era alquilada borro los datos
                         if(!$maquinas_costos->alquilada){
@@ -509,10 +514,6 @@ class MaquinasController extends AppController
                         }
 
 
-                    } else {
-                        debug("NO HUBO CAMBIOS");
-
-                    }
 
                 }
 

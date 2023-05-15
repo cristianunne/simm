@@ -14,6 +14,7 @@ class VariablesAndConstantes
 
     private $operarios_data, $remitos, $uso_maquinaria, $arreglos;
     private $gastos_sueldo, $gastos_combustibles, $gastos_lubricantes, $gastos_arreglos;
+    private $litros_combustible, $litros_lubricante;
     private $toneladas, $precio_tonelada;
 
     function __construct($costos, $operarios_data, $remitos, $uso_maquinaria, $arreglos)
@@ -50,6 +51,8 @@ class VariablesAndConstantes
         $this->setGastosCombustibles();
         $this->setGastosLubricantes();
         $this->setGastosArreglos();
+        $this->setLitrosCombustible();
+        $this->setLitrosLubricante();
 
         $this->setAME();
         $this->setCOM();
@@ -213,6 +216,41 @@ class VariablesAndConstantes
         return $this->CLT;
     }
 
+    /**
+     * @param mixed $litros_lubricante
+     */
+    public function setLitrosLubricante()
+    {
+
+        $litros = 0;
+
+        foreach ($this->getUsoMaquinaria() as $uso_maq)
+        {
+
+            if (count($uso_maq->uso_comb_lub) > 0) {
+
+                foreach ($uso_maq->uso_comb_lub as $uso_comb) {
+                    if ($uso_comb->categoria == 'Lubricante') {
+
+                        $litros = $litros + $uso_comb->litros;
+
+                    }
+                }
+            }
+        }
+
+
+        $this->litros_lubricante = $litros;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLitrosLubricante()
+    {
+        return $this->litros_lubricante;
+    }
+
 
 
     public function setGastosLubricantes()
@@ -282,6 +320,41 @@ class VariablesAndConstantes
 
     }
 
+    /**
+     * @param mixed $litros_combustible
+     */
+    public function setLitrosCombustible()
+    {
+
+        $litros = 0;
+
+
+        foreach ($this->getUsoMaquinaria() as $uso_maq)
+        {
+
+            if (count($uso_maq->uso_comb_lub) > 0) {
+
+                foreach ($uso_maq->uso_comb_lub as $uso_comb) {
+                    if ($uso_comb->categoria == 'Combustible') {
+
+                        $litros = $litros + $uso_comb->litros;
+
+                    }
+                }
+            }
+        }
+
+        $this->litros_combustible = $litros;
+
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLitrosCombustible()
+    {
+        return $this->litros_combustible;
+    }
 
 
 

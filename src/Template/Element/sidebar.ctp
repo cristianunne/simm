@@ -14,7 +14,7 @@
     <div class="sidebar" style="position: fixed;">
         <!-- Sidebar user panel (optional) -->
         <?php if(!empty($empresa)) :  ?>
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="width: 235px !important;">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="width: 227px !important;">
             <div class="image">
 
                     <?php if($empresa->logo == '') :  ?>
@@ -31,7 +31,7 @@
             </div>
 
         </div>
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="width: 235px !important;">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="width: 227px !important;">
             <div class="info" style="white-space: normal;">
                 <p class="d-block text-color-navy" style="margin-bottom: unset;"><small>Email: <?= h($empresa->email) ?></small></p>
                 <p class="d-block text-color-navy" style="margin-bottom: unset;"><small>Dirección: <?= h($empresa->address) ?></small></p>
@@ -44,7 +44,7 @@
 
 
 
-        <nav class="mt-2" style="position: fixed; font-family: none !important; width: 235px !important;">
+        <nav class="mt-2" style="font-family: none !important; width: 227px !important;">
 
             <label type="text" style="display: none !important;" id="seccion" attr=" <?=$seccion ?>"> </label>
             <label type="text" style="display: none !important;" id="subseccion" attr=" <?=$sub_seccion ?>"></label>
