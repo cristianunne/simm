@@ -64,7 +64,12 @@ class InformesController extends AppController
 
     public function view()
     {
+        //Variable usada para el sidebar
+        $seccion = 'Informes';
+        $sub_seccion = 'Inicio';
 
+        $this->set(compact('seccion'));
+        $this->set(compact('sub_seccion'));
     }
 
 

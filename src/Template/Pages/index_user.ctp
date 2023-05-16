@@ -148,7 +148,7 @@
 
                                 <?= $this->Html->link('',
                                     ['controller' => 'Servicios', 'action' => 'index'],
-                                    ['class' => 'btn-simm btn-informes btn btn-default', 'escape' => false ]) ?>
+                                    ['class' => 'btn-simm btn-servicios btn btn-default', 'escape' => false ]) ?>
                             </div>
                             <div class="div_content">
                                 <p class="center text-color-navy">Servicios</p>

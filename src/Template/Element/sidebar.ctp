@@ -196,6 +196,42 @@
                 </li>
 
 
+                <li class="nav-item menu-close" id="informes">
+
+                    <a href="#" class="nav-link" id="title-Informes">
+                        <i class="nav-icon fas fa-file-archive"></i>
+                        <p>
+                            Informes
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Inicio',
+                                ['controller' => 'Informes', 'action' => 'view'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-Informes-Inicio']) ?>
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Destinos y Propietarios',
+                                ['controller' => 'InformesResumen', 'action' => 'index'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-Informes-Destino']) ?>
+
+                            <?=  $this->Html->link(
+                                '<i class="fas fa-greater-than nav-icon"></i> Camiones Rentados',
+                                ['controller' => 'InformesResumen', 'action' => 'camionesReport'], ['class' => 'nav-link', 'escape' => false,
+                                'id' => 'nav-icon-Informes-Camiones']) ?>
+
+                        </li>
+
+                    </ul>
+                </li>
+
+
+
 
 
                 <li class="nav-item menu-close" id="configuracion">

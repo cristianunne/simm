@@ -28,11 +28,13 @@ class InformesResumenController extends AppController
     public function isAuthorized($user)
     {
         if (isset($user['role']) and $user['role'] === 'user') {
-            if (in_array($this->request->getParam('action'), ['index'. 'destinosReport', 'downloadAsExcel', 'delete', 'propietariosReport'])) {
+            if (in_array($this->request->getParam('action'), ['index', 'destinosReport', 'destinosReportIndex', 'downloadAsExcel', 'delete', 'propietariosReport',
+                'propietariosReportIndex', 'camionesReport', 'downloadAsExcelCamiones'])) {
                 return true;
             }
         } else if (isset($user['role']) and $user['role'] === 'supervisor') {
-            if (in_array($this->request->getParam('action'), ['index', 'destinosReport', 'downloadAsExcel', 'delete', 'propietariosReport'])) {
+            if (in_array($this->request->getParam('action'), ['index', 'destinosReport', 'destinosReportIndex', 'downloadAsExcel', 'delete', 'propietariosReport',
+                'propietariosReportIndex', 'camionesReport', 'downloadAsExcelCamiones'])) {
                 return true;
             }
         }
@@ -44,7 +46,7 @@ class InformesResumenController extends AppController
     public function index()
     {
         $seccion = 'Informes';
-        $sub_seccion = 'Informes';
+        $sub_seccion = 'Destino';
 
         $this->set(compact('seccion'));
         $this->set(compact('sub_seccion'));
@@ -233,7 +235,7 @@ class InformesResumenController extends AppController
     public function camionesReport()
     {
         $seccion = 'Informes';
-        $sub_seccion = 'Informes';
+        $sub_seccion = 'Camiones';
 
         $this->set(compact('seccion'));
         $this->set(compact('sub_seccion'));

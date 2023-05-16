@@ -352,6 +352,16 @@ $(function (){
                 sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Análisis Grupos')
             }
 
+            else if(subseccion === 'Destino')
+            {
+                sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Destinos y Propietarios')
+            }
+
+            else if(subseccion === 'Camiones')
+            {
+                sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + 'Camiones Rentados')
+            }
+
             else {
                 sub_item_Active.html( '<i class="fas fa-circle nav-icon" style="color: navy;"></i>' + subseccion)
             }

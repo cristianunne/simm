@@ -100,6 +100,7 @@
             </br>
         </div>
     </div>
+    </div>
 </div>
 
 <?= $this->Html->script('../plugins/datatables/jquery.dataTables.min.js') ?>
