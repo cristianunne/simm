@@ -123,82 +123,87 @@ class InformesResumenController extends AppController
             $remitos_model = $this->loadModel('Remitos');
             $remitos = $remitos_model->find('RemitosByConditions', $array_options);
 
-
-            //ESTE METODO ES EL QUE GENERA EL ERROR
-            $destinos_distinct = $remitos_model->find('DestinosByRemitos', $remitos);
-            $productos_array = $remitos_model->find('GetProductosDistinctByRemitos', $remitos);
-
-
-            //USo los remitos y traigo agrupado las toneladas por producto findGetTotalToneladasByProductos
-            $ton_by_producto = $remitos_model->find('GetTotalToneladasByProductos', $remitos);
-
-            //debug($ton_by_producto->toArray());
-            //debug($remitos);
-
-            //SI destinos distinc esta vacio, no se puede procesar porque no hay remitos
-            if(count($destinos_distinct) == 0){
-
-                //INformo que no hay nada
-                $this->Flash->error(__('No existen Remitos con la información solicitada!'));
-
-            } else {
-                $destinos_with_remitos = $destinos_model->find('all', [
-                    'contain' => ['Remitos' =>  function ($q) use ($remitos) {
-                        return $q->where(['idremitos IN' => $remitos])
-                            ->contain(['Parcelas', 'Productos', 'Lotes', 'Propietarios', 'Destinos']);
-                    }]
-                ])->where(['iddestinos IN' => $destinos_distinct]);
+            if(!empty($remitos))
+            {
+                //ESTE METODO ES EL QUE GENERA EL ERROR
+                $destinos_distinct = $remitos_model->find('DestinosByRemitos', $remitos);
+                $productos_array = $remitos_model->find('GetProductosDistinctByRemitos', $remitos);
 
 
-                //debug($destinos_with_remitos->toArray());
+                //USo los remitos y traigo agrupado las toneladas por producto findGetTotalToneladasByProductos
+                $ton_by_producto = $remitos_model->find('GetTotalToneladasByProductos', $remitos);
 
+                //debug($ton_by_producto->toArray());
+                //debug($remitos);
 
-                //controlo que no venga vacio el array tmb
-                if(count($destinos_with_remitos->toArray()) > 0){
-                    $result_report = $this->processInformeResumenDestino($destinos_with_remitos, $productos_array,
-                       $array_options, $ton_by_producto);
+                //SI destinos distinc esta vacio, no se puede procesar porque no hay remitos
+                if(count($destinos_distinct) == 0){
 
-                    if($result_report != false){
-                        $array_informe['fecha_inicio'] = $fecha_inicio;
-                        $array_informe['fecha_fin'] = $fecha_fin;
-                        $array_informe['categoria'] = 'Destinos';
-                        $array_informe['users_idusers'] = $user_id;
-                        $array_informe['empresas_idempresas'] = $id_empresa;
-
-                        $array_informe['name'] = $result_report['name'];
-                        $array_informe['path'] = $result_report['path'];
-
-                        //el clasificador en la variable elegida en destino o propietarios
-                        $array_informe['clasificador'] = $this->getNameDestinoById($destino);
-
-                        //el producto puede ser filtrado en destinos, pero para propietario es todos
-                        $array_informe['producto'] = $this->getNameProductoById($producto);
-
-                        $entity_informe = $this->InformesResumen->newEntity();
-                        //Creo la entidad y cargo a la base de datos
-                        $entity_informe_resumen = $this->InformesResumen->patchEntity($entity_informe, $array_informe);
-
-                        //DEvuelvo un arreglo con la operacion y el id
-                        if ($this->InformesResumen->save($entity_informe_resumen)) {
-
-                            //Mando la descarga
-
-                            return $this->redirect(['action' => 'destinosReportIndex', $entity_informe_resumen->idinformes_resumen]);
-                        }
-
-                    } else {
-                        //Reportfile es false, entonces no se pudo crear el excel
-                        //vuelvo a destinos report
-                        $this->Flash->error(__('No se puede crear el archivo de informe, intente nuevamente!'));
-                        return $this->redirect(['action' => 'destinosReport']);
-
-                    }
-                } else {
+                    //INformo que no hay nada
                     $this->Flash->error(__('No existen Remitos con la información solicitada!'));
-                    return $this->redirect(['action' => 'destinosReport']);
-                }
 
+                } else {
+                    $destinos_with_remitos = $destinos_model->find('all', [
+                        'contain' => ['Remitos' =>  function ($q) use ($remitos) {
+                            return $q->where(['idremitos IN' => $remitos])
+                                ->contain(['Parcelas', 'Productos', 'Lotes', 'Propietarios', 'Destinos']);
+                        }]
+                    ])->where(['iddestinos IN' => $destinos_distinct]);
+
+
+                    //debug($destinos_with_remitos->toArray());
+
+
+                    //controlo que no venga vacio el array tmb
+                    if(count($destinos_with_remitos->toArray()) > 0){
+                        $result_report = $this->processInformeResumenDestino($destinos_with_remitos, $productos_array,
+                            $array_options, $ton_by_producto);
+
+                        if($result_report != false){
+                            $array_informe['fecha_inicio'] = $fecha_inicio;
+                            $array_informe['fecha_fin'] = $fecha_fin;
+                            $array_informe['categoria'] = 'Destinos';
+                            $array_informe['users_idusers'] = $user_id;
+                            $array_informe['empresas_idempresas'] = $id_empresa;
+
+                            $array_informe['name'] = $result_report['name'];
+                            $array_informe['path'] = $result_report['path'];
+
+                            //el clasificador en la variable elegida en destino o propietarios
+                            $array_informe['clasificador'] = $this->getNameDestinoById($destino);
+
+                            //el producto puede ser filtrado en destinos, pero para propietario es todos
+                            $array_informe['producto'] = $this->getNameProductoById($producto);
+
+                            $entity_informe = $this->InformesResumen->newEntity();
+                            //Creo la entidad y cargo a la base de datos
+                            $entity_informe_resumen = $this->InformesResumen->patchEntity($entity_informe, $array_informe);
+
+                            //DEvuelvo un arreglo con la operacion y el id
+                            if ($this->InformesResumen->save($entity_informe_resumen)) {
+
+                                //Mando la descarga
+
+                                return $this->redirect(['action' => 'destinosReportIndex', $entity_informe_resumen->idinformes_resumen]);
+                            }
+
+                        } else {
+                            //Reportfile es false, entonces no se pudo crear el excel
+                            //vuelvo a destinos report
+                            $this->Flash->error(__('No se puede crear el archivo de informe, intente nuevamente!'));
+                            return $this->redirect(['action' => 'destinosReport']);
+
+                        }
+                    } else {
+                        $this->Flash->error(__('No existen Remitos con la información solicitada!'));
+                        return $this->redirect(['action' => 'destinosReport']);
+                    }
+
+                }
+            } else {
+                $this->Flash->error(__('No existen Remitos con la información solicitada!'));
             }
+
 
 
         }
@@ -272,130 +277,135 @@ class InformesResumenController extends AppController
 
             $array_remitos = $remitos_model->find('GetRemitosByConditionsByMaquinaTransporte', $array_options);
 
-            $tabla_maquinas = TableRegistry::getTableLocator()->get('Maquinas');
-
-            //A partir de los remitos traigo os camiones que pertenecen al centro de costo transporte
-
-            $tabla_remitosmaq = TableRegistry::getTableLocator()->get('RemitosMaquinas');
-            $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $array_remitos);
-            $maquinas_transporte = $tabla_maquinas->find('GetMaquinasTransporte', $maquinas_array);
-
-            //traer los remitos de estas maquinas
-            //debug($maquinas_transporte);
-
-            //TRaigo los datos de los remitos
-            $rem_with_data = $remitos_model->find('all', [])
-                ->where(['idremitos IN' => $array_remitos]);
-
-            //debug($rem_with_data->toArray());
-
-            $array_result = [];
-
-
-            //recoroo las maquinas y traigo los remitos
-            foreach ($maquinas_transporte as $maq)
+            if (!empty($array_remitos))
             {
-                //agrego al array options
-                $array_options['maquina'] = $maq->idmaquinas;
-               // debug($maq->name);
+                $tabla_maquinas = TableRegistry::getTableLocator()->get('Maquinas');
 
-                $array_data = [];
+                //A partir de los remitos traigo os camiones que pertenecen al centro de costo transporte
 
+                $tabla_remitosmaq = TableRegistry::getTableLocator()->get('RemitosMaquinas');
+                $maquinas_array =  $tabla_remitosmaq->find('getMaquinasByRemitos', $array_remitos);
+                $maquinas_transporte = $tabla_maquinas->find('GetMaquinasTransporte', $maquinas_array);
 
-                $remitos = $remitos_model->find('RemitosByConditionsQueryMaquinaTransporte', $array_options);
+                //traer los remitos de estas maquinas
+                //debug($maquinas_transporte);
 
+                //TRaigo los datos de los remitos
+                $rem_with_data = $remitos_model->find('all', [])
+                    ->where(['idremitos IN' => $array_remitos]);
 
-                //traigo los lotes distinct y destinos distinc
+                //debug($rem_with_data->toArray());
 
-                $lotes_distinc = $remitos_model->find('GetLotesDistinctByRemitos', $remitos);
-                $destinos_distinc = $remitos_model->find('GetDestinosDistinctByRemitos', $remitos);
-
-                //debug($lotes_distinc);
-                //debug($destinos_distinc);
-
-
-                $array_data['maquina'] = [
-                    'id' => $maq->idmaquinas,
-                    'name' => $maq->name];
+                $array_result = [];
 
 
-                foreach ($lotes_distinc as $lote)
+                //recoroo las maquinas y traigo los remitos
+                foreach ($maquinas_transporte as $maq)
                 {
-                    $array_lote['lote'] = $this->getNameLoteById($lote);
+                    //agrego al array options
+                    $array_options['maquina'] = $maq->idmaquinas;
+                    // debug($maq->name);
 
-                    $array_destino = null;
+                    $array_data = [];
 
-                    $array_destino_ = null;
 
-                    foreach ($destinos_distinc as $destino)
+                    $remitos = $remitos_model->find('RemitosByConditionsQueryMaquinaTransporte', $array_options);
+
+
+                    //traigo los lotes distinct y destinos distinc
+
+                    $lotes_distinc = $remitos_model->find('GetLotesDistinctByRemitos', $remitos);
+                    $destinos_distinc = $remitos_model->find('GetDestinosDistinctByRemitos', $remitos);
+
+                    //debug($lotes_distinc);
+                    //debug($destinos_distinc);
+
+
+                    $array_data['maquina'] = [
+                        'id' => $maq->idmaquinas,
+                        'name' => $maq->name];
+
+
+                    foreach ($lotes_distinc as $lote)
                     {
+                        $array_lote['lote'] = $this->getNameLoteById($lote);
+
                         $array_destino = null;
 
-                        foreach ($rem_with_data as $rem)
+                        $array_destino_ = null;
+
+                        foreach ($destinos_distinc as $destino)
                         {
-                            $data_remito = null;
-                            if($rem->lotes_idlotes == $lote && $destino == $rem->destinos_iddestinos)
+                            $array_destino = null;
+
+                            foreach ($rem_with_data as $rem)
                             {
-
-                                $array_destino['destino'] = $this->getNameDestinoById($destino);
-                                $data_remito = [
-                                    'idremitos' => $rem->idremitos,
-                                    'fecha' => $rem->fecha,
-                                    'destino' => $this->getNameDestinoById($destino),
-                                    'parcela' => $this->getNameParcelaById($rem->parcelas_idparcelas),
-                                    'producto' => $this->getNameProductoById($rem->productos_idproductos),
-                                    'toneladas' => $rem->ton,
-                                    'precio' =>  $rem->precio_ton,
-                                    'total' => ($rem->ton * $rem->precio_ton)
-                                ];
-
-                                //debug($data_remito);
-
-                                $array_destino['data'][] = $data_remito;
                                 $data_remito = null;
+                                if($rem->lotes_idlotes == $lote && $destino == $rem->destinos_iddestinos)
+                                {
+
+                                    $array_destino['destino'] = $this->getNameDestinoById($destino);
+                                    $data_remito = [
+                                        'idremitos' => $rem->idremitos,
+                                        'fecha' => $rem->fecha,
+                                        'destino' => $this->getNameDestinoById($destino),
+                                        'parcela' => $this->getNameParcelaById($rem->parcelas_idparcelas),
+                                        'producto' => $this->getNameProductoById($rem->productos_idproductos),
+                                        'toneladas' => $rem->ton,
+                                        'precio' =>  $rem->precio_ton,
+                                        'total' => ($rem->ton * $rem->precio_ton)
+                                    ];
+
+                                    //debug($data_remito);
+
+                                    $array_destino['data'][] = $data_remito;
+                                    $data_remito = null;
+
+
+                                }
 
 
                             }
+                            if(!empty($array_destino)){
+                                $array_destino_[] = $array_destino;
+                            }
+
+
 
 
                         }
-                        if(!empty($array_destino)){
-                            $array_destino_[] = $array_destino;
-                        }
 
+                        $array_lote['data'][] = $array_destino_;
+                        $array_destino = null;
 
-
+                        $array_data['data'][] = $array_lote;
+                        $array_lote = null;
 
                     }
-
-                    $array_lote['data'][] = $array_destino_;
-                    $array_destino = null;
-
-                    $array_data['data'][] = $array_lote;
-                    $array_lote = null;
+                    $array_result[] = $array_data;
+                    $array_data = null;
 
                 }
-                $array_result[] = $array_data;
-                $array_data = null;
 
-            }
+                //creo el metadato
+                $metadata = $array_options;
 
-            //creo el metadato
-            $metadata = $array_options;
-
-            $excel_processing = new ExcelProcesssing();
-            $result = $excel_processing->createInformeCamiones($metadata, $array_result);
+                $excel_processing = new ExcelProcesssing();
+                $result = $excel_processing->createInformeCamiones($metadata, $array_result);
 
 
-            if(!$result)
-            {
-                $this->Flash->error(__('Error al generar el informe. Intente nuevamente!'));
+                if(!$result)
+                {
+                    $this->Flash->error(__('Error al generar el informe. Intente nuevamente!'));
+                } else {
+
+                    $this->redirect(['action' => 'downloadAsExcelCamiones', $result['name']]);
+
+                }
+
             } else {
-
-              $this->redirect(['action' => 'downloadAsExcelCamiones', $result['name']]);
-
+                $this->Flash->error(__('No existen remitos para el periodo seleccionado!'));
             }
-
 
 
         }
@@ -669,7 +679,7 @@ class InformesResumenController extends AppController
                             $name_parcela = isset($rem->parcela->name) ? $rem->parcela->name : null;
 
                             $myWorkSheet_res->setCellValue('D' . $index, $name_parcela);
-                            $myWorkSheet_res->setCellValue('E' . $index, $this->getNamePropietarioById($rem->propietario_idpropietarios));
+                            $myWorkSheet_res->setCellValue('E' . $index, $this->getNamePropietarioById($rem->propietarios_idpropietarios));
 
                             $myWorkSheet_res->setCellValue('F' . $index, $this->getFleteroById($rem->idremitos));
                             $myWorkSheet_res->setCellValue('G' . $index, $rem->producto->name);
@@ -837,7 +847,7 @@ class InformesResumenController extends AppController
 
     private function getNamePropietarioById($id = null)
     {
-        if($id != 0){
+        if($id != 0 or $id != '0'){
 
             //TRaigo el nombre del remito
             $prop_model = $this->loadModel('Propietarios');
@@ -1061,75 +1071,84 @@ class InformesResumenController extends AppController
 
             $remitos_model = $this->loadModel('Remitos');
             $remitos = $remitos_model->find('RemitosByConditions', $array_options);
-            $propietarios_distinct = $remitos_model->find('PropietariosByRemitos', $remitos);
 
-            //LA PARCELA ES EL ELEMENTO ORGANIZADOR
+           if(!empty($remitos))
+           {
+               $propietarios_distinct = $remitos_model->find('PropietariosByRemitos', $remitos);
 
-            $parcelas_distinct = $remitos_model->find('GetParcelasDistinctByRemitos', $remitos);
+               //LA PARCELA ES EL ELEMENTO ORGANIZADOR
 
-            //USo los remitos y traigo agrupado las toneladas por producto findGetTotalToneladasByProductos
-            $ton_by_producto = $remitos_model->find('GetTotalToneladasByProductos', $remitos);
+               $parcelas_distinct = $remitos_model->find('GetParcelasDistinctByRemitos', $remitos);
 
-            //SI destinos distinc esta vacio, no se puede procesar porque no hay remitos
-            if(count($propietarios_distinct) == 0){
+               //USo los remitos y traigo agrupado las toneladas por producto findGetTotalToneladasByProductos
+               $ton_by_producto = $remitos_model->find('GetTotalToneladasByProductos', $remitos);
 
-                //INformo que no hay nada
-                $this->Flash->error(__('No existen Remitos con la información solicitada!'));
+               //SI destinos distinc esta vacio, no se puede procesar porque no hay remitos
+               if(count($propietarios_distinct) == 0){
 
-            } else {
-                $propietarios_with_remitos = $propietarios_model->find('all', [
-                    'contain' => ['Remitos' => function ($q) use ($remitos) {
-                        return $q->where(['idremitos IN' => $remitos])
-                            ->contain(['Parcelas', 'Productos', 'Lotes', 'Propietarios', 'Destinos']);
-                    }]
-                ])->where(['idpropietarios IN' => $propietarios_distinct]);
+                   //INformo que no hay nada
+                   $this->Flash->error(__('No existen Remitos con la información solicitada!'));
 
-                //controlo que no venga vacio el array tmb
-                if(count($propietarios_with_remitos->toArray()) > 0){
-                    $result_report = $this->processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct,
-                        $array_options, $ton_by_producto);
+               } else {
+                   $propietarios_with_remitos = $propietarios_model->find('all', [
+                       'contain' => ['Remitos' => function ($q) use ($remitos) {
+                           return $q->where(['idremitos IN' => $remitos])
+                               ->contain(['Parcelas', 'Productos', 'Lotes', 'Propietarios', 'Destinos']);
+                       }]
+                   ])->where(['idpropietarios IN' => $propietarios_distinct]);
 
-
-                    if($result_report != false){
-                        $array_informe['fecha_inicio'] = $fecha_inicio;
-                        $array_informe['fecha_fin'] = $fecha_fin;
-                        $array_informe['categoria'] = 'Propietarios';
-                        $array_informe['users_idusers'] = $user_id;
-                        $array_informe['empresas_idempresas'] = $id_empresa;
-
-                        $array_informe['name'] = $result_report['name'];
-                        $array_informe['path'] = $result_report['path'];
-
-                        //el clasificador en la variable elegida en destino o propietarios
-                        $array_informe['clasificador'] = $this->getNamePropietarioById($propietario);
-
-                        //el producto puede ser filtrado en destinos, pero para propietario es todos
+                   //controlo que no venga vacio el array tmb
+                   if(count($propietarios_with_remitos->toArray()) > 0){
+                       $result_report = $this->processInformeResumenPropietarios($propietarios_with_remitos, $parcelas_distinct,
+                           $array_options, $ton_by_producto);
 
 
-                        $entity_informe = $this->InformesResumen->newEntity();
-                        //Creo la entidad y cargo a la base de datos
-                        $entity_informe_resumen = $this->InformesResumen->patchEntity($entity_informe, $array_informe);
+                       if($result_report != false){
+                           $array_informe['fecha_inicio'] = $fecha_inicio;
+                           $array_informe['fecha_fin'] = $fecha_fin;
+                           $array_informe['categoria'] = 'Propietarios';
+                           $array_informe['users_idusers'] = $user_id;
+                           $array_informe['empresas_idempresas'] = $id_empresa;
 
-                        //DEvuelvo un arreglo con la operacion y el id
+                           $array_informe['name'] = $result_report['name'];
+                           $array_informe['path'] = $result_report['path'];
 
-                        if ($this->InformesResumen->save($entity_informe_resumen)) {
+                           //el clasificador en la variable elegida en destino o propietarios
+                           $array_informe['clasificador'] = $this->getNamePropietarioById($propietario);
 
-                            //Mando la descarga
-                            return $this->redirect(['action' => 'propietariosReportIndex', $entity_informe_resumen->idinformes_resumen]);
-                        }
+                           //el producto puede ser filtrado en destinos, pero para propietario es todos
 
-                    } else {
-                        //Reportfile es false, entonces no se pudo crear el excel
-                        //vuelvo a destinos report
-                        $this->Flash->error(__('No se puede crear el archivo de informe, intente nuevamente!'));
-                        return $this->redirect(['action' => 'propietariosReportIndex']);
 
-                    }
-                }
+                           $entity_informe = $this->InformesResumen->newEntity();
+                           //Creo la entidad y cargo a la base de datos
+                           $entity_informe_resumen = $this->InformesResumen->patchEntity($entity_informe, $array_informe);
 
-            }
+                           //DEvuelvo un arreglo con la operacion y el id
 
-            }
+                           if ($this->InformesResumen->save($entity_informe_resumen)) {
+
+                               //Mando la descarga
+                               return $this->redirect(['action' => 'propietariosReportIndex', $entity_informe_resumen->idinformes_resumen]);
+                           }
+
+                       } else {
+                           //Reportfile es false, entonces no se pudo crear el excel
+                           //vuelvo a destinos report
+                           $this->Flash->error(__('No se puede crear el archivo de informe, intente nuevamente!'));
+                           return $this->redirect(['action' => 'propietariosReportIndex']);
+
+                       }
+                   }
+
+               }
+
+           } else {
+               $this->Flash->error(__('No existen remitos para la fecha seleccionada!'));
+           }
+
+
+
+        }
 
     }
 
@@ -1150,6 +1169,7 @@ class InformesResumenController extends AppController
             ->where(['categoria LIKE' => 'Propietarios', 'empresas_idempresas' => $id_empresa]);
         $this->set(compact('informes_resumen'));
         $id_informe = $id;
+
 
         if($id_informe != null){
 
@@ -1268,16 +1288,25 @@ class InformesResumenController extends AppController
 
             //DIBUJO EL LOGO
 
-            $drawing = new Drawing();
-            $drawing->setName('Logo');
-            $drawing->setDescription('Logo');
-            $drawing->setPath($path);
-            $drawing->setHeight(75);
-            $drawing->setWidth(75);
-            $drawing->setCoordinates('A1');
-            $drawing->setOffsetX(45);
-            $drawing->setOffsetY(15);
-            $drawing->setWorksheet($myWorkSheet_res);
+
+
+            try{
+
+                $drawing = new Drawing();
+                $drawing->setName('Logo');
+                $drawing->setDescription('Logo');
+                $drawing->setPath( $path);
+                $drawing->setHeight(75);
+                $drawing->setWidth(75);
+                $drawing->setCoordinates('A1');
+                $drawing->setOffsetX(45);
+                $drawing->setOffsetY(15);
+                $drawing->setWorksheet($myWorkSheet_res);
+
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $e){
+
+            }
+
 
 
             //Represento la primer tabla

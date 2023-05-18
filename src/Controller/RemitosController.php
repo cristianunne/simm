@@ -283,7 +283,7 @@ class RemitosController extends AppController
             ])->where(['remitos_idremitos' => $id]);
 
 
-
+            //debug($remitos_maq_data->toArray());
 
             //ESte retorna
             $this->set(compact('remitos_maq_data'));
@@ -298,6 +298,7 @@ class RemitosController extends AppController
 
                 }]]
             ])->where(['remitos_idremitos' => $id, 'operarios_idoperarios IS' => null]);
+
 
             //ESte retorna
             $this->set(compact('remitos_maq_data_alquilada'));

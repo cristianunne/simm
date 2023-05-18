@@ -167,7 +167,8 @@
                                                 <td class="dt-center"><?= h($maq->operario->firstname . ' ' . $maq->operario->lastname) ?></td>
                                                 <td class="dt-center"><?= h($maq->maquina->costos_maquinas[0]->worksgroup->name) ?></td>
                                                 <td class="actions" style="text-align: center">
-                                                    <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+                                                    <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'
+                                                        or $current_user['idusers'] == $remitos->users_idusers):  ?>
 
                                                         <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                                             ['action' => 'removeRemitoMaquina', $maq->idremitos_maquinas, $maq->remitos_idremitos],
@@ -192,7 +193,9 @@
                                                 <td class="dt-center"></td>
                                                 <td class="dt-center"><?= h($maq->maquina->costos_maquinas[0]->worksgroup->name) ?></td>
                                                 <td class="actions" style="text-align: center">
-                                                    <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'):  ?>
+
+                                                    <?php if($current_user['role'] == 'supervisor' or $current_user['role'] == 'admin'
+                                                        or $current_user['idusers'] == $remitos->users_idusers):  ?>
 
                                                         <?= $this->Form->postLink(__($this->Html->tag('span', '', ['class' => 'fas fa-trash-alt', 'aria-hidden' => 'true'])),
                                                             ['action' => 'removeRemitoMaquina', $maq->idremitos_maquinas, $maq->remitos_idremitos],

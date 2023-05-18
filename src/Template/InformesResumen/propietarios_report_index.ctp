@@ -56,8 +56,8 @@
                         <tr>
                             <td class="dt-center"><?= h($inf->idinformes_resumen) ?></td>
                             <td class="dt-center"><?= h($inf->created) ?></td>
-                            <td class="dt-center"><?= h($inf->fecha_inicio) ?></td>
-                            <td class="dt-center"><?= h($inf->fecha_fin) ?></td>
+                            <td class="dt-center"><?= h($inf->fecha_inicio->format('d-m-Y')) ?></td>
+                            <td class="dt-center"><?= h($inf->fecha_fin->format('d-m-Y')) ?></td>
                             <td class="dt-center"><?= h($inf->categoria) ?></td>
                             <td class="dt-center"><?= h($inf->clasificador) ?></td>
                             <td class="dt-center"><?= h($inf->producto) ?></td>

@@ -7,6 +7,7 @@ use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Filesystem\File;
 use Cake\ORM\TableRegistry;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -1798,16 +1799,25 @@ class ExcelProcesssing
 
             //DIBUJO EL LOGO
 
-            $drawing = new Drawing();
-            $drawing->setName('Logo');
-            $drawing->setDescription('Logo');
-            $drawing->setPath( $path);
-            $drawing->setHeight(75);
-            $drawing->setWidth(75);
-            $drawing->setCoordinates('A1');
-            $drawing->setOffsetX(45);
-            $drawing->setOffsetY(15);
-            $drawing->setWorksheet($myWorkSheet_res);
+
+
+            try{
+
+                $drawing = new Drawing();
+                $drawing->setName('Logo');
+                $drawing->setDescription('Logo');
+                $drawing->setPath( $path);
+                $drawing->setHeight(75);
+                $drawing->setWidth(75);
+                $drawing->setCoordinates('A1');
+                $drawing->setOffsetX(45);
+                $drawing->setOffsetY(15);
+                $drawing->setWorksheet($myWorkSheet_res);
+
+            } catch (Exception $e){
+
+            }
+
 
             return $myWorkSheet_res;
 

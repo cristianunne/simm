@@ -15,7 +15,7 @@
 
     <div class="text-center p-3" style="background-color: #00172e">
         Desarrollado por:
-        <a class="" href="" target="_blank" style="margin-right: 20px;"> <strong>Mc Donagh Patricio</strong></a>
+        <a class="" href="" target="_blank" style="margin-right: 20px;"> <strong>Mac Donagh Patricio</strong></a>
 
         Programado por:
         <a class="" href="https://www.linkedin.com/in/cristian-j-dasilva/" target="_blank"> <strong>Da Silva Cristian Javier</strong></a>
